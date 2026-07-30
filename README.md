@@ -30,11 +30,20 @@ dashboard-managed package.
 │   │                              widgets, ads, breaking news, homepage helpers
 │   ├── template-parts/            Reusable UI partials (cards, hero, etc.)
 │   └── assets/                    css/ js/ images/
+├── dev/                 Local-only dev tooling (NEVER shipped in the ZIP)
+│   ├── seed-demo.php          Fills the dev site with realistic demo content
+│   └── mu-plugins/            Dev mail catcher, so the ballot's email
+│                              confirmation can be tested without SMTP
 ├── docs/                Audit + installation, deployment, content, dev guides
 ├── build.sh             Packages mysaline/ into dist/mysaline.zip
+├── .wp-env.json         One-command local WordPress (Docker)
+├── package.json         npm scripts: start / seed / reset / mail / zip
 ├── .editorconfig .gitignore LICENSE
 └── README.md
 ```
+
+`build.sh` copies from `mysaline/` only, so everything in `dev/` is structurally
+incapable of reaching production.
 
 ## Feature overview
 
@@ -68,17 +77,45 @@ continue to work unchanged**. Custom post types add new content only and never
 alter existing content or permalinks. See [`docs/AUDIT.md`](docs/AUDIT.md) for
 the full mapping of the current site to the new theme.
 
-## Quick start (local / temporary dev site)
+## Quick start — see it running in one command
 
-1. Have a WordPress site (local via [LocalWP](https://localwp.com/),
-   [`wp-env`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/),
-   Docker, or any temporary host).
-2. Copy the `mysaline/` folder into `wp-content/themes/`, **or** run
-   `./build.sh` and upload `dist/mysaline.zip` via
-   **Appearance → Themes → Add New → Upload Theme**.
-3. Activate **MySaline**.
-4. Follow [`docs/INSTALLATION.md`](docs/INSTALLATION.md) to set the homepage,
-   menus, and demo content.
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+running, plus Node.js.
+
+```bash
+npm install
+npm start
+```
+
+Starts WordPress, activates the theme, and fills it with realistic demo content:
+
+| | |
+| --- | --- |
+| **Site** | http://localhost:8888 |
+| **Dashboard** | http://localhost:8888/wp-admin — `admin` / `password` |
+| **Where everything is edited** | Appearance → MySaline Setup |
+
+The seed includes 16 posts across 8 categories (5 featured), 5 events, 4
+obituaries, 6 businesses, an ad in each of the 7 zones, the **full 33-category
+Favorites ballot with 100+ finalists**, three menus with dropdowns, every theme
+option and the sidebar/footer widgets.
+
+Because ballots need an emailed confirmation link and a local site can't send
+mail, the dev environment captures outgoing email to `dev/mail.log` and surfaces
+the confirmation link as an admin notice — so double opt-in is fully testable
+offline. That catcher lives in `dev/` and never ships in the theme.
+
+```bash
+npm stop         # stop containers
+npm run seed     # re-seed content
+npm run reset    # wipe and rebuild
+npm run mail     # show captured email
+npm run zip      # build dist/mysaline.zip for upload
+npm run lint:php # syntax-check the theme
+```
+
+Prefer LocalWP, MAMP or a staging host? See the manual path in
+[`docs/INSTALLATION.md`](docs/INSTALLATION.md).
 
 ## Build the installable ZIP
 

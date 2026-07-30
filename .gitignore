@@ -16,3 +16,7 @@ Thumbs.db
 # Logs / temp
 *.log
 *.bak
+
+# Local dev environment output (dev/ itself IS tracked — only its output is not)
+dev/mail.log
+.wp-env.override.json

@@ -4,6 +4,68 @@ Set up the theme on a **temporary/local** WordPress site for building and
 testing. **Do not install on the live MySaline.com** until you've signed off
 (see [`DEPLOYMENT.md`](DEPLOYMENT.md)).
 
+---
+
+## Fastest path: one command
+
+The repository ships a ready-made local WordPress environment. You need
+[Docker Desktop](https://www.docker.com/products/docker-desktop/) running and
+Node.js installed, then:
+
+```bash
+npm install
+npm start
+```
+
+That starts WordPress, activates the theme, fills it with realistic demo content
+and sets clean permalinks. When it finishes:
+
+| | |
+| --- | --- |
+| **Site** | http://localhost:8888 |
+| **Dashboard** | http://localhost:8888/wp-admin (`admin` / `password`) |
+| **Setup guide** | Appearance → MySaline Setup |
+
+What the demo content includes: 16 posts across 8 categories (5 flagged as
+Featured for the hero), 5 events, 4 obituaries, 6 businesses in 5 categories, an
+ad in every one of the 7 zones, the **full 33-category Favorites ballot with 100+
+finalists**, three menus with dropdowns, all theme options, and widgets in the
+sidebars and footer. Featured images are generated locally, so nothing binary is
+stored in the repository.
+
+### Testing the Favorites ballot locally
+
+Voting requires email confirmation, and a local site can't send email — so the
+dev environment **captures** it instead. Nothing leaves your machine.
+
+1. Visit the **Saline County Favorites — Vote** page and submit a ballot.
+2. Either open `dev/mail.log`, run `npm run mail`, or just look at the admin —
+   a notice shows the latest confirmation link as a clickable link.
+3. Click it. The votes are counted and your browser is remembered.
+4. Check **Favorites → Results** to see the tally and try the CSV exports.
+
+The mail catcher lives in `dev/` and is loaded only by the local environment.
+It's never part of the packaged theme, so it cannot reach production.
+
+### Everyday commands
+
+```bash
+npm start        # start + activate + seed (safe to re-run)
+npm stop         # stop the containers
+npm run seed     # re-seed content only
+npm run reset    # wipe the database and rebuild from scratch
+npm run mail     # show captured emails
+npm run cli ...  # any WP-CLI command, e.g. npm run cli plugin list
+npm run zip      # build dist/mysaline.zip for upload
+npm run lint:php # syntax-check every theme file
+```
+
+---
+
+## Manual setup (any other WordPress)
+
+Use this if you'd rather not use Docker, or you're testing on a staging host.
+
 ## 1. Get a WordPress site
 
 Any of these works:
