@@ -430,6 +430,107 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .post-password-form input[type="password"] { max-width: 320px; }
 :focus-visible { outline: 2px solid var(--ms-accent); outline-offset: 2px; }
 
+/* 21b. Saline County Favorites ballot ------------------------------------ */
+.ms-fav-page { max-width: 900px; margin: 0 auto; }
+.ms-fav { margin: 1.5rem 0 3rem; }
+.ms-fav__intro { background: var(--ms-surface); border-radius: var(--ms-radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+.ms-fav__intro p { margin: 0 0 .5rem; }
+.ms-fav__intro p:last-child { margin-bottom: 0; }
+.ms-fav__prize { font-weight: 700; color: var(--ms-primary); }
+.ms-fav__window { font-size: .9rem; color: var(--ms-muted); }
+
+.ms-fav-notice { border-radius: var(--ms-radius); padding: 1rem 1.25rem; margin: 0 0 1.5rem; border-left: 5px solid; }
+.ms-fav-notice p { margin: 0; }
+.ms-fav-notice.is-success { background: #e8f6ee; border-color: #1a7f4b; color: #0f5231; }
+.ms-fav-notice.is-warning { background: #fdf3e2; border-color: var(--ms-highlight); color: #6b4e02; }
+
+/* Sticky control bar */
+.ms-fav__bar {
+	position: sticky; top: 60px; z-index: 100;
+	background: #fff; border: 1px solid var(--ms-border); border-radius: var(--ms-radius);
+	padding: 1rem 1.15rem; margin-bottom: 1.5rem; box-shadow: var(--ms-shadow);
+}
+.ms-fav__progress-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.ms-fav__count { font-size: 1.05rem; color: var(--ms-primary); }
+.ms-fav__count [data-fav-voted] { font-size: 1.5rem; font-weight: 800; color: var(--ms-accent); }
+.ms-fav__qualify { font-weight: 700; color: #1a7f4b; font-size: .92rem; }
+.ms-fav__meter { height: 10px; background: var(--ms-surface-2); border-radius: 999px; overflow: hidden; }
+.ms-fav__meter-fill { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ms-accent), var(--ms-highlight)); border-radius: 999px; transition: width .25s ease; }
+.is-qualified .ms-fav__meter-fill { background: linear-gradient(90deg, #1a7f4b, #38b06b); }
+
+.ms-fav__sections-done { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .65rem; }
+.ms-fav__chip {
+	font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+	padding: .22rem .55rem; border-radius: 999px; background: var(--ms-surface-2); color: var(--ms-muted);
+}
+.ms-fav__chip.is-done { background: #1a7f4b; color: #fff; }
+.ms-fav__chip.is-done::before { content: "✓ "; }
+
+.ms-fav__tools { display: flex; gap: .75rem; align-items: center; margin-top: .9rem; flex-wrap: wrap; }
+.ms-fav__search { flex: 1; min-width: 220px; }
+.ms-fav__toggle { display: flex; align-items: center; gap: .4rem; font-weight: 500; font-size: .9rem; margin: 0; white-space: nowrap; }
+.ms-fav__toggle input { width: auto; }
+
+.ms-fav__tabs { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
+.ms-fav__tab {
+	background: var(--ms-surface); color: var(--ms-primary); border: 1px solid var(--ms-border);
+	padding: .45rem .85rem; border-radius: 999px; font-size: .88rem; font-weight: 600; cursor: pointer;
+}
+.ms-fav__tab:hover { background: var(--ms-surface-2); }
+.ms-fav__tab.is-active { background: var(--ms-primary); color: #fff; border-color: var(--ms-primary); }
+.ms-fav__tab-count { opacity: .65; font-size: .78rem; margin-left: .25rem; }
+
+.ms-fav__saved, .ms-fav__noresults { font-size: .88rem; color: var(--ms-muted); margin: 0 0 1rem; }
+
+/* Category cards */
+.ms-fav__section-title { font-size: 1.6rem; margin: 2rem 0 1rem; padding-bottom: .4rem; border-bottom: 3px solid var(--ms-primary); }
+.ms-fav__cat {
+	border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1.1rem 1.25rem;
+	margin: 0 0 1rem; background: #fff; position: relative;
+}
+.ms-fav__cat.is-done { border-color: #1a7f4b; background: #fbfefc; }
+.ms-fav__cat-title { font-family: var(--ms-font-head); font-weight: 700; font-size: 1.12rem; color: var(--ms-primary); padding: 0; display: flex; align-items: center; gap: .5rem; }
+.ms-fav__cat-done { color: #1a7f4b; font-weight: 800; opacity: 0; transition: opacity .15s ease; }
+.ms-fav__cat.is-done .ms-fav__cat-done { opacity: 1; }
+
+.ms-fav__options { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .4rem; margin-top: .75rem; }
+.ms-fav__option {
+	display: flex; align-items: center; gap: .55rem; margin: 0; font-weight: 400; cursor: pointer;
+	padding: .6rem .7rem; border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm);
+	background: var(--ms-surface); transition: all .12s ease; min-height: 44px;
+}
+.ms-fav__option:hover { background: var(--ms-surface-2); border-color: var(--ms-primary-light); }
+.ms-fav__option input { width: auto; margin: 0; flex-shrink: 0; }
+.ms-fav__option:has(input:checked) { background: var(--ms-primary); border-color: var(--ms-primary); color: #fff; font-weight: 600; }
+.ms-fav__option-label { flex: 1; }
+.ms-fav__option-link { font-size: .85rem; opacity: .7; text-decoration: none; }
+.ms-fav__clear { background: transparent; color: var(--ms-muted); border: 0; padding: .35rem 0 0; font-size: .82rem; cursor: pointer; text-decoration: underline; }
+.ms-fav__clear:hover { background: transparent; color: var(--ms-accent); }
+.ms-fav__cat:not(.is-done) .ms-fav__clear { visibility: hidden; }
+
+/* Submit */
+.ms-fav__submit { background: var(--ms-surface); border-radius: var(--ms-radius); padding: 1.5rem; margin-top: 2rem; text-align: center; }
+.ms-fav__email { max-width: 400px; margin: 0 auto 1rem; text-align: left; }
+.ms-fav__email-note { display: block; font-size: .8rem; color: var(--ms-muted); margin-top: .3rem; }
+.ms-fav__submit-btn { font-size: 1.05rem; padding: .9rem 2rem; }
+.ms-fav__resubmit { font-size: .84rem; color: var(--ms-muted); margin: 1rem 0 0; }
+
+/* Results */
+.ms-fav-results__section { font-size: 1.6rem; margin: 2.5rem 0 1rem; padding-bottom: .4rem; border-bottom: 3px solid var(--ms-primary); }
+.ms-fav-result { margin-bottom: 1.5rem; }
+.ms-fav-result h3 { font-size: 1.1rem; margin-bottom: .4rem; }
+.ms-fav-result__list { margin: 0; padding-left: 1.4rem; }
+.ms-fav-result__list li { margin-bottom: .2rem; }
+.ms-fav-result__list li.is-winner { font-weight: 700; color: var(--ms-primary); }
+.ms-fav-result__list li.is-winner .ms-fav-result__name::after { content: " 🏆"; }
+
+@media (max-width: 782px) {
+	.ms-fav__bar { position: sticky; top: 0; padding: .85rem 1rem; }
+	.ms-fav__options { grid-template-columns: 1fr; }
+	.ms-fav__tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: .25rem; }
+	.ms-fav__tab { white-space: nowrap; }
+}
+
 /* 21. Responsive --------------------------------------------------------- */
 @media (max-width: 1024px) {
 	.ms-footer__widgets { grid-template-columns: 1fr 1fr; }

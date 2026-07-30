@@ -65,6 +65,7 @@ advertising.
 | Current site element | New theme equivalent | How it's editable |
 | --- | --- | --- |
 | Promo banner ("Vote in Saline County Favorites") | **Breaking-news bar** (manual message + link, or auto-from-category) | Customize → MySaline Options → Breaking News |
+| Saline County Favorites survey (external Google Form) | **On-site ballot** with search, section tabs, progress meter, autosave (see §9) | Favorites menu + Customize → Saline County Favorites |
 | "READ THE NEWS" article grid | **Featured hero** (1 lead + side list) then **Latest News** grid | Mark posts "Featured"; Customize → Homepage |
 | Callout boxes (Advertise / Elected Officials / Yard Sales / Games) | **Homepage Quick-Link cards** (icon + title + link) | Customize → Homepage Quick Links |
 | News Categories menu + section pages | **Configurable homepage sections** by category + standard category archives | Customize → Homepage Sections; Appearance → Menus |
@@ -97,7 +98,66 @@ items or listings — no theme code required:
 - Yard Sales, Games/crossword → **Pages**, or a Quick-Link card pointing to them
 - Recurring Events → **Events** entries (or an Event Category)
 
-## 9. Deliberately not carried over
+## 9. Saline County Favorites — the survey, audited
+
+The annual reader's-choice survey is one of the site's biggest traffic drivers,
+and the hardest thing on it to actually use.
+
+**How it works today**
+
+- Annual cycle: nominations (mid-June) → nominees verify spelling → finalists
+  published → voting (Jul 20 5:00 AM – Jul 29 6:00 PM) → winners ~Aug 7.
+- **~155+ categories** in four sections: Food (~25), Businesses (~80+),
+  People (~30), Places & Things (~20).
+- Voting happens in an **external Google Form**; the site links out to it.
+- Finalists are published on a **separate, very long plain-text page**.
+- Prize rule: vote in **≥20 categories** and **at least one in each of the four
+  sections** to enter a **$100 drawing**.
+- Only a voter's most recent pick per category counts; re-voting is allowed.
+- Instructions include "It's FREE", "no card or payment required", "Scroll past
+  any ad", and "sign into Google to save progress".
+
+**Friction found**
+
+| Problem | Consequence |
+| --- | --- |
+| 155+ questions in one linear form | Exhausting; most voters abandon partway |
+| No progress indicator | Voters can't tell if they've hit the 20-category / 4-section prize threshold |
+| Finalists on a different page from the ballot | Constant bouncing between a giant list and the form |
+| No search or filter | Finding "Best Plumber" means scrolling past 80+ business categories |
+| External Google Form | Leaves the site — loses ad impressions and branding |
+| Saving progress needs a Google sign-in | Contradicts "no account needed"; drops anyone not signed in |
+| Long lists on mobile | Poor navigation on the majority of traffic |
+
+**How the new ballot fixes each one**
+
+| Fix | Detail |
+| --- | --- |
+| **Instant search** | Type "plumb" → only Best Plumber shows. Escape clears. |
+| **Section tabs** | Vote Food / Businesses / People / Places one section at a time. |
+| **Live progress meter** | "7 of 20 needed" + a chip per section that lights up, and an explicit "✓ You qualify for the drawing". |
+| **"Hide ones I've done"** | A 155-category ballot shrinks as you work through it. |
+| **Finalists on the ballot** | Nominees are the radio options — no separate page. Optional link per finalist. |
+| **On-site** | Keeps her ads, branding and traffic; nothing leaves the site. |
+| **Autosave, no account** | Picks persist in the browser; a warning fires if you leave with unsubmitted picks. |
+| **Skip freely** | Nothing required. Email optional, only for the drawing. |
+| **Mobile-first** | Sticky compact progress bar, 44px tap targets, single-column options, scrollable tabs. |
+| **Re-voting preserved** | A UNIQUE key per (voter, year, category) reproduces "most recent pick counts". |
+
+**Owner-side**
+
+Hand-entering 155 categories isn't realistic, so **Favorites → Import Ballot**
+takes the existing plain-text finalist lists in one paste (`##` section, plain
+line = category, `-` = finalist, optional `| URL`). Re-importing matches by name
+and updates rather than duplicating. Results screen shows per-category leaders
+with **CSV exports** for both full results and qualified drawing entries.
+
+**Known limit:** vote de-duplication (email, or salted IP+browser hash) stops
+casual double-voting but not a determined ballot-stuffer — the same is true of
+the current Google Form. Documented in `CONTENT-MANAGEMENT.md` with options for
+tightening it.
+
+## 10. Deliberately not carried over
 
 - Triple-repeated navigation menus (kept to one primary + optional top/footer).
 - Uncontrolled stacked ad banners (replaced by managed ad zones so the owner

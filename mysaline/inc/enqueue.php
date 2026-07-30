@@ -24,6 +24,11 @@ function mysaline_enqueue_assets() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
+	// Favorites ballot script — only on pages that actually render the ballot.
+	if ( mysaline_has_favorites_ballot() ) {
+		wp_enqueue_script( 'mysaline-favorites', MYSALINE_URI . 'assets/js/favorites.js', array(), MYSALINE_VERSION, true );
+	}
+
 	// Inject the Customizer-driven color palette as CSS variables.
 	wp_add_inline_style( 'mysaline-style', mysaline_dynamic_css() );
 }

@@ -100,6 +100,96 @@ description, and details (phone, email, website, address, hours). Assign one or
 more **Business Categories**. Tick *"Feature in the homepage Business
 Spotlight"* to promote it on the homepage.
 
+## Saline County Favorites (voting ballot)
+
+The annual reader's-choice survey runs **on the site** now — no external form, so
+voters keep seeing your ads and branding, and nobody needs a Google account.
+
+### 1. Build the ballot
+
+Fastest way: **Favorites → Import Ballot**. Paste the whole thing at once —
+`##` for a section, a plain line for a category, a dash for each finalist:
+
+```
+## Food
+Restaurant — BBQ
+- Whole Hog Cafe
+- Wright's Barbecue | https://example.com
+
+## Businesses
+Best Plumber
+- Ace Plumbing
+```
+
+Adding a `| https://…` after a finalist links their name on the ballot.
+Re-importing matches existing categories **by name** and updates them, so you
+can't create duplicates. Tick *Replace* to overwrite a category's finalist list
+rather than add to it.
+
+To edit by hand instead: **Favorites → Add New**, put the category name as the
+title (e.g. "Best Plumber"), pick a **Section**, and list finalists one per line.
+Drag categories in the list view or set *Order* to control ballot order.
+A category with no finalists is skipped automatically.
+
+### 2. Set the window and rules
+
+Customize → MySaline Options → **Saline County Favorites**:
+
+- **Ballot year** — keeps each year's votes separate.
+- **Voting opens / closes** — `YYYY-MM-DD HH:MM` (24-hour, site time). Blank
+  means no limit. Before it opens and after it closes the ballot shows a notice
+  and the options are disabled.
+- **Categories needed** (default 20) and **sections that must each have a vote**
+  (default 4) — these drive the live progress meter voters see.
+- **Prize / rules line**, **intro line**, **thank-you message**.
+- **Publish results publicly** — leave off until you announce winners.
+
+### 3. Put the ballot on a page
+
+Either way works:
+
+- Create the page (e.g. `/scf-2026-vote/`) and set **Page Attributes →
+  Template → Saline County Favorites Ballot**, or
+- Add the shortcode `[mysaline_favorites_ballot]` anywhere in a page.
+
+For winners, use `[mysaline_favorites_results]` and tick *Publish results
+publicly*. Editors can preview results before they're public.
+
+### 4. What voters get
+
+- **Search** — typing "plumb" jumps straight to Best Plumber instead of
+  scrolling past 80 business categories.
+- **Section tabs** — vote one section at a time.
+- **Live progress meter** — "7 of 20 needed" plus a lit-up chip per section, so
+  they can see exactly when they qualify for the drawing.
+- **"Hide ones I've done"** — shrinks a 155-category ballot as they go.
+- **Autosave** — picks are kept on their device; closing the tab loses nothing.
+- **Skip anything**; nothing is required. Email is optional and only used to
+  contact the drawing winner.
+- They can return and change picks until voting closes — only the latest pick in
+  each category counts.
+
+### 5. Results and the drawing
+
+**Favorites → Results** shows the leader and vote totals per category, plus:
+
+- **Export all results (CSV)** — every category, ranked, with counts.
+- **Export drawing entries (CSV)** — the emails of voters who met the threshold,
+  ready to pick a winner from.
+
+### A note on vote integrity
+
+Votes are de-duplicated per voter per category: by email when one is given,
+otherwise by a salted hash of IP + browser. Picks are validated server-side
+against the real finalist list, so the ballot can't be tampered with from the
+browser, and there's a short rate limit on submissions.
+
+This stops casual double-voting, **not** a determined ballot-stuffer — someone
+switching networks or using fresh browsers can vote more than once, which is
+true of the Google Form too. If a category ever looks suspicious, the CSV export
+includes counts you can sanity-check. For a tighter contest, require email and
+verify it, or ask us about adding email confirmation.
+
 ## Newsletter signup
 
 Customize → MySaline Options → **Newsletter**:

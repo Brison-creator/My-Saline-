@@ -52,6 +52,7 @@ click-by-click guide, or in the dashboard go to **Appearance → MySaline Setup*
 | **Community events** | Events menu (dates, venue, tickets) |
 | **Obituaries** | Obituaries menu (portrait, dates, services) |
 | **Business listings** | Businesses menu (+ Business Categories) |
+| **Saline County Favorites** | Favorites menu (bulk ballot importer, results + CSV exports); window & prize rules in Customize |
 | **Navigation menus** | Appearance → Menus (primary, top bar, footer, social) |
 | **Newsletter signup** | Customize → MySaline Options → Newsletter |
 | **Social links** | Customize → MySaline Options → Social Links |

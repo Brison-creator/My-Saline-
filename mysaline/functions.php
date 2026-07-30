@@ -48,6 +48,7 @@ $mysaline_modules = array(
 	'breaking-news',      // Breaking-news data helpers.
 	'events',             // Event query/date helpers.
 	'homepage',           // Featured hero + configurable homepage sections.
+	'favorites',          // Saline County Favorites voting ballot.
 );
 
 foreach ( $mysaline_modules as $mysaline_module ) {
