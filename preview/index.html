@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MySaline — Redesign Preview</title>
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}</style>
+</head>
+<body>
+<style>
+/* ==========================================================================
+   PREVIEW CHROME — adapts to the viewer's light/dark preference.
+   The site canvas inside the frame always renders in the theme's own
+   (light) palette, because that is how the theme actually looks.
+   ========================================================================== */
+:root {
+	--pv-bg: #eef1f6;
+	--pv-panel: #ffffff;
+	--pv-ink: #1b2230;
+	--pv-muted: #5d6a7d;
+	--pv-line: #d3dae4;
+	--pv-accent: #0b2545;
+	--pv-flag: #c8102e;
+	--pv-chrome: #dfe5ee;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--pv-bg: #0d1219;
+		--pv-panel: #151c26;
+		--pv-ink: #e6ecf5;
+		--pv-muted: #94a3b8;
+		--pv-line: #26303e;
+		--pv-accent: #7fa8dd;
+		--pv-flag: #ff5c74;
+		--pv-chrome: #1d2632;
+	}
+}
+:root[data-theme="dark"] {
+	--pv-bg: #0d1219;
+	--pv-panel: #151c26;
+	--pv-ink: #e6ecf5;
+	--pv-muted: #94a3b8;
+	--pv-line: #26303e;
+	--pv-accent: #7fa8dd;
+	--pv-flag: #ff5c74;
+	--pv-chrome: #1d2632;
+}
+:root[data-theme="light"] {
+	--pv-bg: #eef1f6;
+	--pv-panel: #ffffff;
+	--pv-ink: #1b2230;
+	--pv-muted: #5d6a7d;
+	--pv-line: #d3dae4;
+	--pv-accent: #0b2545;
+	--pv-flag: #c8102e;
+	--pv-chrome: #dfe5ee;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+	margin: 0;
+	background: var(--pv-bg);
+	color: var(--pv-ink);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+.pv-wrap { max-width: 1320px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+/* Preview header */
+.pv-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.pv-head h1 { font-family: Georgia, "Times New Roman", serif; font-size: 1.5rem; margin: 0 0 .35rem; letter-spacing: -.01em; }
+.pv-head p { margin: 0; color: var(--pv-muted); font-size: .92rem; max-width: 62ch; }
+.pv-flag {
+	display: inline-flex; align-items: center; gap: .4rem; background: var(--pv-flag); color: #fff;
+	font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+	padding: .3rem .65rem; border-radius: 3px; margin-bottom: .6rem;
+}
+
+/* View switcher */
+.pv-tabs { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.pv-tab {
+	background: var(--pv-panel); color: var(--pv-ink); border: 1px solid var(--pv-line);
+	padding: .5rem .95rem; border-radius: 999px; font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer;
+}
+.pv-tab:hover { border-color: var(--pv-accent); }
+.pv-tab[aria-selected="true"] { background: var(--pv-accent); color: var(--pv-bg); border-color: var(--pv-accent); }
+.pv-tab:focus-visible { outline: 2px solid var(--pv-flag); outline-offset: 2px; }
+
+/* Browser frame */
+.pv-frame { background: var(--pv-panel); border: 1px solid var(--pv-line); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 18px 50px rgba(11,37,69,.13); }
+.pv-bar { display: flex; align-items: center; gap: .75rem; padding: .6rem .9rem; background: var(--pv-chrome); border-bottom: 1px solid var(--pv-line); }
+.pv-dots { display: flex; gap: .35rem; }
+.pv-dots i { width: 11px; height: 11px; border-radius: 50%; background: var(--pv-line); display: block; }
+.pv-url {
+	flex: 1; background: var(--pv-panel); border: 1px solid var(--pv-line); border-radius: 999px;
+	padding: .3rem .8rem; font-size: .76rem; color: var(--pv-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pv-canvas { background: #fff; overflow: hidden; }
+.pv-note { font-size: .82rem; color: var(--pv-muted); margin: .8rem 0 0; }
+.pv-note strong { color: var(--pv-ink); }
+
+/* ==========================================================================
+   THEME STYLES — the real MySaline theme tokens & components.
+   Scoped under .ms so the preview chrome above is unaffected.
+   ========================================================================== */
+.ms {
+	--ms-primary: #0b2545;
+	--ms-primary-dark: #071a33;
+	--ms-primary-light: #17457f;
+	--ms-accent: #c8102e;
+	--ms-accent-dark: #9c0c24;
+	--ms-highlight: #f2b705;
+	--ms-surface: #f4f6f9;
+	--ms-surface-2: #eaeef4;
+	--ms-text: #1a1d23;
+	--ms-muted: #5b6472;
+	--ms-border: #e2e6ec;
+	--ms-radius: 8px;
+	--ms-radius-sm: 4px;
+	--ms-gap: 1.5rem;
+	--ms-shadow: 0 1px 3px rgba(11,37,69,.08), 0 6px 20px rgba(11,37,69,.06);
+	--ms-shadow-hover: 0 4px 10px rgba(11,37,69,.12), 0 12px 32px rgba(11,37,69,.10);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.65;
+	color: var(--ms-text);
+	background: #fff;
+	color-scheme: light;
+}
+.ms h1, .ms h2, .ms h3, .ms h4 { font-family: Georgia, "Times New Roman", Times, serif; color: var(--ms-primary); line-height: 1.2; margin: 0 0 .5em; font-weight: 700; text-wrap: balance; }
+.ms p { margin: 0 0 1em; }
+.ms a { color: var(--ms-primary-light); text-decoration: none; }
+.ms a:hover { color: var(--ms-accent); text-decoration: underline; }
+.ms a:focus-visible, .ms button:focus-visible, .ms input:focus-visible { outline: 2px solid var(--ms-accent); outline-offset: 2px; }
+.ms img { display: block; max-width: 100%; }
+.ms-container { max-width: 1160px; margin: 0 auto; padding: 0 1.15rem; }
+
+/* Top bar */
+.ms-topbar { background: var(--ms-primary-dark); color: #cdd6e4; font-size: .78rem; }
+.ms-topbar .ms-container { display: flex; align-items: center; justify-content: space-between; min-height: 36px; gap: 1rem; flex-wrap: wrap; }
+.ms-topbar a { color: #cdd6e4; }
+.ms-topbar nav { display: flex; gap: 1rem; }
+
+/* Header */
+.ms-header { border-bottom: 1px solid var(--ms-border); }
+.ms-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.1rem 0; flex-wrap: wrap; }
+.ms-logo { font-family: Georgia, serif; font-size: 2.1rem; font-weight: 800; line-height: 1; color: var(--ms-primary); letter-spacing: -.02em; }
+.ms-logo span { color: var(--ms-accent); }
+.ms-tagline { font-size: .72rem; color: var(--ms-muted); text-transform: uppercase; letter-spacing: .1em; margin-top: .3rem; }
+.ms-search-mini { display: flex; gap: .4rem; }
+.ms-search-mini input { border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm); padding: .5rem .7rem; font: inherit; font-size: .88rem; min-width: 190px; }
+
+/* Nav */
+.ms-nav { background: var(--ms-primary); }
+.ms-menu { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; }
+.ms-menu > li > a { display: block; color: #fff; padding: .8rem .95rem; font-weight: 600; font-size: .88rem; border-bottom: 3px solid transparent; }
+.ms-menu > li > a:hover { background: var(--ms-primary-dark); border-bottom-color: var(--ms-highlight); text-decoration: none; }
+.ms-menu > li.is-current > a { background: var(--ms-primary-dark); border-bottom-color: var(--ms-highlight); }
+.ms-menu .has-sub > a::after { content: " ▾"; opacity: .7; font-size: .8em; }
+
+/* Breaking */
+.ms-breaking { background: var(--ms-accent); color: #fff; display: flex; overflow: hidden; }
+.ms-breaking__label { background: var(--ms-accent-dark); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: .55rem .9rem; font-size: .74rem; display: flex; align-items: center; white-space: nowrap; }
+.ms-breaking__track { flex: 1; overflow: hidden; display: flex; align-items: center; }
+.ms-breaking__items { display: flex; gap: 2.5rem; padding: .55rem .9rem; white-space: nowrap; animation: ms-marquee 34s linear infinite; }
+.ms-breaking__track:hover .ms-breaking__items { animation-play-state: paused; }
+.ms-breaking a { color: #fff; font-weight: 600; font-size: .88rem; }
+@keyframes ms-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .ms-breaking__items { animation: none; } }
+
+/* Quick links */
+.ms-quicklinks { display: grid; grid-template-columns: repeat(4, 1fr); gap: .9rem; margin: 1.75rem 0 2rem; }
+.ms-quicklink { display: flex; flex-direction: column; align-items: center; gap: .4rem; text-align: center; padding: 1.1rem .8rem; background: var(--ms-surface); border: 1px solid var(--ms-border); border-radius: var(--ms-radius); color: var(--ms-primary); font-weight: 700; font-size: .92rem; transition: transform .15s ease, background .15s ease, color .15s ease; }
+.ms-quicklink:hover { background: var(--ms-primary); color: #fff; text-decoration: none; transform: translateY(-2px); box-shadow: var(--ms-shadow-hover); }
+.ms-quicklink b { font-size: 1.65rem; line-height: 1; font-weight: 400; }
+
+/* Hero */
+.ms-hero { display: grid; grid-template-columns: 2fr 1fr; gap: var(--ms-gap); margin-bottom: 2.5rem; }
+.ms-hero__lead { position: relative; border-radius: var(--ms-radius); overflow: hidden; min-height: 380px; display: flex; align-items: flex-end; }
+.ms-hero__lead .ms-ph { position: absolute; inset: 0; }
+.ms-hero__lead-body { position: relative; z-index: 2; padding: 1.75rem; color: #fff; width: 100%; background: linear-gradient(to top, rgba(7,26,51,.94) 12%, rgba(7,26,51,.5) 58%, rgba(7,26,51,0) 100%); }
+.ms-hero__lead-body h2 { color: #fff; font-size: 1.95rem; margin-bottom: .35rem; }
+.ms-hero__lead-body .ms-meta { color: #d7deea; }
+.ms-hero__side { display: grid; gap: .9rem; align-content: start; }
+.ms-hero__item { display: grid; grid-template-columns: 92px 1fr; gap: .8rem; align-items: center; }
+.ms-hero__item .ms-ph { width: 92px; height: 70px; border-radius: var(--ms-radius-sm); }
+.ms-hero__item h3 { font-size: .98rem; margin: .25rem 0 0; line-height: 1.28; }
+
+/* Badges / meta */
+.ms-badge { display: inline-block; background: var(--ms-accent); color: #fff; font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: .22rem .55rem; border-radius: var(--ms-radius-sm); margin-bottom: .5rem; }
+.ms-meta { font-size: .8rem; color: var(--ms-muted); display: flex; gap: .75rem; flex-wrap: wrap; }
+
+/* Section head */
+.ms-section { margin-bottom: 2.75rem; }
+.ms-section-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; border-bottom: 3px solid var(--ms-primary); padding-bottom: .45rem; }
+.ms-section-head h2 { margin: 0; font-size: 1.4rem; }
+.ms-section-head a { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ms-accent); white-space: nowrap; }
+
+/* Cards */
+.ms-grid { display: grid; gap: var(--ms-gap); }
+.ms-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.ms-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.ms-grid--4 { grid-template-columns: repeat(4, 1fr); }
+.ms-card { border: 1px solid var(--ms-border); border-radius: var(--ms-radius); overflow: hidden; display: flex; flex-direction: column; background: #fff; transition: box-shadow .18s ease, transform .18s ease; }
+.ms-card:hover { box-shadow: var(--ms-shadow-hover); transform: translateY(-3px); }
+.ms-card__media { position: relative; aspect-ratio: 16/9; }
+.ms-card__media .ms-badge { position: absolute; top: .65rem; left: .65rem; margin: 0; }
+.ms-card__body { padding: 1rem 1.05rem 1.15rem; display: flex; flex-direction: column; flex: 1; }
+.ms-card h3 { font-size: 1.1rem; margin: 0 0 .4rem; line-height: 1.28; }
+.ms-card p { color: var(--ms-muted); font-size: .9rem; margin: 0 0 .85rem; }
+.ms-card .ms-meta { margin-top: auto; }
+
+/* Placeholder art (CSS-only, no external images) */
+.ms-ph { width: 100%; height: 100%; background: var(--ms-primary); position: relative; overflow: hidden; }
+.ms-ph::after { content: ""; position: absolute; inset: 0; background:
+	radial-gradient(circle at 22% 28%, rgba(255,255,255,.16), transparent 42%),
+	radial-gradient(circle at 78% 72%, rgba(242,183,5,.22), transparent 46%),
+	linear-gradient(128deg, rgba(200,16,46,.30), transparent 62%); }
+.ms-ph--b { background: #16385f; }
+.ms-ph--c { background: #1d4a6d; }
+.ms-ph--d { background: #123a52; }
+.ms-ph--e { background: #24405e; }
+
+/* List rows */
+.ms-list-item { display: grid; grid-template-columns: 78px 1fr; gap: .75rem; padding: .8rem 0; border-bottom: 1px solid var(--ms-border); }
+.ms-list-item:last-child { border-bottom: 0; }
+.ms-list-item .ms-ph { width: 78px; height: 60px; border-radius: var(--ms-radius-sm); }
+.ms-list-item h4 { font-size: .94rem; margin: 0 0 .2rem; line-height: 1.3; }
+
+/* Events / obits / biz */
+.ms-evt { display: grid; grid-template-columns: 58px 1fr; gap: .85rem; align-items: start; border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: .95rem 1.05rem; background: #fff; }
+.ms-evt__date { background: var(--ms-primary); color: #fff; border-radius: var(--ms-radius-sm); padding: .4rem 0; text-align: center; line-height: 1; }
+.ms-evt__date b { display: block; font-size: 1.35rem; font-weight: 800; }
+.ms-evt__date span { font-size: .66rem; text-transform: uppercase; letter-spacing: .05em; }
+.ms-evt h4 { margin: 0 0 .2rem; font-size: 1rem; }
+.ms-obit { text-align: center; border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1.2rem 1rem; background: #fff; }
+.ms-obit .ms-ph { width: 96px; height: 96px; border-radius: 50%; margin: 0 auto .7rem; }
+.ms-obit h4 { margin: 0 0 .2rem; font-size: 1rem; }
+.ms-obit .ms-dates { font-size: .82rem; color: var(--ms-muted); }
+.ms-biz { border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1.15rem; background: #fff; }
+.ms-biz .ms-ph { width: 58px; height: 58px; border-radius: var(--ms-radius-sm); margin-bottom: .7rem; }
+.ms-biz h4 { margin: 0 0 .15rem; font-size: 1.05rem; }
+.ms-biz dl { margin: .7rem 0 0; font-size: .86rem; display: grid; grid-template-columns: auto 1fr; gap: .25rem .6rem; }
+.ms-biz dt { font-weight: 700; color: var(--ms-primary); }
+.ms-biz dd { margin: 0; color: var(--ms-muted); }
+
+/* Ads */
+.ms-ad { text-align: center; margin: 1.5rem 0; background: var(--ms-surface); border-radius: var(--ms-radius); padding: 1rem; }
+.ms-ad__label { font-size: .64rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ms-muted); display: block; margin-bottom: .4rem; }
+.ms-ad__box { background: repeating-linear-gradient(45deg, #eef1f6, #eef1f6 11px, #e3e8f0 11px, #e3e8f0 22px); border: 1px dashed var(--ms-border); border-radius: var(--ms-radius-sm); padding: 1.4rem; color: var(--ms-muted); font-size: .84rem; font-weight: 600; }
+
+/* Buttons */
+.ms-btn { display: inline-block; background: var(--ms-accent); color: #fff; border: 0; padding: .7rem 1.35rem; border-radius: var(--ms-radius-sm); font: inherit; font-weight: 600; font-size: .92rem; cursor: pointer; }
+.ms-btn:hover { background: var(--ms-accent-dark); color: #fff; text-decoration: none; }
+
+/* Newsletter */
+.ms-news { background: var(--ms-primary); color: #fff; border-radius: var(--ms-radius); padding: 1.75rem; }
+.ms-news h2 { color: #fff; margin-bottom: .3rem; }
+.ms-news p { color: #d7deea; margin-bottom: 1rem; }
+.ms-news form { display: flex; gap: .5rem; flex-wrap: wrap; max-width: 440px; }
+.ms-news input { flex: 1; min-width: 200px; border: 0; border-radius: var(--ms-radius-sm); padding: .65rem .8rem; font: inherit; }
+
+/* Sidebar */
+.ms-cols { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 2rem; align-items: start; }
+.ms-widget { margin-bottom: 1.75rem; }
+.ms-widget h3 { font-size: 1.05rem; margin: 0 0 .8rem; padding-bottom: .4rem; border-bottom: 3px solid var(--ms-primary); }
+
+/* Footer */
+.ms-footer { background: var(--ms-primary-dark); color: #c2cbdb; margin-top: 2.5rem; font-size: .9rem; }
+.ms-footer a { color: #c2cbdb; }
+.ms-footer__cols { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1.2fr; gap: 2rem; padding: 2.5rem 0; }
+.ms-footer h4 { color: #fff; font-size: 1rem; margin: 0 0 .7rem; padding-bottom: .35rem; border-bottom: 2px solid var(--ms-primary-light); }
+.ms-footer ul { list-style: none; margin: 0; padding: 0; }
+.ms-footer li { padding: .22rem 0; }
+.ms-footer address { font-style: normal; line-height: 1.7; margin: .8rem 0; }
+.ms-footer__logo { font-family: Georgia, serif; font-size: 1.5rem; font-weight: 800; color: #fff; }
+.ms-footer__logo span { color: #ff5568; }
+.ms-social { display: flex; gap: .45rem; margin-top: .9rem; }
+.ms-social a { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; color: #fff; }
+.ms-social a:hover { background: var(--ms-accent); text-decoration: none; }
+.ms-footer__bottom { border-top: 1px solid rgba(255,255,255,.12); padding: 1rem 0; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: .82rem; }
+
+/* Article view */
+.ms-article { max-width: 100%; }
+.ms-article h1 { font-size: 2.1rem; margin: .3rem 0 .6rem; }
+.ms-article__lede { font-size: 1.1rem; color: var(--ms-muted); }
+.ms-article__hero { aspect-ratio: 16/9; border-radius: var(--ms-radius); overflow: hidden; margin: 1.25rem 0; }
+.ms-article__body p { font-size: 1.03rem; }
+.ms-crumbs { font-size: .8rem; color: var(--ms-muted); padding: 1rem 0 0; }
+.ms-tags { display: flex; gap: .4rem; flex-wrap: wrap; margin: 1.5rem 0; }
+.ms-tags a { background: var(--ms-surface); color: var(--ms-muted); padding: .28rem .65rem; border-radius: 999px; font-size: .8rem; }
+.ms-byline { display: flex; align-items: center; gap: .7rem; }
+.ms-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--ms-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; font-family: Georgia, serif; }
+
+/* ==========================================================================
+   FAVORITES BALLOT
+   ========================================================================== */
+.fav-head { background: var(--ms-surface); border-radius: var(--ms-radius); padding: 1.35rem 1.5rem; margin: 1.5rem 0; }
+.fav-head h1 { margin: 0 0 .4rem; font-size: 1.85rem; }
+.fav-head p { margin: 0 0 .4rem; }
+.fav-head .fav-prize { font-weight: 700; color: var(--ms-primary); }
+.fav-head .fav-window { font-size: .86rem; color: var(--ms-muted); margin: 0; }
+
+.fav-bar { position: sticky; top: 0; z-index: 20; background: #fff; border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: .95rem 1.1rem; margin-bottom: 1.35rem; box-shadow: var(--ms-shadow); }
+.fav-prog-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .45rem; }
+.fav-count { font-size: 1rem; color: var(--ms-primary); font-weight: 600; }
+.fav-count b { font-size: 1.5rem; font-weight: 800; color: var(--ms-accent); font-variant-numeric: tabular-nums; }
+.fav-qualify { font-weight: 700; color: #1a7f4b; font-size: .88rem; }
+.fav-meter { height: 9px; background: var(--ms-surface-2); border-radius: 999px; overflow: hidden; }
+.fav-meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ms-accent), var(--ms-highlight)); border-radius: 999px; transition: width .25s ease; }
+.fav-ok .fav-meter i { background: linear-gradient(90deg, #1a7f4b, #38b06b); }
+.fav-chips { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .6rem; }
+.fav-chip { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: .2rem .55rem; border-radius: 999px; background: var(--ms-surface-2); color: var(--ms-muted); }
+.fav-chip.on { background: #1a7f4b; color: #fff; }
+.fav-chip.on::before { content: "✓ "; }
+.fav-tools { display: flex; gap: .6rem; align-items: center; margin-top: .85rem; flex-wrap: wrap; }
+.fav-search { flex: 1; min-width: 210px; border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm); padding: .6rem .75rem; font: inherit; font-size: .92rem; }
+.fav-toggle { display: flex; align-items: center; gap: .35rem; font-size: .86rem; white-space: nowrap; cursor: pointer; }
+.fav-tabs { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .85rem; }
+.fav-tab { background: var(--ms-surface); color: var(--ms-primary); border: 1px solid var(--ms-border); padding: .4rem .8rem; border-radius: 999px; font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.fav-tab:hover { background: var(--ms-surface-2); }
+.fav-tab[aria-selected="true"] { background: var(--ms-primary); color: #fff; border-color: var(--ms-primary); }
+.fav-tab small { opacity: .65; margin-left: .2rem; }
+
+.fav-status { font-size: .86rem; color: var(--ms-muted); margin: 0 0 1rem; }
+.fav-sec-title { font-size: 1.4rem; margin: 1.75rem 0 .9rem; padding-bottom: .35rem; border-bottom: 3px solid var(--ms-primary); }
+.fav-cat { border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1rem 1.15rem; margin: 0 0 .85rem; background: #fff; }
+.fav-cat.done { border-color: #1a7f4b; background: #fbfefc; }
+.fav-cat legend, .fav-cat .fav-cat-title { font-family: Georgia, serif; font-weight: 700; font-size: 1.06rem; color: var(--ms-primary); display: flex; align-items: center; gap: .45rem; margin-bottom: .6rem; }
+.fav-cat .tick { color: #1a7f4b; font-weight: 800; opacity: 0; transition: opacity .15s ease; }
+.fav-cat.done .tick { opacity: 1; }
+.fav-opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: .4rem; }
+.fav-opt { display: flex; align-items: center; gap: .5rem; padding: .55rem .7rem; border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm); background: var(--ms-surface); cursor: pointer; font-size: .92rem; min-height: 42px; transition: background .12s ease, border-color .12s ease; }
+.fav-opt:hover { background: var(--ms-surface-2); border-color: var(--ms-primary-light); }
+.fav-opt input { margin: 0; flex-shrink: 0; }
+.fav-opt.sel { background: var(--ms-primary); border-color: var(--ms-primary); color: #fff; font-weight: 600; }
+.fav-clear { background: none; border: 0; color: var(--ms-muted); font: inherit; font-size: .8rem; text-decoration: underline; cursor: pointer; padding: .4rem 0 0; }
+.fav-clear:hover { color: var(--ms-accent); }
+.fav-submit { background: var(--ms-surface); border-radius: var(--ms-radius); padding: 1.5rem; margin-top: 1.75rem; text-align: center; }
+.fav-email { max-width: 430px; margin: 0 auto 1rem; text-align: left; }
+.fav-email label { font-weight: 600; display: block; margin-bottom: .3rem; font-size: .92rem; }
+.fav-email .req { color: var(--ms-accent); font-weight: 700; font-size: .84rem; }
+.fav-email input { width: 100%; border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm); padding: .6rem .75rem; font: inherit; }
+.fav-email small { display: block; font-size: .79rem; color: var(--ms-muted); margin-top: .35rem; line-height: 1.5; }
+.fav-note-ok { background: #e8f6ee; color: #0f5231; border-left: 5px solid #1a7f4b; border-radius: var(--ms-radius); padding: .9rem 1.15rem; margin-bottom: 1.25rem; font-size: .92rem; }
+.fav-demo { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.fav-demo button { background: #fff; border: 1px solid var(--ms-border); color: var(--ms-primary); padding: .5rem .9rem; border-radius: var(--ms-radius-sm); font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.fav-demo button:hover { border-color: var(--ms-primary); }
+.fav-hidden { display: none !important; }
+
+/* Responsive */
+@media (max-width: 900px) {
+	.ms-hero { grid-template-columns: 1fr; }
+	.ms-cols { grid-template-columns: 1fr; }
+	.ms-grid--4 { grid-template-columns: repeat(2,1fr); }
+	.ms-footer__cols { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 680px) {
+	.ms-grid--3, .ms-grid--2 { grid-template-columns: 1fr; }
+	.ms-quicklinks { grid-template-columns: repeat(2,1fr); }
+	.ms-footer__cols { grid-template-columns: 1fr; }
+	.fav-opts { grid-template-columns: 1fr; }
+	.fav-tabs { overflow-x: auto; flex-wrap: nowrap; }
+	.fav-tab { white-space: nowrap; }
+	.ms-menu { overflow-x: auto; flex-wrap: nowrap; }
+	.ms-menu > li > a { white-space: nowrap; }
+}
+</style>
+
+<div class="pv-wrap">
+
+	<header class="pv-head">
+		<div>
+			<span class="pv-flag">Design preview · not the live site</span>
+			<h1>MySaline redesign</h1>
+			<p>A clickable preview of the custom WordPress theme on branch <code>claude/mysaline-wordpress-theme-ktxbj8</code>. Rendered with the theme's real stylesheet, so what you see here is what the theme produces. Headlines, names and businesses below are <strong>sample content</strong>, not real reporting.</p>
+		</div>
+	</header>
+
+	<div class="pv-tabs" role="tablist" aria-label="Preview screens">
+		<button class="pv-tab" role="tab" aria-selected="true" data-view="home">Homepage</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="ballot">Favorites ballot <span aria-hidden="true">— try it</span></button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="article">Article page</button>
+	</div>
+
+	<div class="pv-frame">
+		<div class="pv-bar">
+			<div class="pv-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+			<div class="pv-url" data-url>mysaline.com</div>
+		</div>
+		<div class="pv-canvas ms">
+
+			<!-- ============================ CHROME ============================ -->
+			<div class="ms-topbar">
+				<div class="ms-container">
+					<span>Thursday, July 30, 2026</span>
+					<nav aria-label="Utility"><a href="#0">About</a><a href="#0">Advertise</a><a href="#0">Contact</a><a href="#0">Newsletter</a></nav>
+				</div>
+			</div>
+
+			<header class="ms-header">
+				<div class="ms-container ms-header__inner">
+					<div>
+						<div class="ms-logo">My<span>Saline</span></div>
+						<div class="ms-tagline">Saline County news since 2007</div>
+					</div>
+					<form class="ms-search-mini" onsubmit="return false"><input type="search" placeholder="Search MySaline…" aria-label="Search"><button class="ms-btn" type="submit">Search</button></form>
+				</div>
+			</header>
+
+			<nav class="ms-nav" aria-label="Primary">
+				<div class="ms-container">
+					<ul class="ms-menu">
+						<li data-nav="home" class="is-current"><a href="#0">Home</a></li>
+						<li class="has-sub"><a href="#0">News</a></li>
+						<li class="has-sub"><a href="#0">Business</a></li>
+						<li><a href="#0">Events</a></li>
+						<li><a href="#0">Obituaries</a></li>
+						<li class="has-sub"><a href="#0">Elections</a></li>
+						<li><a href="#0">Directory</a></li>
+						<li data-nav="ballot"><a href="#0">Favorites</a></li>
+					</ul>
+				</div>
+			</nav>
+
+			<div class="ms-breaking">
+				<span class="ms-breaking__label">Breaking</span>
+				<div class="ms-breaking__track">
+					<div class="ms-breaking__items">
+						<span><a href="#0">Voting is open in Saline County Favorites through July 29</a></span>
+						<span><a href="#0">Benton council approves downtown parking plan</a></span>
+						<span><a href="#0">Bryant schools announce fall calendar</a></span>
+						<span><a href="#0">Voting is open in Saline County Favorites through July 29</a></span>
+						<span><a href="#0">Benton council approves downtown parking plan</a></span>
+						<span><a href="#0">Bryant schools announce fall calendar</a></span>
+					</div>
+				</div>
+			</div>
+
+			<!-- ============================ HOME ============================ -->
+			<main class="pv-view" data-view="home">
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+
+					<nav class="ms-quicklinks" aria-label="Quick links">
+						<a class="ms-quicklink" href="#0"><b aria-hidden="true">📣</b>Advertise with us</a>
+						<a class="ms-quicklink" href="#0"><b aria-hidden="true">🏛️</b>Elected Officials</a>
+						<a class="ms-quicklink" href="#0"><b aria-hidden="true">🏷️</b>Yard Sales</a>
+						<a class="ms-quicklink" href="#0"><b aria-hidden="true">📅</b>Community Events</a>
+					</nav>
+
+					<section class="ms-hero" aria-label="Featured stories">
+						<article class="ms-hero__lead">
+							<div class="ms-ph" aria-hidden="true"></div>
+							<div class="ms-hero__lead-body">
+								<span class="ms-badge">Saline County</span>
+								<h2><a href="#0" data-goto="article">County fair returns this weekend with a bigger midway and free parking</a></h2>
+								<div class="ms-meta"><span>July 30, 2026</span><span>Sample Byline</span><span>4 min read</span></div>
+							</div>
+						</article>
+						<div class="ms-hero__side">
+							<article class="ms-hero__item">
+								<div class="ms-ph ms-ph--b" aria-hidden="true"></div>
+								<div><span class="ms-badge">Business</span><h3><a href="#0">Third restaurant opens on Military Road this month</a></h3></div>
+							</article>
+							<article class="ms-hero__item">
+								<div class="ms-ph ms-ph--c" aria-hidden="true"></div>
+								<div><span class="ms-badge">Bryant</span><h3><a href="#0">Bryant approves new sidewalk plan for Reynolds Road</a></h3></div>
+							</article>
+							<article class="ms-hero__item">
+								<div class="ms-ph ms-ph--d" aria-hidden="true"></div>
+								<div><span class="ms-badge">Elections</span><h3><a href="#0">Who has filed so far for November's municipal races</a></h3></div>
+							</article>
+							<article class="ms-hero__item">
+								<div class="ms-ph ms-ph--e" aria-hidden="true"></div>
+								<div><span class="ms-badge">Schools</span><h3><a href="#0">Registration dates set for the coming school year</a></h3></div>
+							</article>
+						</div>
+					</section>
+
+					<div class="ms-ad"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Leaderboard ad zone — managed under Advertisements, with placement zones and run dates</div></div>
+
+					<div class="ms-cols">
+						<div>
+							<section class="ms-section">
+								<div class="ms-section-head"><h2>Latest News</h2><a href="#0">More</a></div>
+								<div class="ms-grid ms-grid--3">
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><span class="ms-badge">Dining</span></div><div class="ms-card__body"><h3><a href="#0">Four new places to eat in Benton this summer</a></h3><p>A roundup of the openings readers have been asking about, with hours and what to order first.</p><div class="ms-meta"><span>Sample Byline</span><span>Jul 29</span></div></div></article>
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><span class="ms-badge">County</span></div><div class="ms-card__body"><h3><a href="#0">Road work begins Monday on Highway 5 north</a></h3><p>Expect single-lane closures during daytime hours through the middle of next month.</p><div class="ms-meta"><span>Sample Byline</span><span>Jul 29</span></div></div></article>
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><span class="ms-badge">Community</span></div><div class="ms-card__body"><h3><a href="#0">Library summer reading wraps with a record turnout</a></h3><p>Organizers say sign-ups nearly doubled from last year across all three branches.</p><div class="ms-meta"><span>Sample Byline</span><span>Jul 28</span></div></div></article>
+								</div>
+							</section>
+
+							<section class="ms-section">
+								<div class="ms-section-head"><h2>Business News</h2><a href="#0">View all</a></div>
+								<div class="ms-grid ms-grid--3">
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--e" aria-hidden="true"></div><span class="ms-badge">Business</span></div><div class="ms-card__body"><h3><a href="#0">Chamber holds ribbon cutting for downtown shop</a></h3><p>The storefront joins four other businesses that opened on the square this year.</p><div class="ms-meta"><span>Jul 28</span></div></div></article>
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph" aria-hidden="true"></div><span class="ms-badge">Jobs</span></div><div class="ms-card__body"><h3><a href="#0">This week's job listings for Saline County</a></h3><p>Openings in healthcare, logistics, education and skilled trades, updated daily.</p><div class="ms-meta"><span>Jul 28</span></div></div></article>
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><span class="ms-badge">Development</span></div><div class="ms-card__body"><h3><a href="#0">Plans filed for a new retail center off Interstate 30</a></h3><p>Documents show space for six tenants, with construction slated to start in spring.</p><div class="ms-meta"><span>Jul 27</span></div></div></article>
+								</div>
+							</section>
+
+							<section class="ms-section">
+								<div class="ms-section-head"><h2>Upcoming Events</h2><a href="#0">All events</a></div>
+								<div class="ms-grid ms-grid--2">
+									<article class="ms-evt"><div class="ms-evt__date"><b>2</b><span>Aug</span></div><div><h4><a href="#0">Third Thursday on the Square</a></h4><div class="ms-meta"><span>5:00 – 9:00 PM</span><span>Downtown Benton</span></div></div></article>
+									<article class="ms-evt"><div class="ms-evt__date"><b>5</b><span>Aug</span></div><div><h4><a href="#0">Chamber Bingo Night</a></h4><div class="ms-meta"><span>6:30 PM</span><span>Community Center</span></div></div></article>
+									<article class="ms-evt"><div class="ms-evt__date"><b>9</b><span>Aug</span></div><div><h4><a href="#0">Saturday Farmers Market</a></h4><div class="ms-meta"><span>8:00 AM – Noon</span><span>Riverside Park</span></div></div></article>
+									<article class="ms-evt"><div class="ms-evt__date"><b>14</b><span>Aug</span></div><div><h4><a href="#0">Back-to-School Bash</a></h4><div class="ms-meta"><span>4:00 PM</span><span>Bryant</span></div></div></article>
+								</div>
+							</section>
+
+							<section class="ms-section">
+								<div class="ms-section-head"><h2>Recent Obituaries</h2><a href="#0">All obituaries</a></div>
+								<div class="ms-grid ms-grid--4">
+									<article class="ms-obit"><div class="ms-ph" aria-hidden="true"></div><h4><a href="#0">Sample Name</a></h4><div class="ms-dates">1941 – 2026</div></article>
+									<article class="ms-obit"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><h4><a href="#0">Sample Name</a></h4><div class="ms-dates">1953 – 2026</div></article>
+									<article class="ms-obit"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><h4><a href="#0">Sample Name</a></h4><div class="ms-dates">1936 – 2026</div></article>
+									<article class="ms-obit"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><h4><a href="#0">Sample Name</a></h4><div class="ms-dates">1948 – 2026</div></article>
+								</div>
+							</section>
+
+							<section class="ms-section">
+								<div class="ms-section-head"><h2>Business Spotlight</h2><a href="#0">Directory</a></div>
+								<div class="ms-grid ms-grid--3">
+									<article class="ms-biz"><div class="ms-ph ms-ph--e" aria-hidden="true"></div><h4><a href="#0">Sample Hardware Co.</a></h4><div class="ms-meta">Retail · Home &amp; Garden</div><dl><dt>Phone</dt><dd>(501) 000-0000</dd><dt>Hours</dt><dd>Mon–Sat 7–6</dd></dl></article>
+									<article class="ms-biz"><div class="ms-ph" aria-hidden="true"></div><h4><a href="#0">Sample Family Dental</a></h4><div class="ms-meta">Health · Dental</div><dl><dt>Phone</dt><dd>(501) 000-0000</dd><dt>Hours</dt><dd>Mon–Thu 8–5</dd></dl></article>
+									<article class="ms-biz"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><h4><a href="#0">Sample Auto Service</a></h4><div class="ms-meta">Automotive · Repair</div><dl><dt>Phone</dt><dd>(501) 000-0000</dd><dt>Hours</dt><dd>Mon–Fri 7:30–5:30</dd></dl></article>
+								</div>
+							</section>
+						</div>
+
+						<aside>
+							<div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div>
+							<div class="ms-widget">
+								<h3>Recent News</h3>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><div><h4><a href="#0">Council sets date for the budget hearing</a></h4><div class="ms-meta"><span>Jul 29</span></div></div></article>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><div><h4><a href="#0">Fire department adds two new engines</a></h4><div class="ms-meta"><span>Jul 28</span></div></div></article>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><div><h4><a href="#0">Park splash pad reopens after repairs</a></h4><div class="ms-meta"><span>Jul 27</span></div></div></article>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--e" aria-hidden="true"></div><div><h4><a href="#0">Weekend weather: hot, with evening storms</a></h4><div class="ms-meta"><span>Jul 27</span></div></div></article>
+							</div>
+							<div class="ms-widget">
+								<h3>Upcoming Events</h3>
+								<article class="ms-evt" style="border:0;padding:.5rem 0"><div class="ms-evt__date"><b>2</b><span>Aug</span></div><div><h4><a href="#0">Third Thursday</a></h4></div></article>
+								<article class="ms-evt" style="border:0;padding:.5rem 0"><div class="ms-evt__date"><b>5</b><span>Aug</span></div><div><h4><a href="#0">Chamber Bingo</a></h4></div></article>
+								<article class="ms-evt" style="border:0;padding:.5rem 0"><div class="ms-evt__date"><b>9</b><span>Aug</span></div><div><h4><a href="#0">Farmers Market</a></h4></div></article>
+							</div>
+						</aside>
+					</div>
+
+					<div class="ms-news">
+						<h2>Get the MySaline newsletter</h2>
+						<p>Saline County news in your inbox. Free, and no spam.</p>
+						<form onsubmit="return false"><input type="email" placeholder="you@example.com" aria-label="Email address"><button class="ms-btn" type="submit" style="background:#f2b705;color:#0b2545">Subscribe</button></form>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ BALLOT ============================ -->
+			<main class="pv-view fav-hidden" data-view="ballot">
+				<div class="ms-container" style="padding-top:1.25rem;padding-bottom:2rem">
+					<div class="ms-crumbs"><a href="#0">Home</a> › Saline County Favorites</div>
+
+					<div class="fav-head">
+						<h1>2026 Saline County Favorites</h1>
+						<p>It's free, no account needed, and your picks save as you go.</p>
+						<p class="fav-prize">Vote in 20+ categories, including at least one in every section, to enter the $100 drawing.</p>
+						<p class="fav-window">Voting closes July 29, 2026 at 6:00 pm.</p>
+					</div>
+
+					<div class="fav-demo">
+						<button type="button" data-demo="fill">Auto-fill a sample ballot</button>
+						<button type="button" data-demo="reset">Clear all picks</button>
+					</div>
+
+					<div class="fav-bar">
+						<div class="fav-prog-head">
+							<span class="fav-count"><b data-voted>0</b> of 20 needed</span>
+							<span class="fav-qualify" data-qualify hidden>✓ You qualify for the drawing</span>
+						</div>
+						<div class="fav-meter" role="progressbar" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0" data-meter><i data-fill></i></div>
+						<div class="fav-chips" data-chips></div>
+						<div class="fav-tools">
+							<label class="sr" for="fav-q" style="position:absolute;left:-9999px">Search categories</label>
+							<input id="fav-q" class="fav-search" type="search" placeholder="Search categories — try “barbecue” or “plumber”" autocomplete="off" data-q>
+							<label class="fav-toggle"><input type="checkbox" data-hidedone> Hide ones I've done</label>
+						</div>
+						<div class="fav-tabs" role="tablist" aria-label="Ballot sections" data-tabs></div>
+					</div>
+
+					<p class="fav-status" data-status></p>
+					<div data-ballot></div>
+
+					<div class="fav-submit">
+						<div class="fav-email">
+							<label for="fav-email">Your email address <span class="req">(required)</span></label>
+							<input id="fav-email" type="email" placeholder="you@example.com">
+							<small>We email you one link to confirm your ballot — that's what keeps the vote fair. Your votes count once you click it. We don't share your address or add you to anything.</small>
+						</div>
+						<button class="ms-btn" type="button" data-fav-submit>Submit &amp; confirm by email <span data-submit-count></span></button>
+						<p style="font-size:.82rem;color:var(--ms-muted);margin:1rem 0 0">You can come back and change your picks any time before voting closes — only your latest pick in each category counts.</p>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ ARTICLE ============================ -->
+			<main class="pv-view fav-hidden" data-view="article">
+				<div class="ms-container" style="padding-bottom:2rem">
+					<div class="ms-crumbs"><a href="#0">Home</a> › <a href="#0">Saline County</a> › County fair returns this weekend</div>
+					<div class="ms-cols" style="margin-top:1rem">
+						<article class="ms-article">
+							<span class="ms-badge">Saline County</span>
+							<h1>County fair returns this weekend with a bigger midway and free parking</h1>
+							<div class="ms-meta ms-byline" style="margin-bottom:1rem">
+								<span class="ms-avatar" aria-hidden="true">SB</span>
+								<span><a href="#0">Sample Byline</a></span><span>July 30, 2026</span><span>4 min read</span><span><a href="#0">12 comments</a></span>
+							</div>
+							<div class="ms-article__hero"><div class="ms-ph" aria-hidden="true"></div></div>
+							<div class="ms-article__body">
+								<p class="ms-article__lede">This is sample body copy standing in for a real article, so you can see how the theme sets long-form text — measure, line height, and the spacing between paragraphs and subheads.</p>
+								<p>Running text sits at a comfortable reading width with Georgia used for headings and a system sans for body copy. Links inside paragraphs <a href="#0">look like this</a>, and the type scale stays consistent from the headline down to the captions.</p>
+								<h2>Subheads break up longer stories</h2>
+								<p>Section headings inherit the same serif as the headline at a smaller size, which keeps a clear hierarchy without introducing another typeface. Lists, pull quotes and embedded images all pick up the same treatment.</p>
+								<blockquote style="margin:1.5rem 0;padding:.4rem 0 .4rem 1.2rem;border-left:4px solid var(--ms-accent);color:var(--ms-muted);font-style:italic">Pull quotes use the accent red on the rule, which ties article pages back to the breaking-news bar and the section headers.</blockquote>
+								<p>An in-content ad zone can be placed automatically a few paragraphs in, so advertising stays part of the reading experience rather than crowding the top of the page.</p>
+								<div class="ms-ad"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">In-content ad zone</div></div>
+								<p>Below the story the theme shows tags, an author box when a bio exists, previous and next links, and related stories from the same category.</p>
+							</div>
+							<div class="ms-tags"><a href="#0">county fair</a><a href="#0">benton</a><a href="#0">things to do</a></div>
+							<section class="ms-section" style="margin-top:2rem">
+								<div class="ms-section-head"><h2>More like this</h2></div>
+								<div class="ms-grid ms-grid--3">
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--b" aria-hidden="true"></div></div><div class="ms-card__body"><h3><a href="#0">What to know before you go</a></h3><div class="ms-meta"><span>Jul 29</span></div></div></article>
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--c" aria-hidden="true"></div></div><div class="ms-card__body"><h3><a href="#0">Parking and shuttle map</a></h3><div class="ms-meta"><span>Jul 28</span></div></div></article>
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--d" aria-hidden="true"></div></div><div class="ms-card__body"><h3><a href="#0">Last year in photos</a></h3><div class="ms-meta"><span>Jul 20</span></div></div></article>
+								</div>
+							</section>
+						</article>
+						<aside>
+							<div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div>
+							<div class="ms-widget">
+								<h3>Recent News</h3>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><div><h4><a href="#0">Council sets budget hearing date</a></h4><div class="ms-meta"><span>Jul 29</span></div></div></article>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><div><h4><a href="#0">Two new fire engines in service</a></h4><div class="ms-meta"><span>Jul 28</span></div></div></article>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><div><h4><a href="#0">Splash pad reopens</a></h4><div class="ms-meta"><span>Jul 27</span></div></div></article>
+							</div>
+						</aside>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ FOOTER ============================ -->
+			<footer class="ms-footer">
+				<div class="ms-container">
+					<div class="ms-footer__cols">
+						<div>
+							<div class="ms-footer__logo">My<span>Saline</span></div>
+							<p style="margin-top:.7rem">MySaline is the most-read news source in Saline County, Arkansas — local news, events, obituaries and community since 2007.</p>
+							<address>PO Box 165 · Benton, AR 72018<br>501-303-4010</address>
+							<div class="ms-social"><a href="#0" aria-label="Facebook">f</a><a href="#0" aria-label="Instagram">ig</a><a href="#0" aria-label="X">X</a><a href="#0" aria-label="RSS">rss</a></div>
+						</div>
+						<div><h4>Sections</h4><ul><li><a href="#0">Business News</a></li><li><a href="#0">Dining</a></li><li><a href="#0">Court Filings</a></li><li><a href="#0">Jobs</a></li><li><a href="#0">Columnists</a></li></ul></div>
+						<div><h4>Community</h4><ul><li><a href="#0">Community Events</a></li><li><a href="#0">Obituaries</a></li><li><a href="#0">Business Directory</a></li><li><a href="#0">Yard Sales</a></li><li><a href="#0">Favorites</a></li></ul></div>
+						<div><h4>Newsletter</h4><p style="font-size:.86rem">Saline County news in your inbox. Free, and no spam.</p><form onsubmit="return false" style="display:flex;gap:.4rem;flex-wrap:wrap"><input type="email" placeholder="you@example.com" aria-label="Email address" style="flex:1;min-width:150px;border:0;border-radius:4px;padding:.5rem .6rem;font:inherit"><button class="ms-btn" type="submit">Join</button></form></div>
+					</div>
+					<div class="ms-footer__bottom"><span>© 2026 MySaline. All rights reserved.</span><span>Powered by WordPress · MySaline theme</span></div>
+				</div>
+			</footer>
+
+		</div>
+	</div>
+
+	<p class="pv-note"><strong>What's interactive:</strong> the ballot's search, section tabs, progress meter, “hide ones I've done” and autosave all really work here — that's the same client-side behaviour the theme ships. Submitting a ballot and the confirmation email need WordPress and PHP, so the submit button explains what would happen instead of sending.</p>
+
+</div>
+
+<script>
+(function () {
+	'use strict';
+
+	/* ------------------------------------------------ view switching */
+	var tabs = Array.prototype.slice.call(document.querySelectorAll('.pv-tab'));
+	var views = Array.prototype.slice.call(document.querySelectorAll('.pv-view'));
+	var urlEl = document.querySelector('[data-url]');
+	var urls = { home: 'mysaline.com', ballot: 'mysaline.com/scf-2026-vote/', article: 'mysaline.com/county-fair-2026/' };
+
+	function show(name) {
+		views.forEach(function (v) { v.classList.toggle('fav-hidden', v.getAttribute('data-view') !== name); });
+		tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.getAttribute('data-view') === name)); });
+		document.querySelectorAll('.ms-menu > li').forEach(function (li) {
+			li.classList.toggle('is-current', li.getAttribute('data-nav') === name);
+		});
+		if (urlEl) { urlEl.textContent = urls[name] || urls.home; }
+		var frame = document.querySelector('.pv-frame');
+		if (frame) { frame.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+	}
+	tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.getAttribute('data-view')); }); });
+	document.querySelectorAll('[data-goto]').forEach(function (a) {
+		a.addEventListener('click', function (e) { e.preventDefault(); show(a.getAttribute('data-goto')); });
+	});
+	document.querySelectorAll('.ms-menu > li[data-nav]').forEach(function (li) {
+		li.addEventListener('click', function (e) { e.preventDefault(); show(li.getAttribute('data-nav')); });
+	});
+
+	/* ------------------------------------------------ ballot data */
+	var SECTIONS = [
+		{ slug: 'food', name: 'Food', cats: [
+			['Restaurant — BBQ', ['Smokehouse on Main', 'River Road BBQ', 'The Pit Stop']],
+			['Restaurant — Mexican', ['Casa Verde', 'Tres Amigos', 'El Camino Grill']],
+			['Restaurant — Asian', ['Golden Bowl', 'Saline Sushi', 'Bangkok Garden']],
+			['Food Truck', ['Curbside Kitchen', 'The Rolling Griddle', 'Taco Tumbleweed']],
+			['Bakery — Sweets', ['The Sweet Spot', 'Cake Corner', 'Sugar & Flour']],
+			['Bakery — Breads', ['Hearth & Loaf', 'Daily Crumb']],
+			['Caterer', ['Southern Table Catering', 'Two Pines Events', 'Copper Spoon']],
+			['Beverage Stop', ['Bean There Coffee', 'The Daily Grind', 'Sip & Go']],
+			['Fresh Produce', ['Riverside Farmers Market', 'Hillcrest Produce', 'Green Acres Stand']]
+		]},
+		{ slug: 'businesses', name: 'Businesses', cats: [
+			['Plumber', ['Ace Plumbing Co.', "Bob's Pipes & Drains", 'Clearwater Plumbing']],
+			['Heating & Air', ['Comfort Zone HVAC', 'Cool Breeze Air', 'Allied Heating']],
+			['Auto Repair', ['Main Street Motors', 'Precision Auto Care', 'Hometown Garage']],
+			['Auto Dealership', ['Saline Ford', 'Valley Motors', 'Crossroads Auto']],
+			['Boutique', ['Magnolia & Lace', 'The Blue Door', 'Prairie Rose']],
+			['Salon', ['Studio 5 Salon', 'The Mane Room', 'Bella Hair Co.']],
+			['Barber Shop', ['Classic Cuts', 'The Barber Post', 'Sharp Edge']],
+			['Lawn Care', ['GreenScape Lawn', 'Cutting Edge Yards', 'Evergreen Lawn Co.']],
+			['Furniture Store', ['Heritage Home', 'The Furniture Barn', 'Oak & Iron']],
+			['Insurance Agency', ['Shield Insurance Group', 'Legacy Insurance', 'Cornerstone Agency']],
+			['Bank or Credit Union', ['First Community Bank', 'Saline Federal CU', 'Heritage Bank']],
+			['Veterinarian', ['Paws & Claws Clinic', 'Countryside Vet', 'Animal Care Center']]
+		]},
+		{ slug: 'people', name: 'People', cats: [
+			['Dentist', ['Dr. A. Sample', 'Dr. B. Sample', 'Dr. C. Sample']],
+			['Attorney', ['J. Sample, Esq.', 'K. Sample, Esq.', 'L. Sample, Esq.']],
+			['Realtor', ['M. Sample', 'N. Sample', 'P. Sample']],
+			['Teacher', ['R. Sample', 'S. Sample', 'T. Sample']],
+			['Nurse', ['V. Sample, RN', 'W. Sample, RN', 'Y. Sample, RN']],
+			['Photographer', ['Sample Photography', 'Golden Hour Studio', 'Wildflower Photo']],
+			['Coach', ['Coach Sample (Football)', 'Coach Sample (Softball)', 'Coach Sample (Track)']],
+			['Accountant', ['D. Sample, CPA', 'E. Sample, CPA', 'F. Sample, CPA']]
+		]},
+		{ slug: 'places', name: 'Places & Things', cats: [
+			['Park', ['Riverside Park', 'Tyndall Park', 'Bishop Park']],
+			['Trail', ['Saline River Trail', 'Cedar Ridge Loop', 'Old Mill Path']],
+			['Date Spot', ['The Rooftop', 'Riverwalk Bistro', 'Starlight Cinema']],
+			['Event Venue', ['The Depot', 'Magnolia Hall', 'The Barn at Oak Creek']],
+			['Swimming Spot', ['City Aquatic Center', 'Sandy Beach', 'Cedar Springs']],
+			['Photo Spot', ['The Old Mill', 'Downtown Mural Wall', 'Riverbend Overlook']]
+		]}
+	];
+
+	var MIN_CATS = 20, MIN_SECTIONS = 4;
+	var STORE = 'mysaline_preview_favorites';
+	var ballotEl = document.querySelector('[data-ballot]');
+	var tabsEl = document.querySelector('[data-tabs]');
+	var chipsEl = document.querySelector('[data-chips]');
+	if (!ballotEl) { return; }
+
+	/* ------------------------------------------------ render */
+	var total = 0, id = 0, html = '', tabHtml = '', chipHtml = '';
+	tabHtml += '<button class="fav-tab" role="tab" aria-selected="true" data-tab="all">All</button>';
+	SECTIONS.forEach(function (sec) {
+		total += sec.cats.length;
+		tabHtml += '<button class="fav-tab" role="tab" aria-selected="false" data-tab="' + sec.slug + '">' + sec.name + ' <small>' + sec.cats.length + '</small></button>';
+		chipHtml += '<span class="fav-chip" data-chip="' + sec.slug + '">' + sec.name + '</span>';
+		html += '<section data-sec="' + sec.slug + '"><h2 class="fav-sec-title">' + sec.name + '</h2>';
+		sec.cats.forEach(function (c) {
+			id++;
+			var name = c[0], noms = c[1];
+			html += '<fieldset class="fav-cat" data-cat="' + id + '" data-cat-sec="' + sec.slug + '" data-text="' + name.toLowerCase() + '">';
+			html += '<legend class="fav-cat-title">' + name + ' <span class="tick" aria-hidden="true">✓</span></legend>';
+			html += '<div class="fav-opts">';
+			noms.forEach(function (n, i) {
+				var fid = 'v' + id + '-' + i;
+				html += '<label class="fav-opt" for="' + fid + '"><input type="radio" id="' + fid + '" name="vote[' + id + ']" value="' + n.replace(/"/g, '&quot;') + '"><span>' + n + '</span></label>';
+			});
+			html += '</div><button type="button" class="fav-clear" data-clear="' + id + '">Clear</button></fieldset>';
+		});
+		html += '</section>';
+	});
+	ballotEl.innerHTML = html;
+	tabsEl.innerHTML = tabHtml;
+	chipsEl.innerHTML = chipHtml;
+
+	var cats = Array.prototype.slice.call(ballotEl.querySelectorAll('[data-cat]'));
+	var secs = Array.prototype.slice.call(ballotEl.querySelectorAll('[data-sec]'));
+	var chips = Array.prototype.slice.call(chipsEl.querySelectorAll('[data-chip]'));
+	var favTabs = Array.prototype.slice.call(tabsEl.querySelectorAll('[data-tab]'));
+	var qEl = document.querySelector('[data-q]');
+	var hideEl = document.querySelector('[data-hidedone]');
+	var votedEl = document.querySelector('[data-voted]');
+	var fillEl = document.querySelector('[data-fill]');
+	var meterEl = document.querySelector('[data-meter]');
+	var qualEl = document.querySelector('[data-qualify]');
+	var statusEl = document.querySelector('[data-status]');
+	var subCount = document.querySelector('[data-submit-count]');
+	var active = 'all';
+
+	/* ------------------------------------------------ storage */
+	function read() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+	function write(d) { try { localStorage.setItem(STORE, JSON.stringify(d)); } catch (e) {} }
+
+	function restore() {
+		var s = read();
+		Object.keys(s).forEach(function (k) {
+			ballotEl.querySelectorAll('input[name="vote[' + k + ']"]').forEach(function (inp) {
+				if (inp.value === s[k]) { inp.checked = true; }
+			});
+		});
+	}
+
+	/* ------------------------------------------------ progress */
+	function update() {
+		var done = cats.filter(function (c) { return !!c.querySelector('input:checked'); });
+		var n = done.length;
+		var secDone = {};
+		done.forEach(function (c) { secDone[c.getAttribute('data-cat-sec')] = true; });
+		var sn = Object.keys(secDone).length;
+
+		if (votedEl) { votedEl.textContent = String(n); }
+		if (fillEl) { fillEl.style.width = Math.min(100, (n / MIN_CATS) * 100) + '%'; }
+		if (meterEl) { meterEl.setAttribute('aria-valuenow', String(n)); }
+		chips.forEach(function (ch) { ch.classList.toggle('on', !!secDone[ch.getAttribute('data-chip')]); });
+		cats.forEach(function (c) {
+			var on = !!c.querySelector('input:checked');
+			c.classList.toggle('done', on);
+			c.querySelectorAll('.fav-opt').forEach(function (o) {
+				var i = o.querySelector('input');
+				o.classList.toggle('sel', !!(i && i.checked));
+			});
+		});
+
+		var ok = n >= MIN_CATS && sn >= MIN_SECTIONS;
+		if (qualEl) { qualEl.hidden = !ok; }
+		document.querySelector('.fav-bar').classList.toggle('fav-ok', ok);
+		if (subCount) { subCount.textContent = n ? '(' + n + ')' : ''; }
+
+		if (statusEl) {
+			if (!n) {
+				statusEl.textContent = total + ' categories on the ballot. Pick as many as you like, in any order.';
+			} else if (ok) {
+				statusEl.textContent = 'Voted in ' + n + ' of ' + total + ' categories — you qualify for the drawing. Picks are saved on this device.';
+			} else {
+				var needC = Math.max(0, MIN_CATS - n), needS = Math.max(0, MIN_SECTIONS - sn);
+				var bits = [];
+				if (needC) { bits.push(needC + ' more categor' + (needC === 1 ? 'y' : 'ies')); }
+				if (needS) { bits.push(needS + ' more section' + (needS === 1 ? '' : 's')); }
+				statusEl.textContent = 'Voted in ' + n + ' of ' + total + '. Need ' + bits.join(' and ') + ' to enter the drawing. Picks are saved on this device.';
+			}
+		}
+		if (hideEl && hideEl.checked) { filter(); }
+	}
+
+	/* ------------------------------------------------ filter
+	   Handles visibility only. When a search hides everything it owns the
+	   status line; otherwise update() writes it. */
+	function filter() {
+		var term = qEl ? qEl.value.trim().toLowerCase() : '';
+		var hide = hideEl ? hideEl.checked : false;
+		var vis = 0;
+		cats.forEach(function (c) {
+			var show = true;
+			if (term && c.getAttribute('data-text').indexOf(term) === -1) { show = false; }
+			if (show && active !== 'all' && c.getAttribute('data-cat-sec') !== active) { show = false; }
+			if (show && hide && c.classList.contains('done')) { show = false; }
+			c.classList.toggle('fav-hidden', !show);
+			if (show) { vis++; }
+		});
+		secs.forEach(function (s) {
+			s.classList.toggle('fav-hidden', !s.querySelector('[data-cat]:not(.fav-hidden)'));
+		});
+		if (!vis && statusEl) {
+			statusEl.textContent = term
+				? 'No categories match “' + qEl.value.trim() + '”.'
+				: 'Nothing left to show — try unchecking “Hide ones I’ve done”.';
+		}
+		return vis;
+	}
+
+	/* ------------------------------------------------ events
+	   Always update() first (it writes the status line), then filter()
+	   so an empty result set can override that message. */
+	function refresh() { update(); filter(); }
+
+	ballotEl.addEventListener('change', function (e) {
+		var t = e.target;
+		if (t.type === 'radio') {
+			var k = t.name.replace('vote[', '').replace(']', '');
+			var s = read(); s[k] = t.value; write(s);
+			refresh();
+		}
+	});
+	ballotEl.addEventListener('click', function (e) {
+		var b = e.target.closest && e.target.closest('[data-clear]');
+		if (!b) { return; }
+		var k = b.getAttribute('data-clear');
+		ballotEl.querySelectorAll('input[name="vote[' + k + ']"]').forEach(function (i) { i.checked = false; });
+		var s = read(); delete s[k]; write(s);
+		refresh();
+	});
+	if (qEl) {
+		var tmr = null;
+		qEl.addEventListener('input', function () { clearTimeout(tmr); tmr = setTimeout(refresh, 110); });
+		qEl.addEventListener('keydown', function (e) { if (e.key === 'Escape') { qEl.value = ''; refresh(); } });
+	}
+	if (hideEl) { hideEl.addEventListener('change', refresh); }
+	favTabs.forEach(function (t) {
+		t.addEventListener('click', function () {
+			active = t.getAttribute('data-tab');
+			favTabs.forEach(function (x) { x.setAttribute('aria-selected', String(x === t)); });
+			refresh();
+		});
+	});
+
+	/* demo helpers */
+	document.querySelectorAll('[data-demo]').forEach(function (b) {
+		b.addEventListener('click', function () {
+			var mode = b.getAttribute('data-demo');
+			var s = {};
+			if (mode === 'fill') {
+				cats.forEach(function (c, i) {
+					if (i % 4 === 3) { return; } // leave some blank so it looks real
+					var inputs = c.querySelectorAll('input');
+					var pick = inputs[i % inputs.length];
+					if (pick) { pick.checked = true; s[c.getAttribute('data-cat')] = pick.value; }
+				});
+			} else {
+				cats.forEach(function (c) { c.querySelectorAll('input').forEach(function (i) { i.checked = false; }); });
+			}
+			write(s); refresh();
+		});
+	});
+
+	var subBtn = document.querySelector('[data-fav-submit]');
+	if (subBtn) {
+		subBtn.addEventListener('click', function () {
+			var n = cats.filter(function (c) { return !!c.querySelector('input:checked'); }).length;
+			var box = document.createElement('div');
+			box.className = 'fav-note-ok';
+			box.textContent = n
+				? 'On the real site this would hold your ' + n + '-category ballot as pending and email you a confirmation link. Votes only count once you click it — that is what makes one confirmed email equal one ballot. Sending needs WordPress, so nothing was submitted here.'
+				: 'Pick at least one category first. On the real site an empty ballot is rejected with the same message.';
+			var host = document.querySelector('.fav-submit');
+			var old = host.querySelector('.fav-note-ok');
+			if (old) { old.remove(); }
+			host.insertBefore(box, host.firstChild);
+			box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		});
+	}
+
+	restore();
+	refresh();
+}());
+</script>
+
+</body>
+</html>

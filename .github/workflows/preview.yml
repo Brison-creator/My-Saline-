@@ -1,0 +1,52 @@
+name: Deploy design preview to GitHub Pages
+
+# Publishes the static design preview in /preview to GitHub Pages, giving a
+# shareable URL for review.
+#
+# NOTE: GitHub Pages serves STATIC files only — it cannot run PHP, WordPress or
+# MySQL. So this hosts the *design preview* (including the interactive Favorites
+# ballot UI), not a working WordPress site. For the real thing, run the local
+# environment with `npm start`, or install the theme ZIP on a staging host.
+#
+# One-time setup: repository Settings → Pages → Build and deployment →
+# Source: "GitHub Actions".
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'preview/**'
+      - '.github/workflows/preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a newer run supersede an in-flight one, but never cancel a live deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the preview directory
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./preview
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
