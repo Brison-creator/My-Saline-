@@ -41,6 +41,11 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # Turn Pages on via the API if it isn't already, so no manual trip to
+          # Settings → Pages is needed. Requires the pages: write permission
+          # declared above.
+          enablement: true
 
       - name: Upload the preview directory
         uses: actions/upload-pages-artifact@v3
