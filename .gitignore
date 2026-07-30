@@ -1,0 +1,18 @@
+# Build output
+/dist/
+
+# Dependencies
+node_modules/
+vendor/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# Logs / temp
+*.log
+*.bak

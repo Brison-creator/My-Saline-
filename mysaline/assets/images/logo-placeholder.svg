@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="72" viewBox="0 0 320 72" role="img" aria-label="MySaline">
+	<rect width="320" height="72" fill="none"/>
+	<g font-family="Georgia, 'Times New Roman', serif" font-weight="800">
+		<text x="0" y="48" font-size="40" fill="#0b2545">My</text>
+		<text x="66" y="48" font-size="40" fill="#c8102e">Saline</text>
+	</g>
+	<text x="2" y="66" font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="10" letter-spacing="2" fill="#5b6472">SALINE COUNTY NEWS · SINCE 2007</text>
+</svg>

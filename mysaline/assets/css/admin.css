@@ -1,0 +1,15 @@
+/* MySaline admin styling for meta boxes and the setup guide. */
+.mysaline-fields .mysaline-field { margin: 0 0 1rem; }
+.mysaline-fields label { font-weight: 600; display: block; margin-bottom: .25rem; }
+.mysaline-fields .mysaline-field--checkbox label { font-weight: 400; display: flex; gap: .4rem; align-items: center; }
+.mysaline-fields input[type="text"],
+.mysaline-fields input[type="url"],
+.mysaline-fields input[type="email"],
+.mysaline-fields input[type="date"],
+.mysaline-fields input[type="number"],
+.mysaline-fields textarea,
+.mysaline-fields select { max-width: 520px; }
+
+.mysaline-setup table { margin-top: 1rem; }
+.mysaline-setup td { padding: .6rem 1rem; }
+.mysaline-setup h1 { margin-bottom: .5rem; }
