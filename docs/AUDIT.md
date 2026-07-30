@@ -152,10 +152,24 @@ line = category, `-` = finalist, optional `| URL`). Re-importing matches by name
 and updates rather than duplicating. Results screen shows per-category leaders
 with **CSV exports** for both full results and qualified drawing entries.
 
-**Known limit:** vote de-duplication (email, or salted IP+browser hash) stops
-casual double-voting but not a determined ballot-stuffer — the same is true of
-the current Google Form. Documented in `CONTENT-MANAGEMENT.md` with options for
-tightening it.
+**Vote integrity.** Ballots require **email confirmation** (double opt-in): votes
+are held pending and only counted once the voter clicks a single-use, 48-hour link,
+so **one confirmed email = one ballot**. Tokens are stored hashed; picks are
+re-validated server-side against the real finalist list on submit *and* at
+confirmation; once a browser is confirmed, identity comes from a signed cookie
+rather than the submitted address, so nobody can overwrite another voter's ballot;
+confirmation emails are rate-limited per address and per IP so the form can't be
+used to mail-bomb someone.
+
+**Remaining limit:** someone with many working email addresses can still cast one
+ballot per address — the practical ceiling short of demanding ID, and far stronger
+than the old Google Form. `CONTENT-MANAGEMENT.md` documents this plus the two
+sanity checks (results CSV for implausible jumps, drawing CSV for `name+1@`-style
+address batches).
+
+**Operational dependency:** confirmation is only as good as the site's outgoing
+mail, so an SMTP plugin and a test send before voting opens are required, not
+optional — noted in the deployment checklist.
 
 ## 10. Deliberately not carried over
 

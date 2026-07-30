@@ -22,22 +22,78 @@ $ms_ballot = mysaline_fav_get_ballot();
 $ms_status = mysaline_fav_status();
 $ms_total  = mysaline_fav_total_categories();
 
-// Post-submit confirmation.
-$ms_flag = isset( $_GET['fav'] ) ? sanitize_key( $_GET['fav'] ) : '';
+// Post-submit / post-confirm messaging.
+$ms_flag  = isset( $_GET['fav'] ) ? sanitize_key( $_GET['fav'] ) : '';
+$ms_count = isset( $_GET['count'] ) ? absint( $_GET['count'] ) : 0;
+
 if ( $ms_flag ) {
 	$ms_messages = array(
-		'thanks'   => get_theme_mod( 'mysaline_fav_thanks', __( 'Thanks for voting! Your ballot is in.', 'mysaline' ) ),
-		'closed'   => __( 'Voting is closed, so that ballot could not be counted.', 'mysaline' ),
-		'empty'    => __( 'No picks were selected, so nothing was saved.', 'mysaline' ),
-		'toofast'  => __( 'That was a little too quick — please wait a moment and try again.', 'mysaline' ),
-		'badnonce' => __( 'Your session expired. Please reload the page and vote again.', 'mysaline' ),
+		'check_email' => array(
+			'ok'   => true,
+			'text' => __( 'Almost there — check your email. We just sent you a link to confirm your ballot. Your votes are not counted until you click it.', 'mysaline' ),
+		),
+		'confirmed'   => array(
+			'ok'   => true,
+			'text' => get_theme_mod( 'mysaline_fav_thanks', __( 'Thanks for voting! Your ballot is in.', 'mysaline' ) ),
+		),
+		'updated'     => array(
+			'ok'   => true,
+			'text' => __( 'Your picks were updated. You’re already confirmed, so no new email is needed.', 'mysaline' ),
+		),
+		'thanks'      => array(
+			'ok'   => true,
+			'text' => get_theme_mod( 'mysaline_fav_thanks', __( 'Thanks for voting! Your ballot is in.', 'mysaline' ) ),
+		),
+		'expired'     => array(
+			'ok'   => false,
+			'text' => __( 'That confirmation link has expired or was already used. Please submit your ballot again to get a fresh link.', 'mysaline' ),
+		),
+		'noemail'     => array(
+			'ok'   => false,
+			'text' => __( 'Please enter a valid email address so we can confirm your ballot.', 'mysaline' ),
+		),
+		'emailfail'   => array(
+			'ok'   => false,
+			'text' => __( 'We couldn’t send the confirmation email just now. Please try again in a few minutes.', 'mysaline' ),
+		),
+		'toomany'     => array(
+			'ok'   => false,
+			'text' => __( 'That address has already been sent several confirmation links. Please check your inbox (and spam folder) before trying again.', 'mysaline' ),
+		),
+		'closed'      => array(
+			'ok'   => false,
+			'text' => __( 'Voting is closed, so that ballot could not be counted.', 'mysaline' ),
+		),
+		'empty'       => array(
+			'ok'   => false,
+			'text' => __( 'No picks were selected, so nothing was saved.', 'mysaline' ),
+		),
+		'toofast'     => array(
+			'ok'   => false,
+			'text' => __( 'That was a little too quick — please wait a moment and try again.', 'mysaline' ),
+		),
+		'badnonce'    => array(
+			'ok'   => false,
+			'text' => __( 'Your session expired. Please reload the page and vote again.', 'mysaline' ),
+		),
 	);
+
 	if ( isset( $ms_messages[ $ms_flag ] ) ) {
-		$ms_ok = ( 'thanks' === $ms_flag );
+		$ms_msg  = $ms_messages[ $ms_flag ];
+		$ms_body = $ms_msg['text'];
+
+		if ( $ms_count && in_array( $ms_flag, array( 'confirmed', 'updated', 'thanks', 'check_email' ), true ) ) {
+			$ms_body .= ' ' . sprintf(
+				/* translators: %d: number of categories. */
+				esc_html( _n( '(%d category)', '(%d categories)', $ms_count, 'mysaline' ) ),
+				$ms_count
+			);
+		}
+
 		printf(
 			'<div class="ms-fav-notice %1$s" role="status"><p>%2$s</p></div>',
-			$ms_ok ? 'is-success' : 'is-warning',
-			esc_html( $ms_messages[ $ms_flag ] )
+			$ms_msg['ok'] ? 'is-success' : 'is-warning',
+			esc_html( $ms_body )
 		);
 	}
 }
@@ -188,16 +244,59 @@ $ms_prize    = get_theme_mod( 'mysaline_fav_prize', '' );
 		</div>
 
 		<?php if ( $ms_open ) : ?>
+			<?php
+			$ms_trusted = mysaline_fav_trusted_voter();
+			$ms_confirm = mysaline_fav_requires_confirmation();
+			?>
 			<div class="ms-fav__submit">
-				<p class="ms-fav__email">
-					<label for="ms-fav-email"><?php esc_html_e( 'Email (only if you want to enter the drawing)', 'mysaline' ); ?></label>
-					<input type="email" id="ms-fav-email" name="voter_email" placeholder="<?php esc_attr_e( 'you@example.com', 'mysaline' ); ?>" />
-					<span class="ms-fav__email-note"><?php esc_html_e( 'Optional. Used only to contact the drawing winner.', 'mysaline' ); ?></span>
-				</p>
+				<?php if ( $ms_trusted ) : ?>
+					<p class="ms-fav__confirmed-as">
+						<?php
+						printf(
+							/* translators: %s: the voter's confirmed email address. */
+							esc_html__( 'You’re confirmed as %s — your picks save straight away, no new email needed.', 'mysaline' ),
+							'<strong>' . esc_html( $ms_trusted['email'] ) . '</strong>'
+						);
+						?>
+					</p>
+				<?php else : ?>
+					<p class="ms-fav__email">
+						<label for="ms-fav-email">
+							<?php
+							if ( $ms_confirm ) {
+								esc_html_e( 'Your email address', 'mysaline' );
+								echo ' <span class="ms-fav__req">' . esc_html__( '(required)', 'mysaline' ) . '</span>';
+							} else {
+								esc_html_e( 'Email (only if you want to enter the drawing)', 'mysaline' );
+							}
+							?>
+						</label>
+						<input type="email" id="ms-fav-email" name="voter_email"
+							placeholder="<?php esc_attr_e( 'you@example.com', 'mysaline' ); ?>"
+							<?php echo $ms_confirm ? 'required' : ''; ?> />
+						<span class="ms-fav__email-note">
+							<?php
+							if ( $ms_confirm ) {
+								esc_html_e( 'We email you one link to confirm your ballot — that’s what keeps the vote fair. Your votes count once you click it. We don’t share your address or add you to anything.', 'mysaline' );
+							} else {
+								esc_html_e( 'Optional. Used only to contact the drawing winner.', 'mysaline' );
+							}
+							?>
+						</span>
+					</p>
+				<?php endif; ?>
+
 				<button type="submit" class="ms-btn ms-fav__submit-btn">
-					<?php esc_html_e( 'Submit my ballot', 'mysaline' ); ?>
+					<?php
+					if ( $ms_trusted || ! $ms_confirm ) {
+						esc_html_e( 'Submit my ballot', 'mysaline' );
+					} else {
+						esc_html_e( 'Submit & confirm by email', 'mysaline' );
+					}
+					?>
 					<span data-fav-submit-count></span>
 				</button>
+
 				<p class="ms-fav__resubmit"><?php esc_html_e( 'You can come back and change your picks any time before voting closes — only your latest pick in each category counts.', 'mysaline' ); ?></p>
 			</div>
 		<?php endif; ?>

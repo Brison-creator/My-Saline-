@@ -65,6 +65,18 @@ untouched.
 - [ ] Mobile: menu toggle, search toggle, breaking bar, responsive grids.
 - [ ] Featured images display; run Regenerate Thumbnails if needed.
 
+### Before a Favorites voting window opens
+
+Ballots require an email click to count, so outgoing mail is load-bearing:
+
+- [ ] An SMTP plugin is configured (WP Mail SMTP / Post SMTP / host equivalent) —
+      default PHP mail often fails to reach Gmail and Yahoo.
+- [ ] Submitted a real test ballot end to end: email arrives, link confirms, the
+      vote appears under **Favorites → Results**.
+- [ ] Checked the confirmation email doesn't land in spam (test Gmail + Yahoo).
+- [ ] Voting open/close datetimes and the ballot year are set correctly.
+- [ ] Ballot imported and spot-checked; **Publish results publicly** is OFF.
+
 ## 6a. Updating later
 
 Ship updates the same way: `./build.sh <new-version>`, upload, and WordPress

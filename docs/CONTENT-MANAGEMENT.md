@@ -164,10 +164,40 @@ publicly*. Editors can preview results before they're public.
   they can see exactly when they qualify for the drawing.
 - **"Hide ones I've done"** — shrinks a 155-category ballot as they go.
 - **Autosave** — picks are kept on their device; closing the tab loses nothing.
-- **Skip anything**; nothing is required. Email is optional and only used to
-  contact the drawing winner.
+- **Skip anything**; no category is required.
 - They can return and change picks until voting closes — only the latest pick in
   each category counts.
+
+### 4a. Email confirmation (on by default)
+
+To keep the vote fair, a ballot only counts once the voter clicks a link emailed
+to them:
+
+1. Voter fills in the ballot and enters their email, then submits.
+2. The ballot is held as **pending** and a confirmation email goes out.
+3. They click the link → the votes are counted, and the page says thanks.
+4. Their browser is remembered, so if they come back to change picks it saves
+   **instantly** — no second email.
+
+This means **one confirmed email = one ballot**. Pending ballots are never
+included in tallies or exports, and unclicked links are deleted automatically
+after 48 hours.
+
+The **Favorites → Results** screen shows both numbers: confirmed ballots, and how
+many are still awaiting confirmation.
+
+You can edit the email's subject and opening line under Customize → MySaline
+Options → Saline County Favorites. The link, vote count and expiry note are added
+for you.
+
+**Make sure your site can send email.** Confirmation is only as reliable as
+WordPress's outgoing mail. Many hosts deliver poorly to Gmail/Yahoo by default,
+which would silently cost you votes. Install an SMTP plugin (WP Mail SMTP,
+Post SMTP, or your host's own) and send yourself a test before voting opens.
+If sending fails, the voter is told to try again rather than being left guessing.
+
+Confirmation can be switched off in the Customizer, but the results screen will
+warn you that repeat voting is then possible.
 
 ### 5. Results and the drawing
 
@@ -179,16 +209,33 @@ publicly*. Editors can preview results before they're public.
 
 ### A note on vote integrity
 
-Votes are de-duplicated per voter per category: by email when one is given,
-otherwise by a salted hash of IP + browser. Picks are validated server-side
-against the real finalist list, so the ballot can't be tampered with from the
-browser, and there's a short rate limit on submissions.
+With email confirmation on (the default), the protections are:
 
-This stops casual double-voting, **not** a determined ballot-stuffer — someone
-switching networks or using fresh browsers can vote more than once, which is
-true of the Google Form too. If a category ever looks suspicious, the CSV export
-includes counts you can sanity-check. For a tighter contest, require email and
-verify it, or ask us about adding email confirmation.
+- **One confirmed email = one ballot.** Voters are identified by a salted hash of
+  their confirmed address, so a second submission from the same address updates
+  their ballot instead of adding a new one.
+- **Unconfirmed ballots never count.** They sit in a separate pending table that
+  tallies and exports don't read.
+- **Picks are re-validated server-side** against the real finalist list, both on
+  submit and again at confirmation time. A pick that isn't a genuine finalist is
+  discarded, so the ballot can't be tampered with from the browser.
+- **Nobody can overwrite someone else's ballot.** Once a browser is confirmed,
+  identity is taken from a signed cookie, never from whatever address is typed
+  into the form.
+- **Single-use, expiring links.** Tokens are stored hashed (a database leak can't
+  be replayed as votes), work once, and die after 48 hours.
+- **The form can't be used to spam anyone** — confirmation emails are capped per
+  address and per IP address per hour.
+
+**What it does not stop:** someone with many real, working email addresses can
+still cast one ballot per address. That's the practical ceiling for any contest
+that doesn't demand identity documents, and it's a large step up from the old
+Google Form. Two habits close most of the remaining gap:
+
+1. Before announcing winners, export the results CSV and glance at any category
+   whose leader jumped suddenly — real local voting is fairly flat.
+2. The drawing export lists each entrant's email and category count. Batches of
+   near-identical addresses (`name+1@`, `name+2@`) are the usual tell.
 
 ## Newsletter signup
 

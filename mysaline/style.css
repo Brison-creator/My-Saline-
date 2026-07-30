@@ -510,8 +510,14 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 
 /* Submit */
 .ms-fav__submit { background: var(--ms-surface); border-radius: var(--ms-radius); padding: 1.5rem; margin-top: 2rem; text-align: center; }
-.ms-fav__email { max-width: 400px; margin: 0 auto 1rem; text-align: left; }
-.ms-fav__email-note { display: block; font-size: .8rem; color: var(--ms-muted); margin-top: .3rem; }
+.ms-fav__email { max-width: 460px; margin: 0 auto 1rem; text-align: left; }
+.ms-fav__email-note { display: block; font-size: .8rem; color: var(--ms-muted); margin-top: .3rem; line-height: 1.5; }
+.ms-fav__req { color: var(--ms-accent); font-weight: 700; font-size: .85rem; }
+.ms-fav__confirmed-as {
+	max-width: 460px; margin: 0 auto 1rem; padding: .75rem 1rem; border-radius: var(--ms-radius-sm);
+	background: #e8f6ee; color: #0f5231; font-size: .92rem;
+}
+.ms-fav__confirmed-as::before { content: "✓ "; font-weight: 800; }
 .ms-fav__submit-btn { font-size: 1.05rem; padding: .9rem 2rem; }
 .ms-fav__resubmit { font-size: .84rem; color: var(--ms-muted); margin: 1rem 0 0; }
 

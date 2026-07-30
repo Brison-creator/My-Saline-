@@ -26,7 +26,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Bump when the votes table schema changes.
  */
-define( 'MYSALINE_FAV_DB_VERSION', '1.0.0' );
+define( 'MYSALINE_FAV_DB_VERSION', '1.1.0' );
+
+/**
+ * How long a confirmation link stays valid (seconds).
+ */
+define( 'MYSALINE_FAV_TOKEN_TTL', 48 * HOUR_IN_SECONDS );
 
 /* -------------------------------------------------------------------------
  * Registration
@@ -97,7 +102,8 @@ function mysaline_fav_seed_sections() {
  * ---------------------------------------------------------------------- */
 
 /**
- * Fully-qualified votes table name.
+ * Fully-qualified votes table name. Holds CONFIRMED votes only, so every tally
+ * and export counts verified ballots and nothing else.
  *
  * @return string
  */
@@ -107,17 +113,28 @@ function mysaline_fav_table() {
 }
 
 /**
- * Create/upgrade the votes table.
+ * Pending (unconfirmed) ballots, one row per submission awaiting an email click.
+ *
+ * @return string
+ */
+function mysaline_fav_pending_table() {
+	global $wpdb;
+	return $wpdb->prefix . 'mysaline_fav_pending';
+}
+
+/**
+ * Create/upgrade the tables.
  */
 function mysaline_fav_install_table() {
 	global $wpdb;
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-	$table   = mysaline_fav_table();
 	$collate = $wpdb->get_charset_collate();
+	$votes   = mysaline_fav_table();
+	$pending = mysaline_fav_pending_table();
 
-	$sql = "CREATE TABLE {$table} (
+	$sql = "CREATE TABLE {$votes} (
 		id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 		ballot_year smallint(5) unsigned NOT NULL,
 		category_id bigint(20) unsigned NOT NULL,
@@ -130,8 +147,26 @@ function mysaline_fav_install_table() {
 		KEY category_year (category_id,ballot_year),
 		KEY ballot_year (ballot_year)
 	) {$collate};";
-
 	dbDelta( $sql );
+
+	// Tokens are stored hashed, so a database leak cannot be replayed as votes.
+	$sql = "CREATE TABLE {$pending} (
+		id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+		token_hash char(64) NOT NULL,
+		ballot_year smallint(5) unsigned NOT NULL,
+		voter_hash char(64) NOT NULL,
+		voter_email varchar(191) NOT NULL DEFAULT '',
+		payload longtext NOT NULL,
+		return_url text NOT NULL,
+		created_at datetime NOT NULL,
+		expires_at datetime NOT NULL,
+		PRIMARY KEY  (id),
+		UNIQUE KEY token_hash (token_hash),
+		KEY expires_at (expires_at),
+		KEY voter_hash (voter_hash)
+	) {$collate};";
+	dbDelta( $sql );
+
 	update_option( 'mysaline_fav_db_version', MYSALINE_FAV_DB_VERSION );
 }
 
@@ -363,6 +398,58 @@ function mysaline_fav_customize( $wp_customize ) {
 			'section'     => 'mysaline_favorites',
 		)
 	);
+
+	// Email confirmation (double opt-in) — strongly recommended.
+	$wp_customize->add_setting(
+		'mysaline_fav_confirm_email',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'mysaline_sanitize_checkbox',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_fav_confirm_email',
+		array(
+			'type'        => 'checkbox',
+			'label'       => __( 'Require email confirmation before votes count', 'mysaline' ),
+			'description' => __( 'Recommended. Voters get a link by email; votes only count once they click it. This is what keeps one person from voting many times.', 'mysaline' ),
+			'section'     => 'mysaline_favorites',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_fav_email_subject',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_fav_email_subject',
+		array(
+			'type'        => 'text',
+			'label'       => __( 'Confirmation email subject', 'mysaline' ),
+			'description' => __( 'Leave blank to use “Confirm your {site} Favorites ballot”.', 'mysaline' ),
+			'section'     => 'mysaline_favorites',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_fav_email_body',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_textarea_field',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_fav_email_body',
+		array(
+			'type'        => 'textarea',
+			'label'       => __( 'Confirmation email opening line', 'mysaline' ),
+			'description' => __( 'The confirmation link, vote count and expiry note are added automatically.', 'mysaline' ),
+			'section'     => 'mysaline_favorites',
+		)
+	);
 }
 add_action( 'customize_register', 'mysaline_fav_customize' );
 
@@ -528,22 +615,344 @@ function mysaline_fav_total_categories() {
  * ---------------------------------------------------------------------- */
 
 /**
- * Identify a voter: their email when given, otherwise a salted IP+agent hash.
+ * Stable voter identity derived from a confirmed email address.
+ * One confirmed email = one ballot.
  *
- * @param string $email Optional email.
- * @return string 64-char hash.
+ * @param string $email Email address.
+ * @return string 64-char hash, or '' when no email given.
  */
 function mysaline_fav_voter_hash( $email = '' ) {
-	if ( $email ) {
-		return hash( 'sha256', 'ms-fav-email|' . strtolower( trim( $email ) ) . '|' . wp_salt( 'auth' ) );
+	$email = strtolower( trim( (string) $email ) );
+	if ( '' === $email ) {
+		return '';
 	}
-	$ip    = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
-	$agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-	return hash( 'sha256', 'ms-fav-anon|' . $ip . '|' . $agent . '|' . wp_salt( 'auth' ) );
+	return hash( 'sha256', 'ms-fav-email|' . $email . '|' . wp_salt( 'auth' ) );
 }
 
 /**
+ * Whether email confirmation is required before votes count.
+ *
+ * @return bool
+ */
+function mysaline_fav_requires_confirmation() {
+	return (bool) get_theme_mod( 'mysaline_fav_confirm_email', true );
+}
+
+/* ---- "already confirmed on this browser" cookie ---------------------- */
+
+/**
+ * Cookie name for the trusted-voter token.
+ *
+ * @return string
+ */
+function mysaline_fav_cookie_name() {
+	return 'mysaline_fav_voter';
+}
+
+/**
+ * Issue the trusted-voter cookie after a successful confirmation, so the voter
+ * can revise their picks without a fresh email each time.
+ *
+ * @param string $hash  Voter hash.
+ * @param string $email Voter email.
+ */
+function mysaline_fav_set_trust_cookie( $hash, $email ) {
+	$payload = $hash . '|' . rawurlencode( $email );
+	$sig     = hash_hmac( 'sha256', $payload, wp_salt( 'auth' ) );
+	$value   = $payload . '|' . $sig;
+
+	// Not HttpOnly-sensitive beyond identity; still marked HttpOnly + Secure.
+	setcookie(
+		mysaline_fav_cookie_name(),
+		$value,
+		array(
+			'expires'  => time() + YEAR_IN_SECONDS,
+			'path'     => COOKIEPATH ? COOKIEPATH : '/',
+			'domain'   => COOKIE_DOMAIN,
+			'secure'   => is_ssl(),
+			'httponly' => true,
+			'samesite' => 'Lax',
+		)
+	);
+}
+
+/**
+ * Read and verify the trusted-voter cookie.
+ *
+ * Identity comes from the cookie, never from the submitted email field — that is
+ * what stops one person overwriting another person's ballot by typing their
+ * address.
+ *
+ * @return array|null { hash, email } or null when absent/invalid.
+ */
+function mysaline_fav_trusted_voter() {
+	$name = mysaline_fav_cookie_name();
+	if ( empty( $_COOKIE[ $name ] ) ) {
+		return null;
+	}
+
+	$raw   = sanitize_text_field( wp_unslash( $_COOKIE[ $name ] ) );
+	$parts = explode( '|', $raw );
+	if ( 3 !== count( $parts ) ) {
+		return null;
+	}
+
+	list( $hash, $email_enc, $sig ) = $parts;
+	$expected = hash_hmac( 'sha256', $hash . '|' . $email_enc, wp_salt( 'auth' ) );
+	if ( ! hash_equals( $expected, $sig ) ) {
+		return null;
+	}
+	if ( ! preg_match( '/^[a-f0-9]{64}$/', $hash ) ) {
+		return null;
+	}
+
+	return array(
+		'hash'  => $hash,
+		'email' => sanitize_email( rawurldecode( $email_enc ) ),
+	);
+}
+
+/* ---- Writing votes --------------------------------------------------- */
+
+/**
+ * Validate a raw picks array against the real finalist lists.
+ *
+ * @param array $raw category_id => nominee.
+ * @return array Clean category_id => nominee.
+ */
+function mysaline_fav_sanitize_votes( $raw ) {
+	$clean = array();
+	foreach ( (array) $raw as $category_id => $choice ) {
+		$category_id = absint( $category_id );
+		$choice      = sanitize_text_field( $choice );
+		if ( ! $category_id || '' === $choice ) {
+			continue;
+		}
+		// Never trust the client: the pick must be a real finalist here.
+		$allowed = wp_list_pluck( mysaline_fav_get_nominees( $category_id ), 'label' );
+		if ( ! in_array( $choice, $allowed, true ) ) {
+			continue;
+		}
+		$clean[ $category_id ] = $choice;
+	}
+	return $clean;
+}
+
+/**
+ * Write confirmed votes for a voter, replacing their previous picks.
+ *
+ * @param string $hash  Voter hash.
+ * @param string $email Voter email.
+ * @param array  $votes Clean category_id => nominee.
+ * @return int Number of categories saved.
+ */
+function mysaline_fav_apply_votes( $hash, $email, $votes ) {
+	global $wpdb;
+
+	$table = mysaline_fav_table();
+	$year  = mysaline_fav_year();
+	$now   = current_time( 'mysql' );
+	$saved = 0;
+
+	foreach ( $votes as $category_id => $choice ) {
+		// UNIQUE(voter_hash, ballot_year, category_id) keeps one row per voter per
+		// category; re-voting overwrites, matching "most recent pick counts".
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$wpdb->prepare(
+				"INSERT INTO {$table} (ballot_year, category_id, nominee, voter_hash, voter_email, created_at)
+				 VALUES (%d, %d, %s, %s, %s, %s)
+				 ON DUPLICATE KEY UPDATE nominee = VALUES(nominee), voter_email = VALUES(voter_email), created_at = VALUES(created_at)",
+				$year,
+				absint( $category_id ),
+				$choice,
+				$hash,
+				$email,
+				$now
+			)
+		);
+		$saved++;
+	}
+
+	return $saved;
+}
+
+/* ---- Pending ballots + confirmation email ---------------------------- */
+
+/**
+ * Store a pending ballot and return the raw (un-hashed) token for emailing.
+ *
+ * @param string $email      Voter email.
+ * @param string $hash       Voter hash.
+ * @param array  $votes      Clean votes.
+ * @param string $return_url Where to send them after confirming.
+ * @return string Raw token.
+ */
+function mysaline_fav_store_pending( $email, $hash, $votes, $return_url ) {
+	global $wpdb;
+
+	$token = bin2hex( random_bytes( 24 ) );
+
+	// Supersede any earlier unconfirmed ballot from this voter.
+	$wpdb->delete( mysaline_fav_pending_table(), array( 'voter_hash' => $hash, 'ballot_year' => mysaline_fav_year() ), array( '%s', '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+	$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		mysaline_fav_pending_table(),
+		array(
+			'token_hash'  => hash( 'sha256', $token ),
+			'ballot_year' => mysaline_fav_year(),
+			'voter_hash'  => $hash,
+			'voter_email' => $email,
+			'payload'     => wp_json_encode( $votes ),
+			'return_url'  => $return_url,
+			'created_at'  => current_time( 'mysql' ),
+			'expires_at'  => gmdate( 'Y-m-d H:i:s', time() + MYSALINE_FAV_TOKEN_TTL ),
+		),
+		array( '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s' )
+	);
+
+	return $token;
+}
+
+/**
+ * Email the confirmation link.
+ *
+ * @param string $email Recipient.
+ * @param string $token Raw token.
+ * @param int    $count Number of categories on the ballot.
+ * @return bool Whether wp_mail accepted the message.
+ */
+function mysaline_fav_send_confirmation( $email, $token, $count ) {
+	$link = add_query_arg( 'ms_fav_confirm', $token, home_url( '/' ) );
+	$site = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
+
+	$subject = get_theme_mod(
+		'mysaline_fav_email_subject',
+		/* translators: %s: site name. */
+		sprintf( __( 'Confirm your %s Favorites ballot', 'mysaline' ), $site )
+	);
+
+	$intro = get_theme_mod(
+		'mysaline_fav_email_body',
+		__( 'Thanks for voting in Saline County Favorites! Click the link below to confirm your ballot. Your votes are not counted until you do.', 'mysaline' )
+	);
+
+	$body  = $intro . "\n\n";
+	/* translators: %d: number of categories voted in. */
+	$body .= sprintf( _n( 'You voted in %d category.', 'You voted in %d categories.', $count, 'mysaline' ), $count ) . "\n\n";
+	$body .= __( 'Confirm your ballot:', 'mysaline' ) . "\n" . $link . "\n\n";
+	$body .= __( 'This link expires in 48 hours. If you did not vote, you can ignore this email — nothing will be counted.', 'mysaline' ) . "\n\n";
+	$body .= $site . "\n" . home_url( '/' ) . "\n";
+
+	return (bool) wp_mail( $email, $subject, $body );
+}
+
+/**
+ * Handle a confirmation-link click.
+ */
+function mysaline_fav_handle_confirm() {
+	if ( empty( $_GET['ms_fav_confirm'] ) ) {
+		return;
+	}
+
+	global $wpdb;
+
+	$token = sanitize_text_field( wp_unslash( $_GET['ms_fav_confirm'] ) );
+	if ( ! preg_match( '/^[a-f0-9]{48}$/', $token ) ) {
+		wp_safe_redirect( add_query_arg( 'fav', 'expired', home_url( '/' ) ) );
+		exit;
+	}
+
+	$table = mysaline_fav_pending_table();
+	$row   = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->prepare( "SELECT * FROM {$table} WHERE token_hash = %s", hash( 'sha256', $token ) ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		ARRAY_A
+	);
+
+	$fallback = home_url( '/' );
+
+	if ( ! $row ) {
+		wp_safe_redirect( add_query_arg( 'fav', 'expired', $fallback ) );
+		exit;
+	}
+
+	$return = ! empty( $row['return_url'] ) ? $row['return_url'] : $fallback;
+
+	// Expired?
+	if ( strtotime( $row['expires_at'] . ' UTC' ) < time() ) {
+		$wpdb->delete( $table, array( 'id' => (int) $row['id'] ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		wp_safe_redirect( add_query_arg( 'fav', 'expired', $return ) );
+		exit;
+	}
+
+	// Re-validate the picks at confirm time, in case finalists changed since.
+	$votes = json_decode( $row['payload'], true );
+	$votes = mysaline_fav_sanitize_votes( is_array( $votes ) ? $votes : array() );
+
+	$count = 0;
+	if ( ! empty( $votes ) ) {
+		$count = mysaline_fav_apply_votes( $row['voter_hash'], $row['voter_email'], $votes );
+	}
+
+	// Single-use token.
+	$wpdb->delete( $table, array( 'id' => (int) $row['id'] ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+	// Trust this browser from now on.
+	mysaline_fav_set_trust_cookie( $row['voter_hash'], $row['voter_email'] );
+
+	wp_safe_redirect(
+		add_query_arg(
+			array(
+				'fav'   => 'confirmed',
+				'count' => $count,
+			),
+			$return
+		)
+	);
+	exit;
+}
+add_action( 'template_redirect', 'mysaline_fav_handle_confirm' );
+
+/**
+ * Delete expired pending ballots daily.
+ */
+function mysaline_fav_cleanup_pending() {
+	global $wpdb;
+	$table = mysaline_fav_pending_table();
+	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$wpdb->prepare( "DELETE FROM {$table} WHERE expires_at < %s", gmdate( 'Y-m-d H:i:s' ) )
+	);
+}
+add_action( 'mysaline_fav_cleanup', 'mysaline_fav_cleanup_pending' );
+
+/**
+ * Schedule the cleanup job.
+ */
+function mysaline_fav_schedule_cleanup() {
+	if ( ! wp_next_scheduled( 'mysaline_fav_cleanup' ) ) {
+		wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', 'mysaline_fav_cleanup' );
+	}
+}
+add_action( 'after_switch_theme', 'mysaline_fav_schedule_cleanup' );
+add_action( 'admin_init', 'mysaline_fav_schedule_cleanup' );
+
+/**
+ * Clear the schedule when the theme is switched away.
+ */
+function mysaline_fav_unschedule_cleanup() {
+	$ts = wp_next_scheduled( 'mysaline_fav_cleanup' );
+	if ( $ts ) {
+		wp_unschedule_event( $ts, 'mysaline_fav_cleanup' );
+	}
+}
+add_action( 'switch_theme', 'mysaline_fav_unschedule_cleanup' );
+
+/* ---- Submission ------------------------------------------------------ */
+
+/**
  * Handle a submitted ballot.
+ *
+ * Trusted browser (already confirmed once) → votes apply immediately.
+ * Otherwise → stored as pending and a confirmation email is sent.
  */
 function mysaline_fav_handle_submit() {
 	$redirect = wp_get_referer() ? wp_get_referer() : home_url( '/' );
@@ -558,64 +967,90 @@ function mysaline_fav_handle_submit() {
 		exit;
 	}
 
-	// Light rate limit: one submission per identity per 20 seconds.
-	$email = isset( $_POST['voter_email'] ) ? sanitize_email( wp_unslash( $_POST['voter_email'] ) ) : '';
-	$hash  = mysaline_fav_voter_hash( $email );
-	$gate  = 'ms_fav_rl_' . $hash;
-	if ( get_transient( $gate ) ) {
-		wp_safe_redirect( add_query_arg( 'fav', 'toofast', $redirect ) );
-		exit;
-	}
-	set_transient( $gate, 1, 20 );
-
-	$votes_in = isset( $_POST['vote'] ) && is_array( $_POST['vote'] ) ? wp_unslash( $_POST['vote'] ) : array();
-	if ( empty( $votes_in ) ) {
+	$votes = mysaline_fav_sanitize_votes(
+		isset( $_POST['vote'] ) && is_array( $_POST['vote'] ) ? wp_unslash( $_POST['vote'] ) : array()
+	);
+	if ( empty( $votes ) ) {
 		wp_safe_redirect( add_query_arg( 'fav', 'empty', $redirect ) );
 		exit;
 	}
 
-	global $wpdb;
-	$table = mysaline_fav_table();
-	$year  = mysaline_fav_year();
-	$now   = current_time( 'mysql' );
-	$saved = 0;
+	$trusted = mysaline_fav_trusted_voter();
+	$confirm = mysaline_fav_requires_confirmation();
 
-	foreach ( $votes_in as $category_id => $choice ) {
-		$category_id = absint( $category_id );
-		$choice      = sanitize_text_field( $choice );
-		if ( ! $category_id || '' === $choice ) {
-			continue;
+	/* Already-confirmed browser: identity comes from the cookie, so a submitted
+	   email can never be used to overwrite someone else's ballot. */
+	if ( $trusted ) {
+		if ( get_transient( 'ms_fav_rl_' . $trusted['hash'] ) ) {
+			wp_safe_redirect( add_query_arg( 'fav', 'toofast', $redirect ) );
+			exit;
 		}
+		set_transient( 'ms_fav_rl_' . $trusted['hash'], 1, 15 );
 
-		// Never trust the client: the pick must be a real finalist in this category.
-		$allowed = wp_list_pluck( mysaline_fav_get_nominees( $category_id ), 'label' );
-		if ( ! in_array( $choice, $allowed, true ) ) {
-			continue;
-		}
-
-		// UNIQUE(voter_hash, ballot_year, category_id) keeps one row per voter per
-		// category; re-voting overwrites, matching "most recent vote counts".
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-			$wpdb->prepare(
-				"INSERT INTO {$table} (ballot_year, category_id, nominee, voter_hash, voter_email, created_at)
-				 VALUES (%d, %d, %s, %s, %s, %s)
-				 ON DUPLICATE KEY UPDATE nominee = VALUES(nominee), voter_email = VALUES(voter_email), created_at = VALUES(created_at)",
-				$year,
-				$category_id,
-				$choice,
-				$hash,
-				$email,
-				$now
-			)
+		$saved = mysaline_fav_apply_votes( $trusted['hash'], $trusted['email'], $votes );
+		wp_safe_redirect(
+			add_query_arg( array( 'fav' => 'updated', 'count' => $saved ), $redirect )
 		);
-		$saved++;
+		exit;
 	}
 
-	$args = array(
-		'fav'   => 'thanks',
-		'count' => $saved,
+	$email = isset( $_POST['voter_email'] ) ? sanitize_email( wp_unslash( $_POST['voter_email'] ) ) : '';
+
+	// Confirmation mode requires a valid address.
+	if ( $confirm && ! is_email( $email ) ) {
+		wp_safe_redirect( add_query_arg( 'fav', 'noemail', $redirect ) );
+		exit;
+	}
+
+	// Confirmation off and no email given: count it straight away, keyed on a
+	// salted IP+agent hash (weaker, but the owner opted out of confirmation).
+	if ( ! $confirm && ! is_email( $email ) ) {
+		$ip     = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		$agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+		$anon   = hash( 'sha256', 'ms-fav-anon|' . $ip . '|' . $agent . '|' . wp_salt( 'auth' ) );
+		if ( get_transient( 'ms_fav_rl_' . $anon ) ) {
+			wp_safe_redirect( add_query_arg( 'fav', 'toofast', $redirect ) );
+			exit;
+		}
+		set_transient( 'ms_fav_rl_' . $anon, 1, 15 );
+		$saved = mysaline_fav_apply_votes( $anon, '', $votes );
+		wp_safe_redirect( add_query_arg( array( 'fav' => 'thanks', 'count' => $saved ), $redirect ) );
+		exit;
+	}
+
+	$hash = mysaline_fav_voter_hash( $email );
+
+	/* Per-address throttle. Without this the form could be used to mail-bomb
+	   somebody by submitting their address over and over. */
+	$mail_gate  = 'ms_fav_mail_' . $hash;
+	$mail_count = (int) get_transient( $mail_gate );
+	if ( $mail_count >= 3 ) {
+		wp_safe_redirect( add_query_arg( 'fav', 'toomany', $redirect ) );
+		exit;
+	}
+
+	// Per-IP throttle, so one machine cannot cycle through many addresses.
+	$ip      = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+	$ip_gate = 'ms_fav_ip_' . hash( 'sha256', $ip . wp_salt( 'auth' ) );
+	if ( (int) get_transient( $ip_gate ) >= 10 ) {
+		wp_safe_redirect( add_query_arg( 'fav', 'toomany', $redirect ) );
+		exit;
+	}
+
+	$token = mysaline_fav_store_pending( $email, $hash, $votes, $redirect );
+	$sent  = mysaline_fav_send_confirmation( $email, $token, count( $votes ) );
+
+	if ( ! $sent ) {
+		wp_safe_redirect( add_query_arg( 'fav', 'emailfail', $redirect ) );
+		exit;
+	}
+
+	set_transient( $mail_gate, $mail_count + 1, HOUR_IN_SECONDS );
+	set_transient( $ip_gate, (int) get_transient( $ip_gate ) + 1, HOUR_IN_SECONDS );
+
+	wp_safe_redirect(
+		add_query_arg( array( 'fav' => 'check_email', 'count' => count( $votes ) ), $redirect )
 	);
-	wp_safe_redirect( add_query_arg( $args, $redirect ) );
 	exit;
 }
 add_action( 'admin_post_nopriv_mysaline_fav_vote', 'mysaline_fav_handle_submit' );
@@ -664,6 +1099,22 @@ function mysaline_fav_voter_count( $year = 0 ) {
 
 	return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prepare( "SELECT COUNT(DISTINCT voter_hash) FROM {$table} WHERE ballot_year = %d", $year ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	);
+}
+
+/**
+ * Ballots still waiting on an email click.
+ *
+ * @param int $year Ballot year.
+ * @return int
+ */
+function mysaline_fav_pending_count( $year = 0 ) {
+	global $wpdb;
+	$table = mysaline_fav_pending_table();
+	$year  = $year ? (int) $year : mysaline_fav_year();
+
+	return (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE ballot_year = %d AND expires_at >= %s", $year, gmdate( 'Y-m-d H:i:s' ) ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	);
 }
 
@@ -817,13 +1268,28 @@ function mysaline_fav_render_results_page() {
 		<p>
 			<?php
 			printf(
-				/* translators: 1: ballot year, 2: number of ballots. */
-				esc_html__( 'Ballot year %1$s · %2$s ballots cast', 'mysaline' ),
+				/* translators: 1: ballot year, 2: number of confirmed ballots. */
+				esc_html__( 'Ballot year %1$s · %2$s confirmed ballots', 'mysaline' ),
 				esc_html( $year ),
 				esc_html( number_format_i18n( $voters ) )
 			);
+
+			if ( mysaline_fav_requires_confirmation() ) {
+				$pending = mysaline_fav_pending_count( $year );
+				echo ' · ';
+				printf(
+					/* translators: %s: number of ballots awaiting email confirmation. */
+					esc_html__( '%s awaiting email confirmation (not counted)', 'mysaline' ),
+					esc_html( number_format_i18n( $pending ) )
+				);
+			}
 			?>
 		</p>
+		<?php if ( ! mysaline_fav_requires_confirmation() ) : ?>
+			<div class="notice notice-warning inline"><p>
+				<?php esc_html_e( 'Email confirmation is off, so anyone can vote repeatedly from different browsers. Turn it on under Customize → MySaline Options → Saline County Favorites.', 'mysaline' ); ?>
+			</p></div>
+		<?php endif; ?>
 		<p>
 			<a class="button button-primary" href="<?php echo esc_url( $export ); ?>"><?php esc_html_e( 'Export all results (CSV)', 'mysaline' ); ?></a>
 			<a class="button" href="<?php echo esc_url( $draw ); ?>"><?php esc_html_e( 'Export drawing entries (CSV)', 'mysaline' ); ?></a>
