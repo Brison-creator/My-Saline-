@@ -44,6 +44,25 @@
 			} );
 		} );
 
+		// Dismissable sticky mobile ad — stays closed for the session.
+		var sticky = document.getElementById( 'ms-ad-sticky' );
+		if ( sticky ) {
+			try {
+				if ( window.sessionStorage.getItem( 'msAdStickyClosed' ) === '1' ) {
+					sticky.classList.add( 'is-closed' );
+				}
+			} catch ( e ) {}
+			var stickyClose = sticky.querySelector( '.ms-ad-sticky__close' );
+			if ( stickyClose ) {
+				stickyClose.addEventListener( 'click', function () {
+					sticky.classList.add( 'is-closed' );
+					try {
+						window.sessionStorage.setItem( 'msAdStickyClosed', '1' );
+					} catch ( e ) {}
+				} );
+			}
+		}
+
 		// Close mobile menu when a link is chosen.
 		if ( menu ) {
 			menu.addEventListener( 'click', function ( e ) {

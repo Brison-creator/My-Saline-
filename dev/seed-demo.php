@@ -182,14 +182,17 @@ WP_CLI::log( 'Seeding MySaline demo content…' );
  * ---------------------------------------------------------------------- */
 
 $categories = array(
-	'Saline County' => 'County-wide news and government.',
-	'Benton'        => 'News from Benton.',
-	'Bryant'        => 'News from Bryant.',
-	'Business News' => 'Openings, closings, ribbon cuttings and local economy.',
-	'Dining'        => 'Restaurants, food trucks and reviews.',
-	'Elections'     => 'Candidates, filings and results.',
-	'Schools'       => 'Districts, boards and student news.',
-	'Community'     => 'Events, people and neighbourhood news.',
+	'Saline County'  => 'County-wide news and government.',
+	'Benton'         => 'News from Benton.',
+	'Bryant'         => 'News from Bryant.',
+	'Business News'  => 'Openings, closings, ribbon cuttings and local economy.',
+	'Dining'         => 'Restaurants, food trucks and reviews.',
+	'Elections'      => 'Candidates, filings and results.',
+	'Schools'        => 'Districts, boards and student news.',
+	'Community'      => 'Events, people and neighbourhood news.',
+	'Sports'         => 'High school and youth athletics.',
+	'Columnists'     => 'Recurring columns and opinion.',
+	'Public Records' => 'Mugshots, 911 calls, court filings, marriage licenses and jobs.',
 );
 
 $cat_ids = array();
@@ -225,6 +228,12 @@ $posts = array(
 	array( 'Splash pad reopens after repairs', 'Community', false ),
 	array( 'Food truck rally returns to the square in August', 'Dining', false ),
 	array( 'School board reviews the transportation budget', 'Schools', false ),
+	array( 'Salt Bowl set for late August at War Memorial', 'Sports', false ),
+	array( 'Volleyball tryouts announced for both districts', 'Sports', false ),
+	array( 'How the Ball Bounces: on youth sports and grown-ups', 'Columnists', false ),
+	array( 'Court filings for the week of July 27', 'Public Records', false ),
+	array( 'Marriage licenses issued the week of July 27', 'Public Records', false ),
+	array( 'This week in 911 calls', 'Public Records', false ),
 );
 
 $made = 0;
@@ -547,11 +556,14 @@ $home_id = ms_seed_post( 'Home', 'page' );
 $news_id = ms_seed_post( 'News', 'page' );
 
 $pages = array(
-	'About MySaline'      => 'Sample about page. The owner edits this like any other page.',
-	'Advertise with us'   => 'Sample advertising information page.',
-	'Contact Us'          => 'Sample contact page.',
-	'Elected Officials'   => 'Sample reference page listing elected officials.',
-	'Yard Sales'          => 'Sample yard sale listings page.',
+	'About MySaline'        => 'Sample about page. The owner edits this like any other page.',
+	'Advertise with us'     => 'Sample advertising information page.',
+	'Contact Us'            => 'Sample contact page.',
+	'Elected Officials'     => 'Sample reference page listing elected officials.',
+	'Yard Sales'            => 'Sample yard sale listings page.',
+	'Daily Puzzle'          => 'Sample puzzle page.',
+	'Submit an Event'       => 'Sample event submission page.',
+	'District & Ward Maps'  => 'Sample maps reference page.',
 );
 foreach ( $pages as $title => $body ) {
 	ms_seed_post( $title, 'page', array( 'post_content' => $body ) );
@@ -602,9 +614,11 @@ function ms_seed_menu( $name, $location, $items ) {
 
 	$add = function ( $item, $parent = 0 ) use ( $menu_id, &$add ) {
 		$args = array(
-			'menu-item-title'  => $item['title'],
-			'menu-item-status' => 'publish',
+			'menu-item-title'     => $item['title'],
+			'menu-item-status'    => 'publish',
 			'menu-item-parent-id' => $parent,
+			// "mega" / "mega-3" make the theme lay the dropdown out in columns.
+			'menu-item-classes'   => isset( $item['classes'] ) ? $item['classes'] : '',
 		);
 		if ( isset( $item['cat'] ) ) {
 			$args['menu-item-type']      = 'taxonomy';
@@ -655,36 +669,80 @@ $page_by = function ( $title ) {
 	return ! empty( $ids ) ? (int) $ids[0] : 0;
 };
 
+/*
+ * The consolidated seven-section tree from docs/INFORMATION-ARCHITECTURE.md.
+ * Grouped by reader intent rather than by content type, so ~30 destinations
+ * become 7. The "mega"/"mega-3" classes flow big dropdowns into columns.
+ *
+ * Public Records and some Things To Do children point at placeholder pages on
+ * the demo site; on production they map to the existing category archives.
+ */
 ms_seed_menu(
 	'Primary',
 	'primary',
 	array(
-		array( 'title' => 'Home', 'url' => home_url( '/' ) ),
 		array(
 			'title'    => 'News',
 			'url'      => get_permalink( $news_id ),
+			'classes'  => 'mega-3',
 			'children' => array(
-				array( 'title' => 'All Posts', 'url' => get_permalink( $news_id ) ),
 				array( 'title' => 'Saline County', 'cat' => $cat_ids['Saline County'] ),
 				array( 'title' => 'Benton', 'cat' => $cat_ids['Benton'] ),
 				array( 'title' => 'Bryant', 'cat' => $cat_ids['Bryant'] ),
+				array( 'title' => 'Sports', 'cat' => $cat_ids['Sports'] ),
 				array( 'title' => 'Schools', 'cat' => $cat_ids['Schools'] ),
 				array( 'title' => 'Dining', 'cat' => $cat_ids['Dining'] ),
+				array( 'title' => 'Community', 'cat' => $cat_ids['Community'] ),
+				array( 'title' => 'Columnists', 'cat' => $cat_ids['Columnists'] ),
+				array( 'title' => 'All Posts', 'url' => get_permalink( $news_id ) ),
 			),
 		),
-		array( 'title' => 'Business', 'cat' => $cat_ids['Business News'] ),
-		array( 'title' => 'Events', 'url' => get_post_type_archive_link( 'ms_event' ) ),
+		array(
+			'title'    => 'Public Records',
+			'url'      => get_category_link( $cat_ids['Public Records'] ),
+			'classes'  => 'mega',
+			'children' => array(
+				array( 'title' => 'Mugshots Archive', 'cat' => $cat_ids['Public Records'] ),
+				array( 'title' => 'Court Filings', 'cat' => $cat_ids['Public Records'] ),
+				array( 'title' => '911 Calls', 'cat' => $cat_ids['Public Records'] ),
+				array( 'title' => 'Marriage Licenses', 'cat' => $cat_ids['Public Records'] ),
+				array( 'title' => 'Sex Offender Registry', 'cat' => $cat_ids['Public Records'] ),
+				array( 'title' => 'Jobs Listings', 'cat' => $cat_ids['Public Records'] ),
+			),
+		),
 		array( 'title' => 'Obituaries', 'url' => get_post_type_archive_link( 'ms_obituary' ) ),
 		array(
-			'title'    => 'Elections',
-			'url'      => get_category_link( $cat_ids['Elections'] ),
+			'title'    => 'Things To Do',
+			'url'      => get_post_type_archive_link( 'ms_event' ),
+			'classes'  => 'mega',
 			'children' => array(
-				array( 'title' => '2026 Elections', 'cat' => $cat_ids['Elections'] ),
-				array( 'title' => 'Elected Officials', 'page' => $page_by( 'Elected Officials' ) ),
+				array( 'title' => 'Events Calendar', 'url' => get_post_type_archive_link( 'ms_event' ) ),
+				array( 'title' => 'Yard Sales', 'page' => $page_by( 'Yard Sales' ) ),
+				array( 'title' => 'Dining Guide', 'cat' => $cat_ids['Dining'] ),
+				array( 'title' => 'Daily Puzzle', 'page' => $page_by( 'Daily Puzzle' ) ),
+				array( 'title' => 'Submit an Event', 'page' => $page_by( 'Submit an Event' ) ),
 			),
 		),
-		array( 'title' => 'Directory', 'url' => get_post_type_archive_link( 'ms_business' ) ),
-		array( 'title' => 'Favorites', 'page' => $vote_id ),
+		array(
+			'title'    => 'Business',
+			'url'      => get_category_link( $cat_ids['Business News'] ),
+			'children' => array(
+				array( 'title' => 'Business News', 'cat' => $cat_ids['Business News'] ),
+				array( 'title' => 'Business Directory', 'url' => get_post_type_archive_link( 'ms_business' ) ),
+				array( 'title' => 'Advertise with us', 'page' => $page_by( 'Advertise with us' ) ),
+			),
+		),
+		array(
+			'title'    => 'Government',
+			'url'      => get_category_link( $cat_ids['Elections'] ),
+			'children' => array(
+				/* Year is generated, so this label can never go stale. */
+				array( 'title' => gmdate( 'Y' ) . ' Elections', 'cat' => $cat_ids['Elections'] ),
+				array( 'title' => 'Elected Officials', 'page' => $page_by( 'Elected Officials' ) ),
+				array( 'title' => 'District & Ward Maps', 'page' => $page_by( 'District & Ward Maps' ) ),
+			),
+		),
+		array( 'title' => '⭐ Favorites', 'page' => $vote_id ),
 	)
 );
 

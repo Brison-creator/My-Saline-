@@ -54,6 +54,9 @@ get_header();
 		<?php if ( have_posts() ) : ?>
 			<div class="ms-grid ms-grid--3">
 				<?php
+				$mysaline_i = 0;
+				// Directory archives get their own ad zone; everything else in-feed.
+				$mysaline_is_directory = ( is_post_type_archive( 'ms_business' ) || is_tax( 'ms_business_cat' ) );
 				while ( have_posts() ) :
 					the_post();
 					// Use type-appropriate cards for CPT archives.
@@ -61,11 +64,17 @@ get_header();
 						get_template_part( 'template-parts/content-event-card' );
 					} elseif ( is_post_type_archive( 'ms_obituary' ) ) {
 						get_template_part( 'template-parts/content-obituary-card' );
-					} elseif ( is_post_type_archive( 'ms_business' ) || is_tax( 'ms_business_cat' ) ) {
+					} elseif ( $mysaline_is_directory ) {
 						get_template_part( 'template-parts/content-business-card' );
 					} else {
 						get_template_part( 'template-parts/content-card' );
 					}
+					mysaline_ad_in_feed(
+						$mysaline_i,
+						$mysaline_is_directory ? 9 : 6,
+						$mysaline_is_directory ? 'directory' : 'in_feed'
+					);
+					$mysaline_i++;
 				endwhile;
 				?>
 			</div>

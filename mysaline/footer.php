@@ -17,7 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php if ( get_theme_mod( 'mysaline_news_enable', true ) && get_theme_mod( 'mysaline_news_action', '' ) ) : ?>
 		<section class="ms-newsletter-band" aria-label="<?php esc_attr_e( 'Newsletter', 'mysaline' ); ?>">
 			<div class="ms-container">
-				<?php get_template_part( 'template-parts/newsletter' ); ?>
+				<?php
+				get_template_part( 'template-parts/newsletter' );
+				// Newsletter sponsor slot — the list is sold inventory too.
+				mysaline_ad( 'newsletter' );
+				?>
 			</div>
 		</section>
 	<?php endif; ?>
@@ -134,6 +138,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</footer>
 </div><!-- #page -->
+
+<?php mysaline_ad_sticky_mobile(); ?>
 
 <?php wp_footer(); ?>
 </body>

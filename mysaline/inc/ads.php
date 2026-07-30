@@ -25,9 +25,13 @@ function mysaline_ad_zone_choices() {
 			'header'        => __( 'Header (leaderboard, top of page)', 'mysaline' ),
 			'homepage_top'  => __( 'Homepage — below hero', 'mysaline' ),
 			'homepage_mid'  => __( 'Homepage — between sections', 'mysaline' ),
+			'in_feed'       => __( 'In-feed (between story cards in lists & archives)', 'mysaline' ),
 			'sidebar'       => __( 'Sidebar', 'mysaline' ),
 			'in_content'    => __( 'Inside articles (in-content)', 'mysaline' ),
 			'below_content' => __( 'Below article content', 'mysaline' ),
+			'directory'     => __( 'Business directory pages', 'mysaline' ),
+			'newsletter'    => __( 'Newsletter signup sponsor', 'mysaline' ),
+			'sticky_mobile' => __( 'Sticky bar (mobile only)', 'mysaline' ),
 			'footer'        => __( 'Footer', 'mysaline' ),
 		)
 	);
@@ -140,6 +144,44 @@ function mysaline_ad( $zone, $args = array() ) {
 		}
 		echo '</div>';
 	}
+}
+
+/**
+ * Emit an in-feed ad card at a given position in a card grid.
+ *
+ * Call inside a loop: mysaline_ad_in_feed( $i ). Renders an ad styled as a grid
+ * cell after every Nth card, so it flows with the story river the way native
+ * in-feed inventory does.
+ *
+ * @param int    $index    Zero-based loop index.
+ * @param int    $interval Show an ad after every N cards.
+ * @param string $zone     Zone to pull from (directory pages use their own).
+ */
+function mysaline_ad_in_feed( $index, $interval = 6, $zone = 'in_feed' ) {
+	$interval = max( 2, (int) $interval );
+	// Fire after the Nth item, not before the first.
+	if ( 0 === $index || 0 !== ( $index + 1 ) % $interval ) {
+		return;
+	}
+	if ( empty( mysaline_get_ads( $zone, 1 ) ) ) {
+		return;
+	}
+	echo '<div class="ms-ad-cell">';
+	mysaline_ad( $zone );
+	echo '</div>';
+}
+
+/**
+ * Sticky mobile anchor ad, rendered once in the footer.
+ */
+function mysaline_ad_sticky_mobile() {
+	if ( empty( mysaline_get_ads( 'sticky_mobile', 1 ) ) ) {
+		return;
+	}
+	echo '<div class="ms-ad-sticky" id="ms-ad-sticky">';
+	echo '<button type="button" class="ms-ad-sticky__close" aria-label="' . esc_attr__( 'Close advertisement', 'mysaline' ) . '">&times;</button>';
+	mysaline_ad( 'sticky_mobile' );
+	echo '</div>';
 }
 
 /**

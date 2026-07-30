@@ -206,6 +206,26 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-menu .sub-menu a:hover { background: var(--ms-primary-light); }
 .ms-menu .sub-menu .sub-menu { left: 100%; top: 0; }
 
+/* Mega-menu: a dropdown with many children flows into columns instead of
+   becoming an unusable vertical tower. Add the "mega" CSS class to a top-level
+   menu item in Appearance → Menus (Screen Options → CSS Classes). */
+.ms-menu li.mega > .sub-menu {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(190px, 1fr));
+	min-width: 420px;
+	padding: .6rem;
+	gap: 0 .5rem;
+}
+.ms-menu li.mega-3 > .sub-menu { grid-template-columns: repeat(3, minmax(180px, 1fr)); min-width: 600px; }
+.ms-menu li.mega > .sub-menu a { border-radius: var(--ms-radius-sm); }
+/* Keep a right-edge mega panel from overflowing the viewport. */
+.ms-menu > li:nth-last-child(-n+3).mega > .sub-menu,
+.ms-menu > li:nth-last-child(-n+3).mega-3 > .sub-menu { left: auto; right: 0; }
+@media (max-width: 782px) {
+	.ms-menu li.mega > .sub-menu,
+	.ms-menu li.mega-3 > .sub-menu { grid-template-columns: 1fr; min-width: 0; right: auto; left: auto; }
+}
+
 .ms-search-toggle, .ms-menu-toggle {
 	background: transparent; color: var(--ms-primary); border: 0; padding: .5rem; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-weight: 600;
 }
@@ -349,6 +369,26 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-ad__label { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ms-muted); display: block; margin-bottom: .35rem; }
 .ms-ad img { margin: 0 auto; border-radius: var(--ms-radius-sm); }
 .ms-ad--leaderboard { background: var(--ms-surface); padding: 1rem; border-radius: var(--ms-radius); }
+
+/* In-feed ad occupying a grid cell alongside story cards */
+.ms-ad-cell { display: flex; align-items: center; justify-content: center; background: var(--ms-surface); border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1rem; }
+.ms-ad-cell .ms-ad { margin: 0; width: 100%; }
+
+/* Sticky mobile anchor ad */
+.ms-ad-sticky {
+	position: fixed; left: 0; right: 0; bottom: 0; z-index: 300; display: none;
+	background: #fff; border-top: 1px solid var(--ms-border); padding: .5rem .75rem;
+	box-shadow: 0 -2px 12px rgba(11,37,69,.14);
+}
+.ms-ad-sticky .ms-ad { margin: 0; }
+.ms-ad-sticky .ms-ad__label { display: none; }
+.ms-ad-sticky__close {
+	position: absolute; top: -13px; right: .6rem; width: 26px; height: 26px; padding: 0;
+	border-radius: 50%; background: var(--ms-primary); color: #fff; border: 2px solid #fff;
+	font-size: 1rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.ms-ad-sticky.is-closed { display: none !important; }
+@media (max-width: 782px) { .ms-ad-sticky { display: block; } }
 .ms-ad-placeholder { background: repeating-linear-gradient(45deg, var(--ms-surface), var(--ms-surface) 10px, var(--ms-surface-2) 10px, var(--ms-surface-2) 20px); border: 1px dashed var(--ms-border); color: var(--ms-muted); padding: 2rem; border-radius: var(--ms-radius); font-size: .85rem; }
 
 /* 15. Custom post types -------------------------------------------------- */

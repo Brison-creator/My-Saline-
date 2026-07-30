@@ -78,9 +78,12 @@ mysaline_ad( 'homepage_top', array( 'class' => 'ms-ad--leaderboard' ) );
 					</div>
 					<div class="ms-grid ms-grid--3">
 						<?php
+						$mysaline_n = 0;
 						while ( $mysaline_latest->have_posts() ) :
 							$mysaline_latest->the_post();
 							get_template_part( 'template-parts/content-card' );
+							mysaline_ad_in_feed( $mysaline_n, 3 );
+							$mysaline_n++;
 						endwhile;
 						?>
 					</div>
