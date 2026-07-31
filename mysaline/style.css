@@ -356,6 +356,19 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-breadcrumbs a { color: var(--ms-muted); }
 .ms-breadcrumbs a:hover { color: var(--ms-accent); }
 
+/* 12b. Archive filters (obituary name search, directory categories) ------ */
+.ms-archive-tools { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin: 1.5rem 0 1rem; }
+.ms-namesearch { display: flex; gap: .4rem; flex: 1; min-width: 260px; }
+.ms-namesearch input[type="search"] { flex: 1; }
+.ms-chips { display: flex; gap: .4rem; flex-wrap: wrap; margin: 0 0 1rem; }
+.ms-chip {
+	display: inline-block; padding: .42rem .85rem; border-radius: 999px;
+	background: var(--ms-surface); border: 1px solid var(--ms-border);
+	color: var(--ms-primary); font-size: .87rem; font-weight: 600;
+}
+.ms-chip:hover { background: var(--ms-surface-2); text-decoration: none; }
+.ms-chip.is-active { background: var(--ms-primary); color: #fff; border-color: var(--ms-primary); }
+
 /* 13. Sidebar & widgets -------------------------------------------------- */
 .ms-sidebar .widget, .ms-footer .widget { margin-bottom: 2rem; }
 .ms-widget-title { font-size: 1.15rem; margin: 0 0 1rem; padding-bottom: .5rem; border-bottom: 3px solid var(--ms-primary); }

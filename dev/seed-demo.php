@@ -852,6 +852,8 @@ $mods = array(
 
 	// Footer.
 	'mysaline_footer_about'         => 'MySaline is the most-read news source in Saline County, Arkansas — local news, events, obituaries and community since 2007.',
+	'mysaline_obit_submit_url'      => get_permalink( $page_by( 'Submit an Event' ) ), // Placeholder target on the demo site.
+	'mysaline_biz_submit_url'       => get_permalink( $page_by( 'Advertise with us' ) ),
 	'mysaline_contact_address'      => 'PO Box 165 · Benton, AR 72018',
 	'mysaline_contact_phone'        => '501-303-4010',
 	'mysaline_contact_email'        => 'hello@example.com',

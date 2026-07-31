@@ -1004,6 +1004,41 @@ function mysaline_customize_footer( $wp_customize ) {
 		)
 	);
 
+	// Submission links shown above the obituary and directory archives.
+	$wp_customize->add_setting(
+		'mysaline_obit_submit_url',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'esc_url_raw',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_obit_submit_url',
+		array(
+			'type'        => 'url',
+			'label'       => __( '“Submit an obituary” link', 'mysaline' ),
+			'description' => __( 'Shown above the obituaries archive. Leave blank to hide the button.', 'mysaline' ),
+			'section'     => 'mysaline_footer',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_biz_submit_url',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'esc_url_raw',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_biz_submit_url',
+		array(
+			'type'        => 'url',
+			'label'       => __( '“List your business” link', 'mysaline' ),
+			'description' => __( 'Shown above the business directory. Leave blank to hide the button.', 'mysaline' ),
+			'section'     => 'mysaline_footer',
+		)
+	);
+
 	// Contact block (mirrors the current site: PO Box, phone, email).
 	$wp_customize->add_setting(
 		'mysaline_contact_address',

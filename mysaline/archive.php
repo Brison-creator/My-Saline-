@@ -49,7 +49,9 @@ get_header();
 	</div>
 </header>
 
-<div class="ms-content-sidebar" style="margin-top:2rem">
+<?php get_template_part( 'template-parts/archive-filters' ); ?>
+
+<div class="ms-content-sidebar" style="margin-top:1.5rem">
 	<div class="ms-primary-col">
 		<?php if ( have_posts() ) : ?>
 			<div class="ms-grid ms-grid--3">

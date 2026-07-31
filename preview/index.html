@@ -297,6 +297,59 @@ body {
 .ms-byline { display: flex; align-items: center; gap: .7rem; }
 .ms-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--ms-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; font-family: Georgia, serif; }
 
+/* Page header band (archives) */
+.ms-page-head { background: var(--ms-surface); border-bottom: 1px solid var(--ms-border); padding: 1.75rem 0; }
+.ms-page-head h1 { margin: .3rem 0 .35rem; font-size: 2rem; }
+.ms-page-head p { margin: 0; color: var(--ms-muted); max-width: 62ch; }
+
+/* Filter chips */
+.ms-chips { display: flex; gap: .4rem; flex-wrap: wrap; margin: 0 0 1rem; }
+.ms-chip { display: inline-block; padding: .42rem .85rem; border-radius: 999px; background: var(--ms-surface); border: 1px solid var(--ms-border); color: var(--ms-primary); font-size: .87rem; font-weight: 600; text-decoration: none; }
+.ms-chip:hover { background: var(--ms-surface-2); text-decoration: none; }
+.ms-chip.is-active { background: var(--ms-primary); color: #fff; border-color: var(--ms-primary); }
+
+.ms-note { font-size: .86rem; color: var(--ms-muted); background: var(--ms-surface); border-left: 3px solid var(--ms-highlight); padding: .55rem .8rem; border-radius: 0 4px 4px 0; margin: 0 0 1.5rem; }
+
+.ms-cta-row { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.ms-btn--ghost { background: transparent; color: var(--ms-primary); border: 2px solid var(--ms-primary); padding: calc(.7rem - 2px) calc(1.35rem - 2px); }
+.ms-btn--ghost:hover { background: var(--ms-primary); color: #fff; }
+.ms-namesearch { display: flex; gap: .4rem; flex: 1; min-width: 260px; }
+.ms-namesearch input { flex: 1; border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm); padding: .6rem .75rem; font: inherit; }
+
+/* Records list */
+.ms-records { display: flex; flex-direction: column; gap: .6rem; }
+.ms-rec { display: grid; grid-template-columns: 132px 1fr; gap: 1rem; align-items: center; border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: .9rem 1.1rem; background: #fff; }
+.ms-rec__tag { background: var(--ms-primary); color: #fff; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: .3rem .5rem; border-radius: var(--ms-radius-sm); text-align: center; }
+.ms-rec h3 { font-size: 1.05rem; margin: 0 0 .2rem; }
+
+/* Pagination */
+.ms-pager { display: flex; justify-content: center; gap: .3rem; margin: 2rem 0 0; flex-wrap: wrap; }
+.ms-pager__item { display: inline-block; padding: .5rem .85rem; border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm); color: var(--ms-primary); font-weight: 600; text-decoration: none; font-size: .9rem; }
+.ms-pager__item.is-current { background: var(--ms-primary); color: #fff; border-color: var(--ms-primary); }
+.ms-pager__item:hover { background: var(--ms-accent); color: #fff; border-color: var(--ms-accent); text-decoration: none; }
+.ms-pager__dots { padding: .5rem .3rem; color: var(--ms-muted); }
+
+/* Event meta box */
+.ms-evt-meta { display: grid; gap: .55rem; background: var(--ms-surface); padding: 1.15rem 1.25rem; border-radius: var(--ms-radius); margin: 0 0 1.5rem; }
+.ms-evt-meta__row { display: flex; gap: .7rem; align-items: baseline; }
+.ms-evt-meta__row strong { min-width: 92px; color: var(--ms-primary); flex: none; }
+
+/* Single obituary */
+.ms-obit-single { text-align: center; max-width: 720px; margin: 1.5rem auto 0; }
+.ms-obit-single__portrait { width: 180px; height: 180px; border-radius: var(--ms-radius); margin: 0 auto 1.1rem; }
+.ms-obit-single h1 { font-size: 2.1rem; margin: 0 0 .3rem; }
+.ms-obit-single__dates { color: var(--ms-muted); font-size: 1.05rem; margin: 0 0 .2rem; }
+.ms-obit-single__city { color: var(--ms-muted); margin: 0 0 1.5rem; }
+.ms-obit-single__body { text-align: left; }
+.ms-obit-single__service { text-align: left; margin-top: 2rem; }
+
+.screen-reader-text { position: absolute; left: -9999px; }
+
+@media (max-width: 680px) {
+	.ms-rec { grid-template-columns: 1fr; gap: .5rem; }
+	.ms-rec__tag { justify-self: start; }
+}
+
 /* ==========================================================================
    FAVORITES BALLOT
    ========================================================================== */
@@ -384,8 +437,18 @@ body {
 
 	<div class="pv-tabs" role="tablist" aria-label="Preview screens">
 		<button class="pv-tab" role="tab" aria-selected="true" data-view="home">Homepage</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="section">Section front</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="article">Article</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="records">Public Records</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="events">Events</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="event">Single event</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="obits">Obituaries</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="obit">Single obituary</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="directory">Directory</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="business">Single business</button>
 		<button class="pv-tab" role="tab" aria-selected="false" data-view="ballot">Favorites ballot <span aria-hidden="true">— try it</span></button>
-		<button class="pv-tab" role="tab" aria-selected="false" data-view="article">Article page</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="search">Search</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="e404">404</button>
 	</div>
 
 	<div class="pv-frame">
@@ -653,6 +716,318 @@ body {
 				</div>
 			</main>
 
+			<!-- ============================ SECTION FRONT ============================ -->
+			<main class="pv-view fav-hidden" data-view="section">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › News › Saline County</div>
+						<h1>Saline County</h1>
+						<p>County-wide news and government.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.75rem;padding-bottom:2rem">
+					<div class="ms-cols">
+						<div>
+							<div class="ms-grid ms-grid--3">
+								<article class="ms-card"><div class="ms-card__media"><div class="ms-ph" aria-hidden="true"></div><span class="ms-badge">County</span></div><div class="ms-card__body"><h3><a href="#0" data-goto="article">County fair returns this weekend with a bigger midway</a></h3><p>Organizers added a second entrance and dropped the parking fee this year.</p><div class="ms-meta"><span>Sample Byline</span><span>Jul 30</span></div></div></article>
+								<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><span class="ms-badge">County</span></div><div class="ms-card__body"><h3><a href="#0">Road work begins Monday on Highway 5 north</a></h3><p>Expect single-lane closures during daytime hours through mid-August.</p><div class="ms-meta"><span>Sample Byline</span><span>Jul 29</span></div></div></article>
+								<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><span class="ms-badge">County</span></div><div class="ms-card__body"><h3><a href="#0">Fire department puts two new engines into service</a></h3><p>The units replace two trucks that had been in service since 2003.</p><div class="ms-meta"><span>Sample Byline</span><span>Jul 28</span></div></div></article>
+								<div class="ms-ad-cell"><div class="ms-ad" style="margin:0;background:none;padding:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">In-feed ad zone<br><small style="font-weight:400">Sold as native placement between stories</small></div></div></div>
+								<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><span class="ms-badge">County</span></div><div class="ms-card__body"><h3><a href="#0">Quorum court sets the date for its budget hearing</a></h3><p>The session is open to the public and will be streamed.</p><div class="ms-meta"><span>Sample Byline</span><span>Jul 27</span></div></div></article>
+								<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--e" aria-hidden="true"></div><span class="ms-badge">County</span></div><div class="ms-card__body"><h3><a href="#0">Splash pad reopens after repairs</a></h3><p>Crews replaced the pump and resurfaced the deck over three weeks.</p><div class="ms-meta"><span>Sample Byline</span><span>Jul 27</span></div></div></article>
+							</div>
+							<nav class="ms-pager" aria-label="Pagination">
+								<span class="ms-pager__item is-current">1</span><a class="ms-pager__item" href="#0">2</a><a class="ms-pager__item" href="#0">3</a><span class="ms-pager__dots">…</span><a class="ms-pager__item" href="#0">Next »</a>
+							</nav>
+						</div>
+						<aside>
+							<div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div>
+							<div class="ms-widget"><h3>Recent News</h3>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><div><h4><a href="#0">Council sets budget hearing date</a></h4><div class="ms-meta"><span>Jul 29</span></div></div></article>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><div><h4><a href="#0">Two new fire engines in service</a></h4><div class="ms-meta"><span>Jul 28</span></div></div></article>
+								<article class="ms-list-item"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><div><h4><a href="#0">Splash pad reopens</a></h4><div class="ms-meta"><span>Jul 27</span></div></div></article>
+							</div>
+						</aside>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ PUBLIC RECORDS ============================ -->
+			<main class="pv-view fav-hidden" data-view="records">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › Public Records</div>
+						<h1>Public Records</h1>
+						<p>Mugshots, 911 calls, court filings, marriage licenses, the offender registry and job listings — all in one place.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<nav class="ms-chips" aria-label="Record types">
+						<a class="ms-chip is-active" href="#0">All records</a>
+						<a class="ms-chip" href="#0">Mugshots Archive</a>
+						<a class="ms-chip" href="#0">Court Filings</a>
+						<a class="ms-chip" href="#0">911 Calls</a>
+						<a class="ms-chip" href="#0">Marriage Licenses</a>
+						<a class="ms-chip" href="#0">Offender Registry</a>
+						<a class="ms-chip" href="#0">Jobs Listings</a>
+					</nav>
+					<p class="ms-note">These six were six separate menu items before. Same content, one door.</p>
+					<div class="ms-cols">
+						<div>
+							<div class="ms-records">
+								<article class="ms-rec"><span class="ms-rec__tag">Court Filings</span><div><h3><a href="#0">Court filings for the week of July 27</a></h3><div class="ms-meta"><span>Updated weekly</span><span>Jul 28</span></div></div></article>
+								<article class="ms-rec"><span class="ms-rec__tag">Marriage</span><div><h3><a href="#0">Marriage licenses issued the week of July 27</a></h3><div class="ms-meta"><span>Updated weekly</span><span>Jul 28</span></div></div></article>
+								<article class="ms-rec"><span class="ms-rec__tag">911 Calls</span><div><h3><a href="#0">This week in 911 calls</a></h3><div class="ms-meta"><span>Updated weekly</span><span>Jul 27</span></div></div></article>
+								<article class="ms-rec"><span class="ms-rec__tag">Jobs</span><div><h3><a href="#0">This week's job listings for Saline County</a></h3><div class="ms-meta"><span>Updated daily</span><span>Jul 27</span></div></div></article>
+								<article class="ms-rec"><span class="ms-rec__tag">Mugshots</span><div><h3><a href="#0">Mugshot archive — July 2026</a></h3><div class="ms-meta"><span>Updated daily</span><span>Jul 26</span></div></div></article>
+							</div>
+							<nav class="ms-pager" aria-label="Pagination"><span class="ms-pager__item is-current">1</span><a class="ms-pager__item" href="#0">2</a><a class="ms-pager__item" href="#0">3</a><span class="ms-pager__dots">…</span><a class="ms-pager__item" href="#0">Next »</a></nav>
+						</div>
+						<aside>
+							<div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div>
+						</aside>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ EVENTS ARCHIVE ============================ -->
+			<main class="pv-view fav-hidden" data-view="events">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › Things To Do › Events</div>
+						<h1>Community Events</h1>
+						<p>Sorted by date automatically — the next thing happening is always first.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-cta-row">
+						<a class="ms-btn" href="#0">Submit an event</a>
+						<span class="ms-note" style="margin:0">Submissions arrive in the dashboard as drafts for approval.</span>
+					</div>
+					<div class="ms-cols">
+						<div>
+							<div class="ms-grid ms-grid--2">
+								<article class="ms-evt"><div class="ms-evt__date"><b>2</b><span>Aug</span></div><div><h4><a href="#0" data-goto="event">Third Thursday on the Square</a></h4><div class="ms-meta"><span>5:00 – 9:00 PM</span><span>Downtown Benton</span><span>Free</span></div><p class="ms-card__excerpt" style="margin:.4rem 0 0">Live music, food trucks and late shopping on the courthouse square.</p></div></article>
+								<article class="ms-evt"><div class="ms-evt__date"><b>5</b><span>Aug</span></div><div><h4><a href="#0">Chamber Bingo Night</a></h4><div class="ms-meta"><span>6:30 PM</span><span>Community Center</span><span>$10</span></div><p class="ms-card__excerpt" style="margin:.4rem 0 0">Doors at six. Proceeds support the scholarship fund.</p></div></article>
+								<article class="ms-evt"><div class="ms-evt__date"><b>9</b><span>Aug</span></div><div><h4><a href="#0">Saturday Farmers Market</a></h4><div class="ms-meta"><span>8:00 AM – Noon</span><span>Riverside Park</span><span>Free</span></div><p class="ms-card__excerpt" style="margin:.4rem 0 0">Produce, baked goods and crafts from about forty local vendors.</p></div></article>
+								<article class="ms-evt"><div class="ms-evt__date"><b>14</b><span>Aug</span></div><div><h4><a href="#0">Back-to-School Bash</a></h4><div class="ms-meta"><span>4:00 PM</span><span>Bryant</span><span>Free</span></div><p class="ms-card__excerpt" style="margin:.4rem 0 0">Backpacks, haircuts and immunisations while supplies last.</p></div></article>
+								<article class="ms-evt"><div class="ms-evt__date"><b>23</b><span>Aug</span></div><div><h4><a href="#0">Fall Craft Fair</a></h4><div class="ms-meta"><span>9:00 AM – 4:00 PM</span><span>The Depot</span><span>$3</span></div><p class="ms-card__excerpt" style="margin:.4rem 0 0">Two floors of vendors, with parking behind the building.</p></div></article>
+								<div class="ms-ad-cell"><div class="ms-ad" style="margin:0;background:none;padding:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">In-feed ad zone</div></div></div>
+							</div>
+						</div>
+						<aside>
+							<div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div>
+						</aside>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ SINGLE EVENT ============================ -->
+			<main class="pv-view fav-hidden" data-view="event">
+				<div class="ms-container" style="padding-bottom:2rem">
+					<div class="ms-crumbs"><a href="#0">Home</a> › <a href="#0" data-goto="events">Events</a> › Third Thursday on the Square</div>
+					<div class="ms-cols" style="margin-top:1rem">
+						<article class="ms-article">
+							<span class="ms-badge">Event</span>
+							<h1>Third Thursday on the Square</h1>
+							<div class="ms-article__hero"><div class="ms-ph ms-ph--c" aria-hidden="true"></div></div>
+							<div class="ms-evt-meta">
+								<div class="ms-evt-meta__row"><strong>Date</strong><span>Thursday, August 2, 2026</span></div>
+								<div class="ms-evt-meta__row"><strong>Time</strong><span>5:00 PM – 9:00 PM</span></div>
+								<div class="ms-evt-meta__row"><strong>Location</strong><span>Downtown Benton — 200 Sample Street</span></div>
+								<div class="ms-evt-meta__row"><strong>Cost</strong><span>Free</span></div>
+								<div class="ms-evt-meta__row"><strong>Organizer</strong><span>Sample Organizer</span></div>
+								<div class="ms-evt-meta__row"><a class="ms-btn" href="#0">Tickets &amp; info</a></div>
+							</div>
+							<div class="ms-article__body">
+								<p>Sample event description. Every field above is a form field in the dashboard — no code, and no separate calendar plugin to keep in sync.</p>
+								<p>Events sort by their start date automatically, so the archive always leads with whatever is happening next.</p>
+							</div>
+						</article>
+						<aside>
+							<div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div>
+							<div class="ms-widget"><h3>Upcoming Events</h3>
+								<article class="ms-evt" style="border:0;padding:.5rem 0"><div class="ms-evt__date"><b>5</b><span>Aug</span></div><div><h4><a href="#0">Chamber Bingo</a></h4></div></article>
+								<article class="ms-evt" style="border:0;padding:.5rem 0"><div class="ms-evt__date"><b>9</b><span>Aug</span></div><div><h4><a href="#0">Farmers Market</a></h4></div></article>
+							</div>
+						</aside>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ OBITUARIES ARCHIVE ============================ -->
+			<main class="pv-view fav-hidden" data-view="obits">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › Obituaries</div>
+						<h1>Obituaries</h1>
+						<p>One entry per person, each with its own page families can share.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-cta-row">
+						<form class="ms-namesearch" onsubmit="return false">
+							<label class="screen-reader-text" for="obit-q">Search by name</label>
+							<input id="obit-q" type="search" placeholder="Search by name…">
+							<button class="ms-btn" type="submit">Search</button>
+						</form>
+						<a class="ms-btn ms-btn--ghost" href="#0">Submit an obituary</a>
+					</div>
+					<p class="ms-note">Name search works because each person is a separate entry — the current daily-digest format makes this unreliable.</p>
+					<div class="ms-grid ms-grid--4">
+						<article class="ms-obit"><div class="ms-ph" aria-hidden="true"></div><h4><a href="#0" data-goto="obit">Sample Name One</a></h4><div class="ms-dates">1941 – 2026 · Benton</div></article>
+						<article class="ms-obit"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><h4><a href="#0">Sample Name Two</a></h4><div class="ms-dates">1953 – 2026 · Bryant</div></article>
+						<article class="ms-obit"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><h4><a href="#0">Sample Name Three</a></h4><div class="ms-dates">1936 – 2026 · Alexander</div></article>
+						<article class="ms-obit"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><h4><a href="#0">Sample Name Four</a></h4><div class="ms-dates">1948 – 2026 · Benton</div></article>
+						<article class="ms-obit"><div class="ms-ph ms-ph--e" aria-hidden="true"></div><h4><a href="#0">Sample Name Five</a></h4><div class="ms-dates">1944 – 2026 · Haskell</div></article>
+						<article class="ms-obit"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><h4><a href="#0">Sample Name Six</a></h4><div class="ms-dates">1959 – 2026 · Benton</div></article>
+						<article class="ms-obit"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><h4><a href="#0">Sample Name Seven</a></h4><div class="ms-dates">1932 – 2026 · Bryant</div></article>
+						<article class="ms-obit"><div class="ms-ph" aria-hidden="true"></div><h4><a href="#0">Sample Name Eight</a></h4><div class="ms-dates">1951 – 2026 · Benton</div></article>
+					</div>
+					<nav class="ms-pager" aria-label="Pagination"><span class="ms-pager__item is-current">1</span><a class="ms-pager__item" href="#0">2</a><a class="ms-pager__item" href="#0">3</a><span class="ms-pager__dots">…</span><a class="ms-pager__item" href="#0">Next »</a></nav>
+				</div>
+			</main>
+
+			<!-- ============================ SINGLE OBITUARY ============================ -->
+			<main class="pv-view fav-hidden" data-view="obit">
+				<div class="ms-container" style="padding-bottom:2rem">
+					<div class="ms-crumbs"><a href="#0">Home</a> › <a href="#0" data-goto="obits">Obituaries</a> › Sample Name One</div>
+					<article class="ms-article ms-obit-single">
+						<div class="ms-ph ms-obit-single__portrait" aria-hidden="true"></div>
+						<h1>Sample Name One</h1>
+						<p class="ms-obit-single__dates">March 12, 1941 — July 24, 2026 · Age 85</p>
+						<p class="ms-obit-single__city">Benton, Arkansas</p>
+						<div class="ms-article__body ms-obit-single__body">
+							<p>Sample obituary text. Families can share this page directly — it has its own address, its own photo and its own service details.</p>
+							<p>That is the part the current daily-digest format cannot do: when several obituaries share one dated post, no individual has a link of their own.</p>
+						</div>
+						<div class="ms-evt-meta ms-obit-single__service">
+							<h2 style="font-size:1.15rem;margin:0 0 .5rem">Service arrangements</h2>
+							<div class="ms-evt-meta__row"><strong>Service</strong><span>Saturday at 2:00 PM</span></div>
+							<div class="ms-evt-meta__row"><strong>Location</strong><span>Sample Memorial Chapel</span></div>
+							<div class="ms-evt-meta__row"><strong>Funeral home</strong><span><a href="#0">Sample Funeral Home</a></span></div>
+						</div>
+					</article>
+				</div>
+			</main>
+
+			<!-- ============================ DIRECTORY ============================ -->
+			<main class="pv-view fav-hidden" data-view="directory">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › Business › Directory</div>
+						<h1>Business Directory</h1>
+						<p>Filter by category instead of scrolling one long list.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-cta-row">
+						<form class="ms-namesearch" onsubmit="return false">
+							<label class="screen-reader-text" for="biz-q">Search businesses</label>
+							<input id="biz-q" type="search" placeholder="Search businesses…">
+							<button class="ms-btn" type="submit">Search</button>
+						</form>
+						<a class="ms-btn ms-btn--ghost" href="#0">List your business</a>
+					</div>
+					<nav class="ms-chips" aria-label="Business categories">
+						<a class="ms-chip is-active" href="#0">All</a>
+						<a class="ms-chip" href="#0">Retail</a>
+						<a class="ms-chip" href="#0">Food &amp; Dining</a>
+						<a class="ms-chip" href="#0">Health</a>
+						<a class="ms-chip" href="#0">Automotive</a>
+						<a class="ms-chip" href="#0">Home Services</a>
+					</nav>
+					<div class="ms-grid ms-grid--3">
+						<article class="ms-biz"><div class="ms-ph ms-ph--e" aria-hidden="true"></div><h4><a href="#0" data-goto="business">Sample Hardware Co.</a></h4><div class="ms-meta">Retail · Home &amp; Garden</div><dl><dt>Phone</dt><dd>(501) 000-0001</dd><dt>Hours</dt><dd>Mon–Sat 7–6</dd></dl></article>
+						<article class="ms-biz"><div class="ms-ph" aria-hidden="true"></div><h4><a href="#0">Sample Family Dental</a></h4><div class="ms-meta">Health · Dental</div><dl><dt>Phone</dt><dd>(501) 000-0002</dd><dt>Hours</dt><dd>Mon–Thu 8–5</dd></dl></article>
+						<article class="ms-biz"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><h4><a href="#0">Sample Auto Service</a></h4><div class="ms-meta">Automotive · Repair</div><dl><dt>Phone</dt><dd>(501) 000-0003</dd><dt>Hours</dt><dd>Mon–Fri 7:30–5:30</dd></dl></article>
+						<article class="ms-biz"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><h4><a href="#0">Sample Coffee House</a></h4><div class="ms-meta">Food &amp; Dining</div><dl><dt>Phone</dt><dd>(501) 000-0004</dd><dt>Hours</dt><dd>Daily 6–4</dd></dl></article>
+						<article class="ms-biz"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><h4><a href="#0">Sample Lawn &amp; Landscape</a></h4><div class="ms-meta">Home Services</div><dl><dt>Phone</dt><dd>(501) 000-0005</dd><dt>Hours</dt><dd>Mon–Fri 8–5</dd></dl></article>
+						<div class="ms-ad-cell"><div class="ms-ad" style="margin:0;background:none;padding:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Directory ad zone<br><small style="font-weight:400">Sold separately from run-of-site</small></div></div></div>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ SINGLE BUSINESS ============================ -->
+			<main class="pv-view fav-hidden" data-view="business">
+				<div class="ms-container" style="padding-bottom:2rem">
+					<div class="ms-crumbs"><a href="#0">Home</a> › <a href="#0" data-goto="directory">Directory</a> › Sample Hardware Co.</div>
+					<article class="ms-article">
+						<header style="display:flex;gap:1.25rem;align-items:center;margin:1rem 0 1.5rem">
+							<div class="ms-ph ms-ph--e" style="width:84px;height:84px;border-radius:6px;flex:none" aria-hidden="true"></div>
+							<div>
+								<span class="ms-badge">Business</span>
+								<h1 style="margin:.3rem 0 0;font-size:1.9rem">Sample Hardware Co.</h1>
+								<div class="ms-meta">Retail · Home &amp; Garden</div>
+							</div>
+						</header>
+						<div class="ms-cols" style="grid-template-columns:minmax(0,1fr) 300px">
+							<div class="ms-article__body">
+								<p>Sample business description. Owners send you the details; you paste them into the fields and the listing renders itself.</p>
+								<p>Each listing can be flagged for the homepage Business Spotlight, and listings carry their own advertising zone separate from run-of-site inventory.</p>
+							</div>
+							<aside>
+								<div class="ms-biz"><h3 class="ms-widget-title" style="font-size:1.05rem;margin:0 0 .8rem;padding-bottom:.4rem;border-bottom:3px solid var(--ms-primary)">Details</h3>
+									<dl>
+										<dt>Address</dt><dd>100 Sample Street<br>Benton, AR 72015</dd>
+										<dt>Phone</dt><dd><a href="#0">(501) 000-0001</a></dd>
+										<dt>Email</dt><dd><a href="#0">hello@example.com</a></dd>
+										<dt>Web</dt><dd><a href="#0">example.com</a></dd>
+										<dt>Hours</dt><dd>Mon–Sat 7–6</dd>
+									</dl>
+									<a class="ms-btn" style="margin-top:1rem;display:block;text-align:center" href="#0">Visit website</a>
+								</div>
+							</aside>
+						</div>
+					</article>
+				</div>
+			</main>
+
+			<!-- ============================ SEARCH ============================ -->
+			<main class="pv-view fav-hidden" data-view="search">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<h1>Search results for “benton”</h1>
+						<p>7 results across news, events, obituaries and the directory.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-cols">
+						<div>
+							<article class="ms-list-item" style="grid-template-columns:110px 1fr"><div class="ms-ph" aria-hidden="true"></div><div><span class="ms-badge">Post</span><h3 style="font-size:1.15rem;margin:.3rem 0"><a href="#0" data-goto="article">County fair returns this weekend</a></h3><p class="ms-card__excerpt">Organizers added a second entrance and dropped the parking fee.</p></div></article>
+							<article class="ms-list-item" style="grid-template-columns:110px 1fr"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><div><span class="ms-badge">Event</span><h3 style="font-size:1.15rem;margin:.3rem 0"><a href="#0" data-goto="event">Third Thursday on the Square</a></h3><p class="ms-card__excerpt">Downtown Benton · August 2 · Free</p></div></article>
+							<article class="ms-list-item" style="grid-template-columns:110px 1fr"><div class="ms-ph ms-ph--e" aria-hidden="true"></div><div><span class="ms-badge">Business</span><h3 style="font-size:1.15rem;margin:.3rem 0"><a href="#0" data-goto="business">Sample Hardware Co.</a></h3><p class="ms-card__excerpt">100 Sample Street, Benton — Retail · Home &amp; Garden</p></div></article>
+							<article class="ms-list-item" style="grid-template-columns:110px 1fr"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><div><span class="ms-badge">Obituary</span><h3 style="font-size:1.15rem;margin:.3rem 0"><a href="#0" data-goto="obit">Sample Name One</a></h3><p class="ms-card__excerpt">1941 – 2026 · Benton</p></div></article>
+							<p class="ms-note" style="margin-top:1.25rem">Search covers posts, pages, events, obituaries and businesses together — each result labelled by type.</p>
+						</div>
+						<aside><div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div></aside>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ 404 ============================ -->
+			<main class="pv-view fav-hidden" data-view="e404">
+				<div class="ms-container" style="padding:2.5rem 1.15rem">
+					<div style="max-width:640px">
+						<h1 style="font-size:2.2rem">Page not found</h1>
+						<p style="font-size:1.05rem;color:var(--ms-muted)">We couldn't find that page. It may have moved. Try a search, or browse recent news below.</p>
+						<form class="ms-namesearch" onsubmit="return false" style="max-width:440px">
+							<label class="screen-reader-text" for="e404-q">Search</label>
+							<input id="e404-q" type="search" placeholder="Search MySaline…">
+							<button class="ms-btn" type="submit">Search</button>
+						</form>
+					</div>
+					<section class="ms-section" style="margin-top:2.5rem">
+						<div class="ms-section-head"><h2>Recent News</h2></div>
+						<div class="ms-grid ms-grid--3">
+							<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--b" aria-hidden="true"></div></div><div class="ms-card__body"><h3><a href="#0">Four new places to eat in Benton</a></h3><div class="ms-meta"><span>Jul 29</span></div></div></article>
+							<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--c" aria-hidden="true"></div></div><div class="ms-card__body"><h3><a href="#0">Road work begins Monday</a></h3><div class="ms-meta"><span>Jul 29</span></div></div></article>
+							<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--d" aria-hidden="true"></div></div><div class="ms-card__body"><h3><a href="#0">Library reading wraps up</a></h3><div class="ms-meta"><span>Jul 28</span></div></div></article>
+						</div>
+					</section>
+				</div>
+			</main>
+
 			<!-- ============================ FOOTER ============================ -->
 			<footer class="ms-footer">
 				<div class="ms-container">
@@ -686,7 +1061,21 @@ body {
 	var tabs = Array.prototype.slice.call(document.querySelectorAll('.pv-tab'));
 	var views = Array.prototype.slice.call(document.querySelectorAll('.pv-view'));
 	var urlEl = document.querySelector('[data-url]');
-	var urls = { home: 'mysaline.com', ballot: 'mysaline.com/scf-2026-vote/', article: 'mysaline.com/county-fair-2026/' };
+	var urls = {
+		home:      'mysaline.com',
+		section:   'mysaline.com/category/saline-county/',
+		article:   'mysaline.com/county-fair-2026/',
+		records:   'mysaline.com/category/public-records/',
+		events:    'mysaline.com/events/',
+		event:     'mysaline.com/events/third-thursday-on-the-square/',
+		obits:     'mysaline.com/obituaries/',
+		obit:      'mysaline.com/obituaries/sample-name-one/',
+		directory: 'mysaline.com/businesses/',
+		business:  'mysaline.com/businesses/sample-hardware-co/',
+		ballot:    'mysaline.com/scf-2026-vote/',
+		search:    'mysaline.com/?s=benton',
+		e404:      'mysaline.com/a-page-that-moved/'
+	};
 
 	function show(name) {
 		views.forEach(function (v) { v.classList.toggle('fav-hidden', v.getAttribute('data-view') !== name); });
