@@ -1,0 +1,184 @@
+/*
+ * Print styles.
+ *
+ * Families print obituaries and take them to services; readers print event
+ * details and directory listings. Without this they get navigation, ads and a
+ * dark header burning through toner, with the actual content squeezed into a
+ * column. This strips the site down to the words.
+ */
+
+@page {
+	margin: 1.6cm 1.4cm;
+}
+
+@media print {
+
+	/* --- Kill the furniture ------------------------------------------- */
+	.ms-topbar,
+	.ms-nav,
+	.ms-breaking,
+	.ms-search-panel,
+	.ms-header__actions,
+	.ms-quicklinks,
+	.ms-sidebar,
+	.ms-footer,
+	.ms-ad,
+	.ms-ad-cell,
+	.ms-ad-sticky,
+	.ms-newsletter,
+	.ms-newsletter-band,
+	.ms-post-nav,
+	.ms-related,
+	.ms-comments,
+	.ms-comments-area,
+	.ms-pagination,
+	.ms-pager,
+	.ms-archive-tools,
+	.ms-chips,
+	.ms-social,
+	.ms-menu-toggle,
+	.ms-search-toggle,
+	.skip-link,
+	.ms-fav__bar,
+	.ms-fav__submit,
+	.ms-fav__tabs,
+	.ms-fav__tools,
+	form {
+		display: none !important;
+	}
+
+	/* --- Reset the page ----------------------------------------------- */
+	html, body {
+		background: #fff !important;
+		color: #000 !important;
+		font-size: 11.5pt;
+		line-height: 1.45;
+	}
+
+	body {
+		font-family: Georgia, "Times New Roman", Times, serif;
+	}
+
+	.ms-container,
+	.ms-content-sidebar,
+	.ms-primary-col,
+	.ms-site-main {
+		display: block !important;
+		max-width: none !important;
+		width: auto !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		grid-template-columns: none !important;
+	}
+
+	/* --- Masthead: a simple line identifying the source ---------------- */
+	.ms-header {
+		border: 0 !important;
+		border-bottom: 1.5pt solid #000 !important;
+		padding: 0 0 .3cm !important;
+		margin-bottom: .5cm !important;
+	}
+	.ms-header__inner { display: block !important; padding: 0 !important; }
+	.ms-brand__title, .ms-brand__title a { color: #000 !important; font-size: 20pt !important; }
+	.ms-brand__tagline { color: #333 !important; }
+	.ms-brand__logo img { max-height: 1.4cm !important; filter: grayscale(100%); }
+
+	/* --- Typography ---------------------------------------------------- */
+	h1, h2, h3, h4 {
+		color: #000 !important;
+		page-break-after: avoid;
+		break-after: avoid;
+	}
+	.ms-article__title, .ms-obit-single h1 { font-size: 20pt !important; margin: 0 0 .2cm !important; }
+	.ms-article__content, .ms-article__body { font-size: 11.5pt !important; }
+	p, li, blockquote { orphans: 3; widows: 3; }
+	blockquote { border-left: 2pt solid #666 !important; color: #222 !important; }
+
+	a { color: #000 !important; text-decoration: none !important; }
+	/* Spell out destinations, since a printed link is unusable otherwise. */
+	.ms-article__content a[href^="http"]::after,
+	.ms-article__body a[href^="http"]::after {
+		content: " (" attr(href) ")";
+		font-size: 9pt;
+		color: #444;
+		word-break: break-all;
+	}
+
+	/* --- Images -------------------------------------------------------- */
+	img {
+		max-width: 100% !important;
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+	.ms-featured-media { margin: 0 0 .4cm !important; }
+	.ms-placeholder { display: none !important; }
+
+	/* --- Meta ---------------------------------------------------------- */
+	.ms-article__meta, .ms-card__meta, .ms-meta {
+		color: #333 !important;
+		font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+		font-size: 9.5pt !important;
+	}
+	.ms-cat-badge, .ms-badge {
+		background: none !important;
+		color: #000 !important;
+		border: .5pt solid #000 !important;
+		padding: 0 .15cm !important;
+	}
+	.ms-author-avatar, .ms-avatar { display: none !important; }
+
+	/* --- Obituaries: the page most likely to be printed ---------------- */
+	.ms-obit-single, .ms-single-obit { text-align: left !important; }
+	.ms-obit-single__portrait, .ms-single-obit .ms-obit-single__portrait {
+		float: right;
+		width: 3.6cm !important;
+		height: auto !important;
+		margin: 0 0 .4cm .5cm !important;
+		page-break-inside: avoid;
+	}
+	.ms-obit-single__dates, .ms-single-obit .ms-dates {
+		font-size: 12pt !important;
+		color: #000 !important;
+		margin-bottom: .3cm !important;
+	}
+	/* Service details must not split across a page. */
+	.ms-event-meta {
+		background: none !important;
+		border: .75pt solid #000 !important;
+		padding: .35cm !important;
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+	.ms-event-meta__row strong { color: #000 !important; }
+
+	/* --- Cards flatten into a list ------------------------------------- */
+	.ms-grid, .ms-grid--2, .ms-grid--3, .ms-grid--4 {
+		display: block !important;
+	}
+	.ms-card, .ms-biz, .ms-evt, .ms-obit {
+		border: 0 !important;
+		border-bottom: .5pt solid #999 !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+		padding: 0 0 .3cm !important;
+		margin: 0 0 .3cm !important;
+		page-break-inside: avoid;
+		break-inside: avoid;
+	}
+	.ms-card__media { display: none !important; }
+
+	/* --- Source line at the end ---------------------------------------- */
+	.ms-print-source {
+		display: block !important;
+		margin-top: .6cm;
+		padding-top: .2cm;
+		border-top: .5pt solid #999;
+		font-size: 9pt;
+		color: #444;
+		font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+		word-break: break-all;
+	}
+}
+
+/* Hidden on screen; revealed by the print block above. */
+.ms-print-source { display: none; }

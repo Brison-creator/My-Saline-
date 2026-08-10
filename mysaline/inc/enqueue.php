@@ -16,6 +16,10 @@ function mysaline_enqueue_assets() {
 	// Main stylesheet (the theme header + all styles live in style.css).
 	wp_enqueue_style( 'mysaline-style', get_stylesheet_uri(), array(), MYSALINE_VERSION );
 
+	// Print styles: obituaries and event details get printed, so they get a
+	// stylesheet rather than whatever the browser improvises.
+	wp_enqueue_style( 'mysaline-print', MYSALINE_URI . 'assets/css/print.css', array( 'mysaline-style' ), MYSALINE_VERSION, 'print' );
+
 	// Front-end behaviour (mobile menu, search toggle, ad rotation).
 	wp_enqueue_script( 'mysaline-main', MYSALINE_URI . 'assets/js/main.js', array(), MYSALINE_VERSION, true );
 

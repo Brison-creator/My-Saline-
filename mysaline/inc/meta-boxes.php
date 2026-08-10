@@ -81,6 +81,7 @@ function mysaline_meta_fields() {
  */
 function mysaline_add_meta_boxes() {
 	add_meta_box( 'mysaline_featured', __( 'Featured Story', 'mysaline' ), 'mysaline_render_featured_box', 'post', 'side', 'high' );
+	add_meta_box( 'mysaline_hub', __( 'Section Hub Options', 'mysaline' ), 'mysaline_render_hub_box', 'page', 'side', 'default' );
 	add_meta_box( 'mysaline_event', __( 'Event Details', 'mysaline' ), 'mysaline_render_cpt_box', 'ms_event', 'normal', 'high' );
 	add_meta_box( 'mysaline_obit', __( 'Obituary Details', 'mysaline' ), 'mysaline_render_cpt_box', 'ms_obituary', 'normal', 'high' );
 	add_meta_box( 'mysaline_biz', __( 'Business Details', 'mysaline' ), 'mysaline_render_cpt_box', 'ms_business', 'normal', 'high' );
@@ -102,6 +103,45 @@ function mysaline_render_featured_box( $post ) {
 		<input type="checkbox" name="_ms_featured" value="1" <?php checked( $value, '1' ); ?> />
 		<span><?php esc_html_e( 'Show this story in the homepage featured hero.', 'mysaline' ); ?></span>
 	</label>
+	<?php
+}
+
+/**
+ * Section Hub options for pages: an icon and an optional category feed.
+ *
+ * Only meaningful on the "Section Hub" page template, so the box explains that
+ * rather than appearing without context.
+ *
+ * @param WP_Post $post Post.
+ */
+function mysaline_render_hub_box( $post ) {
+	wp_nonce_field( 'mysaline_save_meta', 'mysaline_meta_nonce' );
+	$icon = get_post_meta( $post->ID, '_ms_hub_icon', true );
+	$cat  = (int) get_post_meta( $post->ID, '_ms_hub_category', true );
+	?>
+	<p class="description" style="margin-top:0">
+		<?php esc_html_e( 'Used when this page uses the “Section Hub” template, or when it appears as a card on a parent hub.', 'mysaline' ); ?>
+	</p>
+	<p>
+		<label for="_ms_hub_icon"><strong><?php esc_html_e( 'Card icon (emoji)', 'mysaline' ); ?></strong></label>
+		<input type="text" id="_ms_hub_icon" name="_ms_hub_icon" value="<?php echo esc_attr( $icon ); ?>" style="width:100%" placeholder="📅" />
+	</p>
+	<p>
+		<label for="_ms_hub_category"><strong><?php esc_html_e( 'Show latest posts from', 'mysaline' ); ?></strong></label>
+		<?php
+		wp_dropdown_categories(
+			array(
+				'show_option_none' => __( '— No post feed —', 'mysaline' ),
+				'option_none_value' => 0,
+				'selected'         => $cat,
+				'name'             => '_ms_hub_category',
+				'id'               => '_ms_hub_category',
+				'class'            => 'widefat',
+				'hide_empty'       => false,
+			)
+		);
+		?>
+	</p>
 	<?php
 }
 
@@ -190,6 +230,27 @@ function mysaline_save_meta( $post_id, $post ) {
 	}
 	if ( ! current_user_can( 'edit_post', $post_id ) ) {
 		return;
+	}
+
+	// Section Hub options live on pages and are handled separately, since they
+	// are not part of the generic field table.
+	if ( 'page' === $post->post_type ) {
+		if ( isset( $_POST['_ms_hub_icon'] ) ) {
+			$icon = sanitize_text_field( wp_unslash( $_POST['_ms_hub_icon'] ) );
+			if ( '' === $icon ) {
+				delete_post_meta( $post_id, '_ms_hub_icon' );
+			} else {
+				update_post_meta( $post_id, '_ms_hub_icon', $icon );
+			}
+		}
+		if ( isset( $_POST['_ms_hub_category'] ) ) {
+			$hub_cat = absint( $_POST['_ms_hub_category'] );
+			if ( ! $hub_cat ) {
+				delete_post_meta( $post_id, '_ms_hub_category' );
+			} else {
+				update_post_meta( $post_id, '_ms_hub_category', $hub_cat );
+			}
+		}
 	}
 
 	$all = mysaline_meta_fields();

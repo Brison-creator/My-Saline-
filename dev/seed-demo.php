@@ -569,6 +569,94 @@ foreach ( $pages as $title => $body ) {
 	ms_seed_post( $title, 'page', array( 'post_content' => $body ) );
 }
 
+/**
+ * Look up a page ID by exact title.
+ *
+ * Avoids get_page_by_title(), which is deprecated as of WordPress 6.2 and would
+ * emit notices with WP_DEBUG enabled in this environment.
+ */
+$page_by = function ( $title ) {
+	$ids = get_posts(
+		array(
+			'post_type'        => 'page',
+			'post_status'      => array( 'publish', 'draft' ),
+			'title'            => $title,
+			'posts_per_page'   => 1,
+			'fields'           => 'ids',
+			'suppress_filters' => false,
+		)
+	);
+	return ! empty( $ids ) ? (int) $ids[0] : 0;
+};
+
+/*
+ * Section hubs. Child pages become the hub's cards automatically, so this also
+ * demonstrates how the owner builds one: create a parent, set the template,
+ * then create children with an icon and an excerpt.
+ */
+$hubs = array(
+	'Things To Do' => array(
+		'icon'     => '🎪',
+		'excerpt'  => 'Events, yard sales, dining and the daily puzzle — everything happening in Saline County.',
+		'children' => array(
+			array( 'Yard Sales', '🏷️', 'Weekend listings, with a form to add your own.' ),
+			array( 'Daily Puzzle', '🧩', 'The crossword, refreshed every morning.' ),
+			array( 'Submit an Event', '📝', 'Send us your event and we will add it to the calendar.' ),
+		),
+	),
+	'Government'   => array(
+		'icon'     => '🏛️',
+		'excerpt'  => 'Elections, elected officials and district maps for Saline County.',
+		'category' => isset( $cat_ids['Elections'] ) ? $cat_ids['Elections'] : 0,
+		'children' => array(
+			array( 'Elected Officials', '🏛️', 'Who represents you, with contact details.' ),
+			array( 'District & Ward Maps', '🗺️', 'Districts, wards and voting zones.' ),
+		),
+	),
+);
+
+foreach ( $hubs as $hub_title => $hub ) {
+	$hub_id = ms_seed_post(
+		$hub_title,
+		'page',
+		array( 'post_excerpt' => $hub['excerpt'] )
+	);
+	if ( ! $hub_id ) {
+		continue;
+	}
+	update_post_meta( $hub_id, '_wp_page_template', 'templates/hub.php' );
+	update_post_meta( $hub_id, '_ms_hub_icon', $hub['icon'] );
+	if ( ! empty( $hub['category'] ) ) {
+		update_post_meta( $hub_id, '_ms_hub_category', (int) $hub['category'] );
+	}
+
+	foreach ( $hub['children'] as $order => $child ) {
+		list( $c_title, $c_icon, $c_excerpt ) = $child;
+		$child_id = ms_seed_post(
+			$c_title,
+			'page',
+			array(
+				'post_parent'  => $hub_id,
+				'menu_order'   => $order,
+				'post_excerpt' => $c_excerpt,
+				'post_content' => 'Sample reference page.',
+			)
+		);
+		if ( $child_id ) {
+			update_post_meta( $child_id, '_ms_hub_icon', $c_icon );
+		}
+	}
+}
+WP_CLI::log( '  · 2 section hubs with child pages' );
+
+// Give the long reference pages the full-width template.
+foreach ( array( 'About MySaline', 'Advertise with us', 'Contact Us' ) as $fw ) {
+	$fw_id = $page_by( $fw );
+	if ( $fw_id ) {
+		update_post_meta( $fw_id, '_wp_page_template', 'templates/full-width.php' );
+	}
+}
+
 // Voting page uses the ballot template.
 $vote_id = ms_seed_post(
 	'Saline County Favorites — Vote',
@@ -648,26 +736,6 @@ function ms_seed_menu( $name, $location, $items ) {
 	$locations[ $location ] = $menu_id;
 	set_theme_mod( 'nav_menu_locations', $locations );
 }
-
-/**
- * Look up a page ID by exact title.
- *
- * Avoids get_page_by_title(), which is deprecated as of WordPress 6.2 and would
- * emit notices with WP_DEBUG enabled in this environment.
- */
-$page_by = function ( $title ) {
-	$ids = get_posts(
-		array(
-			'post_type'        => 'page',
-			'post_status'      => array( 'publish', 'draft' ),
-			'title'            => $title,
-			'posts_per_page'   => 1,
-			'fields'           => 'ids',
-			'suppress_filters' => false,
-		)
-	);
-	return ! empty( $ids ) ? (int) $ids[0] : 0;
-};
 
 /*
  * The consolidated seven-section tree from docs/INFORMATION-ARCHITECTURE.md.

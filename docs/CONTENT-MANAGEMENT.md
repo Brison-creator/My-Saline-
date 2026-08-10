@@ -237,6 +237,63 @@ Google Form. Two habits close most of the remaining gap:
 2. The drawing export lists each entrant's email and category count. Batches of
    near-identical addresses (`name+1@`, `name+2@`) are the usual tell.
 
+## Page templates
+
+When you create or edit a page, look for **Template** under *Page Attributes*
+(classic editor) or in the *Page* tab of the sidebar (block editor):
+
+| Template | Use it for |
+| --- | --- |
+| **Default** | Ordinary pages, with the sidebar |
+| **Full Width (no sidebar)** | About, Advertise, Contact, maps, long reference pages |
+| **Section Hub** | A landing page for a group — Things To Do, Government |
+| **Saline County Favorites Ballot** | The voting page |
+
+### Building a Section Hub
+
+A hub turns a cluster of pages into one landing page, so the nav needs one item
+instead of five.
+
+1. Create the parent page (e.g. "Things To Do"), set **Template → Section Hub**.
+2. Write a sentence in the **Excerpt** — it becomes the subheading.
+3. Create the child pages (Yard Sales, Daily Puzzle…), and for each set
+   **Page Attributes → Parent** to the hub.
+4. On each child, fill in the **Section Hub Options** box: an emoji for the card
+   icon, and an excerpt for the card description.
+5. Optionally, on the hub itself, pick a category under *Show latest posts from*
+   to append a feed of recent coverage.
+
+The cards build themselves from the child pages — no shortcodes, no code.
+
+## Sharing on social media
+
+The theme writes the tags Facebook, X and Instagram read when someone posts a
+link: headline, description and the featured image at full size, plus author,
+section and publish date. Without these a shared link shows as a bare URL, so
+this matters on every post.
+
+**Set a featured image on every post** — it's what appears in the share preview.
+When a post has none, the site logo is used instead.
+
+The theme also outputs structured data (JSON-LD) that helps Google understand
+your content: `NewsArticle` for posts, `Event` for events, `LocalBusiness` for
+directory listings, plus breadcrumbs and publisher details built from your
+Customizer settings.
+
+**If you install an SEO plugin** (Yoast, Rank Math, All in One SEO, SEOPress,
+Slim SEO or The SEO Framework), the theme detects it and steps aside
+automatically, so you never get duplicate tags. No setting to change.
+
+## Printing
+
+Obituaries get printed and taken to services; event details get printed and
+stuck on refrigerators. The theme has a print stylesheet that strips navigation,
+ads, sidebars and the footer, converts the page to black on white, keeps the
+portrait and service details from splitting across pages, spells out link
+destinations, and adds a line showing which page it came from.
+
+Nothing to configure — it applies whenever anyone prints.
+
 ## Newsletter signup
 
 Customize → MySaline Options → **Newsletter**:

@@ -9,6 +9,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
+			<?php
+			// Shown only on paper: where this page came from, so a printed
+			// obituary or event still carries its source.
+			if ( is_singular() ) {
+				printf(
+					'<p class="ms-print-source">%s</p>',
+					esc_html(
+						sprintf(
+							/* translators: 1: site name, 2: URL, 3: date printed. */
+							__( 'Printed from %1$s — %2$s (%3$s)', 'mysaline' ),
+							get_bloginfo( 'name' ),
+							get_permalink(),
+							date_i18n( get_option( 'date_format' ) )
+						)
+					)
+				);
+			}
+			?>
 		</div><!-- .ms-container -->
 	</main><!-- #ms-main -->
 

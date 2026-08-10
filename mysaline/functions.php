@@ -49,6 +49,7 @@ $mysaline_modules = array(
 	'events',             // Event query/date helpers.
 	'homepage',           // Featured hero + configurable homepage sections.
 	'favorites',          // Saline County Favorites voting ballot.
+	'seo',                // Open Graph, Twitter cards, JSON-LD structured data.
 );
 
 foreach ( $mysaline_modules as $mysaline_module ) {
