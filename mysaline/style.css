@@ -190,7 +190,10 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-topbar__left { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
 
 .ms-header { background: var(--ms-bg); border-bottom: 1px solid var(--ms-border); }
-.ms-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.15rem 0; }
+/* This element also carries .ms-container. Using the padding shorthand here
+   zeroed the container's horizontal padding, pushing the masthead flush to
+   the viewport edge, so only the vertical sides are set. */
+.ms-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding-top: 1.15rem; padding-bottom: 1.15rem; }
 .ms-brand { display: flex; align-items: center; gap: .85rem; min-width: 0; }
 .ms-brand__logo img { max-height: 66px; width: auto; }
 .ms-brand__title { font-family: var(--ms-font-head); font-size: 1.9rem; font-weight: 800; color: var(--ms-primary); margin: 0; line-height: 1; }
