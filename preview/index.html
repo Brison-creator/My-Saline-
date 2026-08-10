@@ -156,10 +156,29 @@ body {
 /* Nav */
 .ms-nav { background: var(--ms-primary); }
 .ms-menu { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; }
+.ms-menu li { position: relative; }
 .ms-menu > li > a { display: block; color: #fff; padding: .8rem .95rem; font-weight: 600; font-size: .88rem; border-bottom: 3px solid transparent; }
 .ms-menu > li > a:hover { background: var(--ms-primary-dark); border-bottom-color: var(--ms-highlight); text-decoration: none; }
 .ms-menu > li.is-current > a { background: var(--ms-primary-dark); border-bottom-color: var(--ms-highlight); }
 .ms-menu .has-sub > a::after { content: " ▾"; opacity: .7; font-size: .8em; }
+
+/* Dropdowns / mega menus */
+.ms-menu .sub-menu {
+	position: absolute; left: 0; top: 100%; min-width: 220px; background: var(--ms-primary-dark);
+	list-style: none; margin: 0; padding: .4rem 0; box-shadow: var(--ms-shadow); z-index: 210;
+	opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity .14s ease, transform .14s ease;
+}
+.ms-menu li:hover > .sub-menu,
+.ms-menu li:focus-within > .sub-menu,
+.ms-menu li.is-open > .sub-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+.ms-menu .sub-menu a { display: block; padding: .55rem 1.1rem; color: #fff; font-weight: 500; font-size: .9rem; border-bottom: 0; white-space: nowrap; }
+.ms-menu .sub-menu a:hover { background: var(--ms-primary-light); text-decoration: none; }
+/* Many children flow into columns rather than a tall tower. */
+.ms-menu li.mega > .sub-menu { display: grid; grid-template-columns: repeat(2, minmax(190px,1fr)); min-width: 420px; padding: .55rem; gap: 0 .4rem; }
+.ms-menu li.mega-3 > .sub-menu { display: grid; grid-template-columns: repeat(3, minmax(175px,1fr)); min-width: 570px; padding: .55rem; gap: 0 .4rem; }
+.ms-menu li.mega > .sub-menu a, .ms-menu li.mega-3 > .sub-menu a { border-radius: var(--ms-radius-sm); }
+/* Keep right-edge panels inside the viewport. */
+.ms-menu > li:nth-last-child(-n+3) > .sub-menu { left: auto; right: 0; }
 
 /* Breaking */
 .ms-breaking { background: var(--ms-accent); color: #fff; display: flex; overflow: hidden; }
@@ -255,8 +274,13 @@ body {
 .ms-ad__box { background: repeating-linear-gradient(45deg, #eef1f6, #eef1f6 11px, #e3e8f0 11px, #e3e8f0 22px); border: 1px dashed var(--ms-border); border-radius: var(--ms-radius-sm); padding: 1.4rem; color: var(--ms-muted); font-size: .84rem; font-weight: 600; }
 
 /* Buttons */
-.ms-btn { display: inline-block; background: var(--ms-accent); color: #fff; border: 0; padding: .7rem 1.35rem; border-radius: var(--ms-radius-sm); font: inherit; font-weight: 600; font-size: .92rem; cursor: pointer; }
-.ms-btn:hover { background: var(--ms-accent-dark); color: #fff; text-decoration: none; }
+/* Specificity note: the `.ms a` rule above is (0,1,1), so button links need to
+   match or beat it. The shipped theme uses a bare `a` selector and doesn't hit
+   this — this is a preview-only guard. */
+.ms-btn, .ms a.ms-btn { display: inline-block; background: var(--ms-accent); color: #fff; border: 0; padding: .7rem 1.35rem; border-radius: var(--ms-radius-sm); font: inherit; font-weight: 600; font-size: .92rem; cursor: pointer; text-decoration: none; }
+.ms-btn:hover, .ms a.ms-btn:hover { background: var(--ms-accent-dark); color: #fff; text-decoration: none; }
+.ms a.ms-btn--ghost { background: transparent; color: var(--ms-primary); }
+.ms a.ms-btn--ghost:hover { background: var(--ms-primary); color: #fff; }
 
 /* Newsletter */
 .ms-news { background: var(--ms-primary); color: #fff; border-radius: var(--ms-radius); padding: 1.75rem; }
@@ -344,6 +368,50 @@ body {
 .ms-obit-single__service { text-align: left; margin-top: 2rem; }
 
 .screen-reader-text { position: absolute; left: -9999px; }
+
+/* Hub cards (Things To Do / Government landing) */
+.ms-hubgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
+.ms-hub { display: block; padding: 1.35rem 1.3rem; background: #fff; border: 1px solid var(--ms-border); border-radius: var(--ms-radius); text-decoration: none; transition: box-shadow .16s ease, transform .16s ease; }
+.ms-hub:hover { text-decoration: none; box-shadow: var(--ms-shadow-hover); transform: translateY(-2px); }
+.ms-hub b { font-size: 1.9rem; line-height: 1; display: block; margin-bottom: .5rem; font-weight: 400; }
+.ms-hub h3 { margin: 0 0 .3rem; font-size: 1.15rem; }
+.ms-hub p { margin: 0 0 .6rem; color: var(--ms-muted); font-size: .9rem; }
+.ms-hub__meta { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--ms-accent); }
+
+/* Columnist rows */
+.ms-authors { display: grid; gap: .75rem; }
+.ms-author { display: grid; grid-template-columns: 52px 1fr; gap: 1rem; align-items: start; background: #fff; border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1.1rem 1.2rem; }
+.ms-author .ms-avatar { width: 52px; height: 52px; font-size: 1rem; }
+.ms-author h3 { margin: 0 0 .2rem; font-size: 1.12rem; }
+.ms-author p { margin: .4rem 0 0; color: var(--ms-muted); font-size: .92rem; }
+
+/* Advertise page */
+.ms-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1rem; }
+.ms-stat { background: var(--ms-primary); color: #fff; border-radius: var(--ms-radius); padding: 1.2rem 1.3rem; }
+.ms-stat b { display: block; font-family: Georgia, serif; font-size: 2rem; line-height: 1; margin-bottom: .3rem; }
+.ms-stat span { font-size: .85rem; color: #cdd6e4; }
+.ms-zones { display: grid; gap: .6rem; margin-top: 1rem; }
+.ms-zone { display: grid; grid-template-columns: 108px 1fr; gap: 1rem; align-items: center; background: #fff; border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: .9rem 1.1rem; }
+.ms-zone__tag { background: var(--ms-surface-2); color: var(--ms-primary); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: .3rem .5rem; border-radius: var(--ms-radius-sm); text-align: center; }
+.ms-zone h3 { margin: 0 0 .15rem; font-size: 1.02rem; }
+.ms-zone h3 em { font-style: normal; background: var(--ms-accent); color: #fff; font-size: .62rem; text-transform: uppercase; letter-spacing: .06em; padding: .14rem .38rem; border-radius: 3px; margin-left: .4rem; vertical-align: middle; font-family: var(--ms-font-body, inherit); }
+.ms-zone p { margin: 0; color: var(--ms-muted); font-size: .88rem; }
+
+/* Favorites winners */
+.ms-fav-results__section { font-size: 1.5rem; margin: 2rem 0 1rem; padding-bottom: .35rem; border-bottom: 3px solid var(--ms-primary); }
+.ms-fav-results__section:first-child { margin-top: 0; }
+.ms-winner { margin-bottom: 1.35rem; }
+.ms-winner h3 { font-size: 1.05rem; margin: 0 0 .35rem; }
+.ms-winner__list { margin: 0; padding-left: 1.35rem; color: var(--ms-muted); }
+.ms-winner__list li { margin-bottom: .18rem; }
+.ms-winner__list li.is-winner { font-weight: 700; color: var(--ms-primary); }
+.ms-winner__list li.is-winner::after { content: " 🏆"; }
+
+@media (max-width: 680px) {
+	.ms-zone { grid-template-columns: 1fr; gap: .45rem; }
+	.ms-zone__tag { justify-self: start; }
+	.ms-author { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 680px) {
 	.ms-rec { grid-template-columns: 1fr; gap: .5rem; }
@@ -446,7 +514,12 @@ body {
 		<button class="pv-tab" role="tab" aria-selected="false" data-view="obit">Single obituary</button>
 		<button class="pv-tab" role="tab" aria-selected="false" data-view="directory">Directory</button>
 		<button class="pv-tab" role="tab" aria-selected="false" data-view="business">Single business</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="todo">Things To Do</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="govt">Government</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="columnists">Columnists</button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="advertise">Advertise</button>
 		<button class="pv-tab" role="tab" aria-selected="false" data-view="ballot">Favorites ballot <span aria-hidden="true">— try it</span></button>
+		<button class="pv-tab" role="tab" aria-selected="false" data-view="results">Favorites winners</button>
 		<button class="pv-tab" role="tab" aria-selected="false" data-view="search">Search</button>
 		<button class="pv-tab" role="tab" aria-selected="false" data-view="e404">404</button>
 	</div>
@@ -479,14 +552,54 @@ body {
 			<nav class="ms-nav" aria-label="Primary">
 				<div class="ms-container">
 					<ul class="ms-menu">
-						<li data-nav="home" class="is-current"><a href="#0">Home</a></li>
-						<li class="has-sub"><a href="#0">News</a></li>
-						<li class="has-sub"><a href="#0">Business</a></li>
-						<li><a href="#0">Events</a></li>
-						<li><a href="#0">Obituaries</a></li>
-						<li class="has-sub"><a href="#0">Elections</a></li>
-						<li><a href="#0">Directory</a></li>
-						<li data-nav="ballot"><a href="#0">Favorites</a></li>
+						<li class="has-sub mega-3" data-nav="section"><a href="#0">News</a>
+							<ul class="sub-menu">
+								<li><a href="#0" data-goto="section">Saline County</a></li>
+								<li><a href="#0" data-goto="section">Benton</a></li>
+								<li><a href="#0" data-goto="section">Bryant</a></li>
+								<li><a href="#0" data-goto="section">Sports</a></li>
+								<li><a href="#0" data-goto="section">Schools</a></li>
+								<li><a href="#0" data-goto="section">Dining</a></li>
+								<li><a href="#0" data-goto="section">Community</a></li>
+								<li><a href="#0" data-goto="columnists">Columnists</a></li>
+								<li><a href="#0" data-goto="section">All Posts</a></li>
+							</ul>
+						</li>
+						<li class="has-sub mega" data-nav="records"><a href="#0">Public Records</a>
+							<ul class="sub-menu">
+								<li><a href="#0" data-goto="records">Mugshots Archive</a></li>
+								<li><a href="#0" data-goto="records">Court Filings</a></li>
+								<li><a href="#0" data-goto="records">911 Calls</a></li>
+								<li><a href="#0" data-goto="records">Marriage Licenses</a></li>
+								<li><a href="#0" data-goto="records">Offender Registry</a></li>
+								<li><a href="#0" data-goto="records">Jobs Listings</a></li>
+							</ul>
+						</li>
+						<li data-nav="obits"><a href="#0" data-goto="obits">Obituaries</a></li>
+						<li class="has-sub mega" data-nav="todo"><a href="#0">Things To Do</a>
+							<ul class="sub-menu">
+								<li><a href="#0" data-goto="events">Events Calendar</a></li>
+								<li><a href="#0" data-goto="todo">Yard Sales</a></li>
+								<li><a href="#0" data-goto="section">Dining Guide</a></li>
+								<li><a href="#0" data-goto="todo">Daily Puzzle</a></li>
+								<li><a href="#0" data-goto="todo">Submit an Event</a></li>
+							</ul>
+						</li>
+						<li class="has-sub" data-nav="directory"><a href="#0">Business</a>
+							<ul class="sub-menu">
+								<li><a href="#0" data-goto="section">Business News</a></li>
+								<li><a href="#0" data-goto="directory">Business Directory</a></li>
+								<li><a href="#0" data-goto="advertise">Advertise with us</a></li>
+							</ul>
+						</li>
+						<li class="has-sub" data-nav="govt"><a href="#0">Government</a>
+							<ul class="sub-menu">
+								<li><a href="#0" data-goto="govt">2026 Elections</a></li>
+								<li><a href="#0" data-goto="govt">Elected Officials</a></li>
+								<li><a href="#0" data-goto="govt">District &amp; Ward Maps</a></li>
+							</ul>
+						</li>
+						<li data-nav="ballot"><a href="#0" data-goto="ballot">⭐ Favorites</a></li>
 					</ul>
 				</div>
 			</nav>
@@ -1028,6 +1141,162 @@ body {
 				</div>
 			</main>
 
+			<!-- ============================ THINGS TO DO ============================ -->
+			<main class="pv-view fav-hidden" data-view="todo">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › Things To Do</div>
+						<h1>Things To Do</h1>
+						<p>Everything for "what's happening this weekend" — previously scattered between the nav, the browse links and the sidebar.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-hubgrid">
+						<a class="ms-hub" href="#0" data-goto="events"><b aria-hidden="true">📅</b><h3>Events Calendar</h3><p>Sorted by date, always leading with what's next.</p><span class="ms-hub__meta">5 upcoming</span></a>
+						<a class="ms-hub" href="#0"><b aria-hidden="true">🏷️</b><h3>Yard Sales</h3><p>Weekend listings, with a form to add your own.</p><span class="ms-hub__meta">Updated Fridays</span></a>
+						<a class="ms-hub" href="#0" data-goto="section"><b aria-hidden="true">🍽️</b><h3>Dining Guide</h3><p>Openings, reviews and where to eat.</p><span class="ms-hub__meta">14 articles</span></a>
+						<a class="ms-hub" href="#0"><b aria-hidden="true">🧩</b><h3>Daily Puzzle</h3><p>The crossword, refreshed every morning.</p><span class="ms-hub__meta">New today</span></a>
+					</div>
+					<div class="ms-ad" style="margin:1.75rem 0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Leaderboard ad zone</div></div>
+					<section class="ms-section">
+						<div class="ms-section-head"><h2>Coming up</h2><a href="#0" data-goto="events">All events</a></div>
+						<div class="ms-grid ms-grid--2">
+							<article class="ms-evt"><div class="ms-evt__date"><b>2</b><span>Aug</span></div><div><h4><a href="#0" data-goto="event">Third Thursday on the Square</a></h4><div class="ms-meta"><span>5:00 – 9:00 PM</span><span>Downtown Benton</span></div></div></article>
+							<article class="ms-evt"><div class="ms-evt__date"><b>5</b><span>Aug</span></div><div><h4><a href="#0">Chamber Bingo Night</a></h4><div class="ms-meta"><span>6:30 PM</span><span>Community Center</span></div></div></article>
+							<article class="ms-evt"><div class="ms-evt__date"><b>9</b><span>Aug</span></div><div><h4><a href="#0">Saturday Farmers Market</a></h4><div class="ms-meta"><span>8:00 AM – Noon</span><span>Riverside Park</span></div></div></article>
+							<article class="ms-evt"><div class="ms-evt__date"><b>14</b><span>Aug</span></div><div><h4><a href="#0">Back-to-School Bash</a></h4><div class="ms-meta"><span>4:00 PM</span><span>Bryant</span></div></div></article>
+						</div>
+					</section>
+				</div>
+			</main>
+
+			<!-- ============================ GOVERNMENT ============================ -->
+			<main class="pv-view fav-hidden" data-view="govt">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › Government</div>
+						<h1>Government &amp; Elections</h1>
+						<p>The election year in the heading is generated, so it can never read "2024" in 2026 again.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-hubgrid">
+						<a class="ms-hub" href="#0"><b aria-hidden="true">🗳️</b><h3>2026 Elections</h3><p>Candidate filings, sample ballots and results.</p><span class="ms-hub__meta">Year auto-generated</span></a>
+						<a class="ms-hub" href="#0"><b aria-hidden="true">🏛️</b><h3>Elected Officials</h3><p>Who represents you, with contact details.</p><span class="ms-hub__meta">Reference page</span></a>
+						<a class="ms-hub" href="#0"><b aria-hidden="true">🗺️</b><h3>District &amp; Ward Maps</h3><p>Districts, wards and zones.</p><span class="ms-hub__meta">Reference page</span></a>
+					</div>
+					<div class="ms-cols" style="margin-top:2rem">
+						<div>
+							<section class="ms-section">
+								<div class="ms-section-head"><h2>Latest coverage</h2><a href="#0">View all</a></div>
+								<div class="ms-grid ms-grid--3">
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--d" aria-hidden="true"></div><span class="ms-badge">Elections</span></div><div class="ms-card__body"><h3><a href="#0" data-goto="article">Who has filed so far for November's races</a></h3><p>A running list, updated as filings come in.</p><div class="ms-meta"><span>Jul 29</span></div></div></article>
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--b" aria-hidden="true"></div><span class="ms-badge">County</span></div><div class="ms-card__body"><h3><a href="#0">Quorum court sets budget hearing date</a></h3><p>The session is open and will be streamed.</p><div class="ms-meta"><span>Jul 27</span></div></div></article>
+									<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><span class="ms-badge">Benton</span></div><div class="ms-card__body"><h3><a href="#0">Council approves downtown parking plan</a></h3><p>The vote followed two months of public comment.</p><div class="ms-meta"><span>Jul 26</span></div></div></article>
+								</div>
+							</section>
+						</div>
+						<aside><div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div></aside>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ COLUMNISTS ============================ -->
+			<main class="pv-view fav-hidden" data-view="columnists">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › News › Columnists</div>
+						<h1>Columnists</h1>
+						<p>Recurring voices, each with an author page collecting everything they've written.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-authors">
+						<article class="ms-author"><span class="ms-avatar" aria-hidden="true">BW</span><div><h3><a href="#0">How the Ball Bounces</a></h3><div class="ms-meta">Sample Columnist · Sports</div><p>Lifestyle-oriented sports commentary, weekly.</p></div></article>
+						<article class="ms-author"><span class="ms-avatar" aria-hidden="true">SC</span><div><h3><a href="#0">From the Square</a></h3><div class="ms-meta">Sample Columnist · Community</div><p>Notes on local life and the people in it.</p></div></article>
+						<article class="ms-author"><span class="ms-avatar" aria-hidden="true">JD</span><div><h3><a href="#0">County Lines</a></h3><div class="ms-meta">Sample Columnist · Government</div><p>What happened at the meeting, and what it means.</p></div></article>
+					</div>
+					<section class="ms-section" style="margin-top:2rem">
+						<div class="ms-section-head"><h2>Recent columns</h2></div>
+						<div class="ms-grid ms-grid--3">
+							<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--e" aria-hidden="true"></div><span class="ms-badge">Column</span></div><div class="ms-card__body"><h3><a href="#0" data-goto="article">On youth sports and grown-ups</a></h3><p>Adults took something kids know how to do and made it complicated.</p><div class="ms-meta"><span>Sample Columnist</span><span>Jul 28</span></div></div></article>
+							<article class="ms-card"><div class="ms-card__media"><div class="ms-ph" aria-hidden="true"></div><span class="ms-badge">Column</span></div><div class="ms-card__body"><h3><a href="#0">What the square used to look like</a></h3><p>A look back at downtown before the last renovation.</p><div class="ms-meta"><span>Sample Columnist</span><span>Jul 25</span></div></div></article>
+							<article class="ms-card"><div class="ms-card__media"><div class="ms-ph ms-ph--c" aria-hidden="true"></div><span class="ms-badge">Column</span></div><div class="ms-card__body"><h3><a href="#0">Reading the budget line by line</a></h3><p>Where the money actually goes, in plain language.</p><div class="ms-meta"><span>Sample Columnist</span><span>Jul 22</span></div></div></article>
+						</div>
+					</section>
+				</div>
+			</main>
+
+			<!-- ============================ ADVERTISE ============================ -->
+			<main class="pv-view fav-hidden" data-view="advertise">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › Business › Advertise</div>
+						<h1>Advertise with MySaline</h1>
+						<p>Every placement below is a named zone in the dashboard — schedulable, rotatable and countable, so it can be priced as a product.</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-stats">
+						<div class="ms-stat"><b>300k</b><span>page views / month</span></div>
+						<div class="ms-stat"><b>115k</b><span>social followers</span></div>
+						<div class="ms-stat"><b>2,500</b><span>newsletter subscribers</span></div>
+						<div class="ms-stat"><b>Since 2007</b><span>serving Saline County</span></div>
+					</div>
+					<div class="ms-cols" style="margin-top:2rem">
+						<div>
+							<h2>Placements</h2>
+							<div class="ms-zones">
+								<div class="ms-zone"><span class="ms-zone__tag">Header</span><div><h3>Leaderboard</h3><p>Top of every page, beside the logo. 970×90 or 728×90.</p></div></div>
+								<div class="ms-zone"><span class="ms-zone__tag">In-feed</span><div><h3>Native in-feed <em>new</em></h3><p>Between story cards on the homepage and every archive. Reads as part of the river.</p></div></div>
+								<div class="ms-zone"><span class="ms-zone__tag">Sidebar</span><div><h3>Rail</h3><p>Beside articles and archives, sticky as the reader scrolls. 300×250 or 300×600.</p></div></div>
+								<div class="ms-zone"><span class="ms-zone__tag">In-article</span><div><h3>In-content</h3><p>Placed automatically after the third paragraph of every story.</p></div></div>
+								<div class="ms-zone"><span class="ms-zone__tag">Directory</span><div><h3>Directory sponsor <em>new</em></h3><p>Between business listings, sold separately from run-of-site.</p></div></div>
+								<div class="ms-zone"><span class="ms-zone__tag">Newsletter</span><div><h3>List sponsor <em>new</em></h3><p>Beside the signup block, in front of 2,500 subscribers.</p></div></div>
+								<div class="ms-zone"><span class="ms-zone__tag">Mobile</span><div><h3>Sticky anchor <em>new</em></h3><p>Dismissable bar pinned to the bottom on phones, where most traffic is.</p></div></div>
+							</div>
+							<div class="ms-note" style="margin-top:1.5rem">Each zone supports multiple ads rotating at random, start and stop dates for scheduling, an image with a click-through or pasted ad-network code, and a sponsor name — all from the Advertisements menu.</div>
+						</div>
+						<aside>
+							<div class="ms-biz">
+								<h3 class="ms-widget-title" style="font-size:1.05rem;margin:0 0 .8rem;padding-bottom:.4rem;border-bottom:3px solid var(--ms-primary)">Get in touch</h3>
+								<dl><dt>Email</dt><dd><a href="#0">hello@example.com</a></dd><dt>Phone</dt><dd>501-303-4010</dd><dt>Mail</dt><dd>PO Box 165<br>Benton, AR 72018</dd></dl>
+								<a class="ms-btn" style="margin-top:1rem;display:block;text-align:center" href="#0">Request the media kit</a>
+							</div>
+						</aside>
+					</div>
+				</div>
+			</main>
+
+			<!-- ============================ FAVORITES RESULTS ============================ -->
+			<main class="pv-view fav-hidden" data-view="results">
+				<div class="ms-page-head">
+					<div class="ms-container">
+						<div class="ms-crumbs"><a href="#0">Home</a> › Favorites › Winners</div>
+						<h1>2026 Saline County Favorites — Winners</h1>
+						<p>Published with one checkbox when voting closes. Until then readers see "results will be published when voting closes."</p>
+					</div>
+				</div>
+				<div class="ms-container" style="padding-top:1.5rem;padding-bottom:2rem">
+					<div class="ms-cols">
+						<div>
+							<h2 class="ms-fav-results__section">Food</h2>
+							<div class="ms-winner"><h3>Restaurant — BBQ</h3><ol class="ms-winner__list"><li class="is-winner">Smokehouse on Main</li><li>River Road BBQ</li><li>The Pit Stop</li></ol></div>
+							<div class="ms-winner"><h3>Bakery — Sweets</h3><ol class="ms-winner__list"><li class="is-winner">The Sweet Spot</li><li>Cake Corner</li><li>Sugar &amp; Flour</li></ol></div>
+							<div class="ms-winner"><h3>Food Truck</h3><ol class="ms-winner__list"><li class="is-winner">Curbside Kitchen</li><li>The Rolling Griddle</li><li>Taco Tumbleweed</li></ol></div>
+							<h2 class="ms-fav-results__section">Businesses</h2>
+							<div class="ms-winner"><h3>Plumber</h3><ol class="ms-winner__list"><li class="is-winner">Ace Plumbing Co.</li><li>Clearwater Plumbing</li><li>Bob's Pipes &amp; Drains</li></ol></div>
+							<div class="ms-winner"><h3>Salon</h3><ol class="ms-winner__list"><li class="is-winner">Studio 5 Salon</li><li>The Mane Room</li><li>Bella Hair Co.</li></ol></div>
+							<p class="ms-note" style="margin-top:1.5rem">Only confirmed ballots count toward these totals. The dashboard exports full results and the qualified drawing entries as CSV.</p>
+						</div>
+						<aside>
+							<div class="ms-ad" style="margin-top:0"><span class="ms-ad__label">Advertisement</span><div class="ms-ad__box">Sidebar ad zone</div></div>
+							<div class="ms-widget"><h3>Winner badges</h3><p style="font-size:.9rem;color:var(--ms-muted)">Winning businesses can be linked straight to their directory listing, turning the contest into directory traffic.</p><a class="ms-btn ms-btn--ghost" href="#0" data-goto="directory">Browse the directory</a></div>
+						</aside>
+					</div>
+				</div>
+			</main>
+
 			<!-- ============================ FOOTER ============================ -->
 			<footer class="ms-footer">
 				<div class="ms-container">
@@ -1072,7 +1341,12 @@ body {
 		obit:      'mysaline.com/obituaries/sample-name-one/',
 		directory: 'mysaline.com/businesses/',
 		business:  'mysaline.com/businesses/sample-hardware-co/',
+		todo:      'mysaline.com/things-to-do/',
+		govt:      'mysaline.com/government/',
+		columnists: 'mysaline.com/category/columnists/',
+		advertise: 'mysaline.com/advertise/',
 		ballot:    'mysaline.com/scf-2026-vote/',
+		results:   'mysaline.com/scf-2026-winners/',
 		search:    'mysaline.com/?s=benton',
 		e404:      'mysaline.com/a-page-that-moved/'
 	};
