@@ -117,12 +117,15 @@ function ms_seed_image( $post_id, $seed, $w = 1200, $h = 675 ) {
 		$hx  = hexdec( substr( $hash, $i * 4, 2 ) ) / 255;
 		$hy  = hexdec( substr( $hash, $i * 4 + 2, 2 ) ) / 255;
 		$rad = (int) ( $w * ( 0.16 + $hx * 0.3 ) );
-		$col = imagecolorallocatealpha(
+		// GD alpha runs 0 (opaque) to 127 (transparent); anything outside that
+		// range is a ValueError on PHP 8, so the ramp is clamped.
+		$alpha = min( 127, 100 + $i * 6 );
+		$col   = imagecolorallocatealpha(
 			$im,
 			$p[1][0],
 			$p[1][1],
 			$p[1][2],
-			100 + $i * 12
+			$alpha
 		);
 		imagefilledellipse( $im, (int) ( $hx * $w ), (int) ( $hy * $h ), $rad, $rad, $col );
 	}
@@ -236,6 +239,9 @@ $posts = array(
 	array( 'This week in 911 calls', 'Public Records', false ),
 );
 
+$seed_admins = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
+$seed_author = ! empty( $seed_admins ) ? (int) $seed_admins[0] : 1;
+
 $made = 0;
 foreach ( $posts as $i => $row ) {
 	list( $title, $cat, $featured ) = $row;
@@ -244,6 +250,9 @@ foreach ( $posts as $i => $row ) {
 		$title,
 		'post',
 		array(
+			// WP-CLI runs with no current user, so post_author would default to 0
+			// and the byline would be empty. Attribute to the first admin.
+			'post_author'  => $seed_author,
 			'post_content' => ms_seed_body( 5 ),
 			'post_excerpt' => 'Sample excerpt used to populate the development site so card and archive layouts can be reviewed with realistic text.',
 			'post_date'    => gmdate( 'Y-m-d H:i:s', strtotime( '-' . $i . ' days' ) ),
@@ -266,6 +275,21 @@ foreach ( $posts as $i => $row ) {
 	$made++;
 }
 WP_CLI::log( '  · ' . $made . ' posts (5 flagged as Featured)' );
+
+// Remove WordPress's stock sample post so it stops turning up in Latest News.
+$hello = get_posts(
+	array(
+		'post_type'      => 'post',
+		'name'           => 'hello-world',
+		'posts_per_page' => 1,
+		'fields'         => 'ids',
+		'post_status'    => array( 'publish', 'draft' ),
+	)
+);
+if ( ! empty( $hello ) ) {
+	wp_trash_post( (int) $hello[0] );
+	WP_CLI::log( '  · trashed the stock "Hello world!" post' );
+}
 
 /* -------------------------------------------------------------------------
  * 3. Community events
@@ -370,6 +394,10 @@ $zones = array(
 	'sidebar'       => 'Sidebar',
 	'in_content'    => 'In-content',
 	'below_content' => 'Below article',
+	'in_feed'       => 'In-feed (between stories)',
+	'directory'     => 'Directory listings',
+	'newsletter'    => 'Newsletter sponsor',
+	'sticky_mobile' => 'Mobile sticky anchor',
 	'footer'        => 'Footer',
 );
 

@@ -240,6 +240,21 @@ function mysaline_social_meta() {
 }
 add_action( 'wp_head', 'mysaline_social_meta', 5 );
 
+/**
+ * Drop core's canonical tag when the theme is emitting its own.
+ *
+ * WordPress adds rel_canonical() to wp_head by default. Without this the page
+ * carries two identical canonical links, which search engines flag. If an SEO
+ * plugin is running, the theme emits nothing and core's tag is left alone.
+ */
+function mysaline_dedupe_canonical() {
+	if ( mysaline_seo_plugin_active() ) {
+		return;
+	}
+	remove_action( 'wp_head', 'rel_canonical' );
+}
+add_action( 'wp', 'mysaline_dedupe_canonical' );
+
 /* -------------------------------------------------------------------------
  * Structured data (JSON-LD)
  * ---------------------------------------------------------------------- */

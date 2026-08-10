@@ -181,6 +181,13 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-topbar a { color: #cdd6e4; }
 .ms-topbar a:hover { color: #fff; }
 .ms-topbar__date { letter-spacing: .02em; }
+/* The top-bar nav is a wp_nav_menu <ul>; without this it renders as a
+   default bulleted, vertically stacked list. */
+.ms-topbar__menu { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 1rem; }
+.ms-topbar__menu li { margin: 0; }
+.ms-topbar__menu a { display: inline-block; padding: .2rem 0; }
+.ms-topbar__right { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.ms-topbar__left { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
 
 .ms-header { background: var(--ms-bg); border-bottom: 1px solid var(--ms-border); }
 .ms-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.15rem 0; }
@@ -190,6 +197,9 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-brand__title a { color: inherit; text-decoration: none; }
 .ms-brand__tagline { margin: .2rem 0 0; font-size: .8rem; color: var(--ms-muted); text-transform: uppercase; letter-spacing: .08em; }
 .ms-header__actions { display: flex; align-items: center; gap: .75rem; }
+.ms-header__promo { border-top: 1px solid var(--ms-border); background: var(--ms-surface); }
+.ms-header__promo .ms-ad { margin: .75rem auto; max-width: 970px; }
+.ms-header__promo .ms-ad img { margin: 0 auto; }
 
 .ms-nav { background: var(--ms-primary); position: sticky; top: 0; z-index: 200; }
 .ms-nav .ms-container { display: flex; align-items: center; }

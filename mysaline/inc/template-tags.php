@@ -49,14 +49,20 @@ function mysaline_post_meta( $args = array() ) {
 
 	echo '<div class="ms-card__meta">';
 
-	if ( $args['author'] ) {
+	// A post whose author account was deleted reports ID 0 and an empty name.
+	// Rendering that produced an empty link pointing at a broken /author/ URL,
+	// so the byline is skipped entirely unless there is a real author.
+	$mysaline_author_id   = (int) get_the_author_meta( 'ID' );
+	$mysaline_author_name = trim( (string) get_the_author() );
+
+	if ( $args['author'] && $mysaline_author_id && '' !== $mysaline_author_name ) {
+		echo '<span class="ms-meta-author">';
 		if ( $args['avatar'] ) {
-			echo '<span class="ms-meta-author">';
-			echo get_avatar( get_the_author_meta( 'ID' ), 40, '', '', array( 'class' => 'ms-author-avatar' ) );
-			echo ' <a href="' . esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ) . '">' . esc_html( get_the_author() ) . '</a></span>';
-		} else {
-			echo '<span class="ms-meta-author"><a href="' . esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ) . '">' . esc_html( get_the_author() ) . '</a></span>';
+			echo get_avatar( $mysaline_author_id, 40, '', '', array( 'class' => 'ms-author-avatar' ) );
+			echo ' ';
 		}
+		echo '<a href="' . esc_url( get_author_posts_url( $mysaline_author_id ) ) . '">' . esc_html( $mysaline_author_name ) . '</a>';
+		echo '</span>';
 	}
 
 	if ( $args['date'] ) {

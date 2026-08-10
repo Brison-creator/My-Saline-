@@ -400,12 +400,12 @@ body {
 /* Favorites winners */
 .ms-fav-results__section { font-size: 1.5rem; margin: 2rem 0 1rem; padding-bottom: .35rem; border-bottom: 3px solid var(--ms-primary); }
 .ms-fav-results__section:first-child { margin-top: 0; }
-.ms-winner { margin-bottom: 1.35rem; }
-.ms-winner h3 { font-size: 1.05rem; margin: 0 0 .35rem; }
-.ms-winner__list { margin: 0; padding-left: 1.35rem; color: var(--ms-muted); }
-.ms-winner__list li { margin-bottom: .18rem; }
-.ms-winner__list li.is-winner { font-weight: 700; color: var(--ms-primary); }
-.ms-winner__list li.is-winner::after { content: " 🏆"; }
+.ms-fav-result { margin-bottom: 1.35rem; }
+.ms-fav-result h3 { font-size: 1.05rem; margin: 0 0 .35rem; }
+.ms-fav-result__list { margin: 0; padding-left: 1.35rem; color: var(--ms-muted); }
+.ms-fav-result__list li { margin-bottom: .18rem; }
+.ms-fav-result__list li.is-winner { font-weight: 700; color: var(--ms-primary); }
+.ms-fav-result__list li.is-winner::after { content: " 🏆"; }
 
 @media (max-width: 680px) {
 	.ms-zone { grid-template-columns: 1fr; gap: .45rem; }
@@ -1281,12 +1281,12 @@ body {
 					<div class="ms-cols">
 						<div>
 							<h2 class="ms-fav-results__section">Food</h2>
-							<div class="ms-winner"><h3>Restaurant — BBQ</h3><ol class="ms-winner__list"><li class="is-winner">Smokehouse on Main</li><li>River Road BBQ</li><li>The Pit Stop</li></ol></div>
-							<div class="ms-winner"><h3>Bakery — Sweets</h3><ol class="ms-winner__list"><li class="is-winner">The Sweet Spot</li><li>Cake Corner</li><li>Sugar &amp; Flour</li></ol></div>
-							<div class="ms-winner"><h3>Food Truck</h3><ol class="ms-winner__list"><li class="is-winner">Curbside Kitchen</li><li>The Rolling Griddle</li><li>Taco Tumbleweed</li></ol></div>
+							<div class="ms-fav-result"><h3>Restaurant — BBQ</h3><ol class="ms-fav-result__list"><li class="is-winner"><span class="ms-fav-result__name">Smokehouse on Main</span></li><li>River Road BBQ</li><li>The Pit Stop</li></ol></div>
+							<div class="ms-fav-result"><h3>Bakery — Sweets</h3><ol class="ms-fav-result__list"><li class="is-winner"><span class="ms-fav-result__name">The Sweet Spot</span></li><li>Cake Corner</li><li>Sugar &amp; Flour</li></ol></div>
+							<div class="ms-fav-result"><h3>Food Truck</h3><ol class="ms-fav-result__list"><li class="is-winner"><span class="ms-fav-result__name">Curbside Kitchen</span></li><li>The Rolling Griddle</li><li>Taco Tumbleweed</li></ol></div>
 							<h2 class="ms-fav-results__section">Businesses</h2>
-							<div class="ms-winner"><h3>Plumber</h3><ol class="ms-winner__list"><li class="is-winner">Ace Plumbing Co.</li><li>Clearwater Plumbing</li><li>Bob's Pipes &amp; Drains</li></ol></div>
-							<div class="ms-winner"><h3>Salon</h3><ol class="ms-winner__list"><li class="is-winner">Studio 5 Salon</li><li>The Mane Room</li><li>Bella Hair Co.</li></ol></div>
+							<div class="ms-fav-result"><h3>Plumber</h3><ol class="ms-fav-result__list"><li class="is-winner"><span class="ms-fav-result__name">Ace Plumbing Co.</span></li><li>Clearwater Plumbing</li><li>Bob's Pipes &amp; Drains</li></ol></div>
+							<div class="ms-fav-result"><h3>Salon</h3><ol class="ms-fav-result__list"><li class="is-winner"><span class="ms-fav-result__name">Studio 5 Salon</span></li><li>The Mane Room</li><li>Bella Hair Co.</li></ol></div>
 							<p class="ms-note" style="margin-top:1.5rem">Only confirmed ballots count toward these totals. The dashboard exports full results and the qualified drawing entries as CSV.</p>
 						</div>
 						<aside>

@@ -25,8 +25,15 @@ get_header();
 					<?php mysaline_category_badge(); ?>
 					<h1 class="ms-article__title"><?php the_title(); ?></h1>
 					<div class="ms-article__meta">
-						<?php echo get_avatar( get_the_author_meta( 'ID' ), 40, '', '', array( 'class' => 'ms-author-avatar' ) ); ?>
-						<span><?php the_author_posts_link(); ?></span>
+						<?php
+						// Skip the byline entirely when the author account is gone,
+						// rather than printing an empty link to a broken /author/ URL.
+						$mysaline_author_id = (int) get_the_author_meta( 'ID' );
+						if ( $mysaline_author_id && '' !== trim( (string) get_the_author() ) ) :
+							echo get_avatar( $mysaline_author_id, 40, '', '', array( 'class' => 'ms-author-avatar' ) );
+							?>
+							<span><?php the_author_posts_link(); ?></span>
+						<?php endif; ?>
 						<time datetime="<?php echo esc_attr( get_the_date( DATE_W3C ) ); ?>"><?php echo esc_html( get_the_date() ); ?></time>
 						<span><?php echo esc_html( mysaline_reading_time() ); ?></span>
 						<?php if ( comments_open() ) : ?>

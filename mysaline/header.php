@@ -79,13 +79,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 
 			<div class="ms-header__actions">
-				<?php mysaline_ad( 'header' ); ?>
 				<button class="ms-search-toggle" aria-expanded="false" aria-controls="ms-search-panel">
 					<span class="dashicons-before dashicons-search" aria-hidden="true"></span>
 					<span class="screen-reader-text"><?php esc_html_e( 'Search', 'mysaline' ); ?></span>
 				</button>
 			</div>
 		</div>
+
+		<?php
+		/*
+		 * The leaderboard gets its own centred band under the masthead. Running
+		 * it inline beside the logo squeezed the brand down to a fraction of the
+		 * header, which is exactly backwards for the most valuable real estate
+		 * on the page.
+		 */
+		if ( ! empty( mysaline_get_ads( 'header', 1 ) ) ) :
+			?>
+			<div class="ms-header__promo">
+				<div class="ms-container"><?php mysaline_ad( 'header' ); ?></div>
+			</div>
+			<?php
+		endif;
+		?>
 	</header>
 
 	<nav class="ms-nav" role="navigation" aria-label="<?php esc_attr_e( 'Primary Menu', 'mysaline' ); ?>">
