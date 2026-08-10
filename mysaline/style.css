@@ -29,6 +29,10 @@ Tags: news, magazine, blog, custom-logo, custom-menu, featured-images, threaded-
    10. Homepage sections
    11. Single post / page
    12. Archives & search
+   12b. Archive filters (obituary name search, directory categories)
+   12c. Section hubs & full-width pages
+   12d. Author / columnist archive header
+   12e. Block pattern helpers
    13. Sidebar & widgets
    14. Advertisements
    15. Custom post types (events, obituaries, businesses)
@@ -38,6 +42,8 @@ Tags: news, magazine, blog, custom-logo, custom-menu, featured-images, threaded-
    19. Pagination
    20. Accessibility & WP core classes
    21. Responsive
+   21b. Saline County Favorites ballot
+   (Print styles live in assets/css/print.css)
    ========================================================================= */
 
 /* 1. Design tokens ------------------------------------------------------- */
@@ -383,6 +389,31 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-hub b { font-size: 1.9rem; line-height: 1; display: block; margin-bottom: .5rem; font-weight: 400; }
 .ms-hub h2 { margin: 0 0 .3rem; font-size: 1.15rem; }
 .ms-hub p { margin: 0; color: var(--ms-muted); font-size: .9rem; }
+
+/* 12d. Author / columnist archive header --------------------------------- */
+.ms-author-header {
+	display: grid; grid-template-columns: 96px 1fr; gap: 1.5rem; align-items: center;
+	background: var(--ms-surface); border-radius: var(--ms-radius);
+	padding: 1.75rem; margin: 1.5rem 0 0;
+}
+.ms-author-header__avatar { border-radius: 50%; width: 96px; height: 96px; }
+.ms-author-header h1 { margin: .1rem 0 .4rem; font-size: 1.9rem; }
+.ms-author-header__bio { margin: 0 0 .5rem; color: var(--ms-muted); max-width: 62ch; }
+.ms-author-header__meta { margin: 0; font-size: .88rem; color: var(--ms-muted); }
+@media (max-width: 680px) {
+	.ms-author-header { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+	.ms-author-header__bio { text-align: left; }
+}
+
+/* 12e. Block pattern helpers --------------------------------------------- */
+.ms-pattern-stats .wp-block-column { padding: 1.25rem 1.3rem; border-radius: var(--ms-radius); }
+.ms-pattern-stats h3 { color: #fff; font-size: 2rem; margin: 0 0 .2rem; }
+.ms-pattern-stats p { color: #cdd6e4; font-size: .85rem; margin: 0; }
+.ms-pattern-callout { padding: 1.5rem; border-radius: var(--ms-radius); border-left: 4px solid var(--ms-accent); }
+.ms-pattern-callout h3 { margin-top: 0; }
+.ms-pattern-contact h3 { font-size: 1.05rem; margin-bottom: .3rem; }
+.ms-pattern-staff { margin: 1.25rem 0; }
+.ms-pattern-staff h3 { margin-top: 0; }
 
 /* 13. Sidebar & widgets -------------------------------------------------- */
 .ms-sidebar .widget, .ms-footer .widget { margin-bottom: 2rem; }

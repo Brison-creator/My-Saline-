@@ -145,7 +145,7 @@ $ms_prize    = get_theme_mod( 'mysaline_fav_prize', '' );
 
 		<!-- Sticky control bar: progress + search + filters -->
 		<div class="ms-fav__bar" id="ms-fav-bar">
-			<div class="ms-fav__progress">
+			<div class="ms-fav__progress" role="status" aria-live="polite" aria-atomic="true">
 				<div class="ms-fav__progress-head">
 					<strong class="ms-fav__count">
 						<span data-fav-voted>0</span>
