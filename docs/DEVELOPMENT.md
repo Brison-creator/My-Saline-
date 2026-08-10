@@ -84,3 +84,38 @@ Do site-specific tweaks in a **child theme** or a small site plugin so
 
 Develop on the feature branch; keep `mysaline/` the single source of truth for
 theme files. `dist/` is build output and is git-ignored.
+
+## Validation performed
+
+The theme has been booted and exercised on a real WordPress install
+(WordPress 7.0.3, PHP 8.4, SQLite via the official `sqlite-database-integration`
+drop-in — used because Docker's build network could not reach Alpine mirrors,
+so `wp-env` was unavailable).
+
+What was verified end to end:
+
+- **Rendering** — 13 page types and 6 single templates return HTTP 200 with zero
+  PHP notices, warnings or fatals; the debug log stays clean.
+- **Scale** — with 2,022 posts the homepage renders in ~0.17s and every archive,
+  search and deep-pagination page (tested to page 50) in under 0.08s, on SQLite
+  and PHP's single-threaded dev server. Production MySQL with opcache is faster.
+- **Admin** — all 12 dashboard screens load clean, every meta box renders on its
+  post type, and both CSV exports return `text/csv` with correct filenames.
+- **Favorites, full double opt-in** — 33 categories / 99 nominees render; a
+  submitted ballot is held pending with zero confirmed votes; the emailed link
+  confirms the votes, consumes the pending row and issues the trust cookie;
+  replaying the link returns `fav=expired`.
+- **Social metadata** — Open Graph, Twitter Card and a valid three-node JSON-LD
+  graph render on a live post, with exactly one canonical tag.
+
+### Security probes against the vote path
+
+All rejected: missing nonce, forged nonce, missing email, malformed email, a
+nominee that isn't on the ballot, XSS and SQL-injection payloads as nominee
+values, nonexistent and negative category IDs, and an empty ballot. Confirmation
+tokens reject short, non-hex, path-traversal and brute-force candidates.
+
+Both CSV exports return HTTP 400 with no data to an unauthenticated request, and
+attempting to overwrite another voter's confirmed ballot by submitting their
+email fails — it only creates a new pending ballot, which requires access to
+their inbox to confirm.
