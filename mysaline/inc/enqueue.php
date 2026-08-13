@@ -23,6 +23,17 @@ function mysaline_enqueue_assets() {
 	// Front-end behaviour (mobile menu, search toggle, ad rotation).
 	wp_enqueue_script( 'mysaline-main', MYSALINE_URI . 'assets/js/main.js', array(), MYSALINE_VERSION, true );
 
+	// The accordion buttons are built in JS, so their screen-reader labels have
+	// to come across from PHP to stay translatable.
+	wp_localize_script(
+		'mysaline-main',
+		'mysalineNavStrings',
+		array(
+			'expand'   => __( 'Show submenu for', 'mysaline' ),
+			'collapse' => __( 'Hide submenu for', 'mysaline' ),
+		)
+	);
+
 	// Threaded comments.
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );

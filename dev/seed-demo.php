@@ -80,7 +80,7 @@ function ms_seed_post( $title, $type = 'post', $extra = array() ) {
  * @param int    $h       Height.
  * @return int Attachment ID (0 on failure).
  */
-function ms_seed_image( $post_id, $seed, $w = 1200, $h = 675 ) {
+function ms_seed_image( $post_id, $seed, $w = 1200, $h = 675, $scene = 'community' ) {
 	if ( ! function_exists( 'imagecreatetruecolor' ) ) {
 		return 0;
 	}
@@ -90,50 +90,219 @@ function ms_seed_image( $post_id, $seed, $w = 1200, $h = 675 ) {
 		return (int) get_post_thumbnail_id( $post_id );
 	}
 
-	$palettes = array(
-		array( array( 22, 69, 95 ), array( 143, 205, 231 ) ),   // Harbor / baby blue.
-		array( array( 13, 46, 64 ), array( 203, 231, 245 ) ),   // Deep harbor / sky tint.
-		array( array( 46, 115, 150 ), array( 251, 247, 239 ) ), // Mid blue / cream.
-		array( array( 31, 88, 116 ), array( 227, 169, 60 ) ),   // Slate blue / honey.
-		array( array( 22, 69, 95 ), array( 178, 69, 47 ) ),     // Harbor / brick.
-	);
-	$p  = $palettes[ abs( crc32( $seed ) ) % count( $palettes ) ];
-	$im = imagecreatetruecolor( $w, $h );
+	$hash = md5( $seed );
+	$im   = imagecreatetruecolor( $w, $h );
+	imagealphablending( $im, true );
 
-	// Vertical gradient base.
+	// Palette, straight from the logo.
+	$navy  = array( 15, 43, 78 );
+	$deep  = array( 9, 28, 52 );
+	$mid   = array( 46, 115, 150 );
+	$blue  = array( 11, 92, 232 );
+	$sky   = array( 159, 211, 240 );
+	$soft  = array( 207, 231, 247 );
+	$cream = array( 251, 247, 239 );
+	$honey = array( 227, 169, 60 );
+	$brick = array( 178, 69, 47 );
+
+	$alloc = static function ( $c, $a = 0 ) use ( $im ) {
+		return $a > 0
+			? imagecolorallocatealpha( $im, $c[0], $c[1], $c[2], min( 127, $a ) )
+			: imagecolorallocate( $im, $c[0], $c[1], $c[2] );
+	};
+
+	// Sky: a vertical wash from the deep navy down to the crystal blue.
+	$top    = 'night' === $scene ? $deep : $navy;
+	$bottom = 'night' === $scene ? $navy : $sky;
 	for ( $y = 0; $y < $h; $y++ ) {
 		$t = $y / max( 1, $h - 1 );
-		$r = (int) ( $p[0][0] * ( 1 - $t * .45 ) );
-		$g = (int) ( $p[0][1] * ( 1 - $t * .45 ) );
-		$b = (int) ( $p[0][2] * ( 1 - $t * .45 ) );
-		$c = imagecolorallocate( $im, $r, $g, $b );
-		imageline( $im, 0, $y, $w, $y, $c );
+		imageline(
+			$im, 0, $y, $w, $y,
+			$alloc(
+				array(
+					(int) ( $top[0] + ( $bottom[0] - $top[0] ) * $t ),
+					(int) ( $top[1] + ( $bottom[1] - $top[1] ) * $t ),
+					(int) ( $top[2] + ( $bottom[2] - $top[2] ) * $t ),
+				)
+			)
+		);
 	}
 
-	// A few translucent accent shapes, deterministic per seed.
-	$hash = md5( $seed );
-	imagealphablending( $im, true );
-	for ( $i = 0; $i < 5; $i++ ) {
-		$hx  = hexdec( substr( $hash, $i * 4, 2 ) ) / 255;
-		$hy  = hexdec( substr( $hash, $i * 4 + 2, 2 ) ) / 255;
-		$rad = (int) ( $w * ( 0.16 + $hx * 0.3 ) );
-		// GD alpha runs 0 (opaque) to 127 (transparent); anything outside that
-		// range is a ValueError on PHP 8, so the ramp is clamped.
-		$alpha = min( 127, 100 + $i * 6 );
-		$col   = imagecolorallocatealpha(
-			$im,
-			$p[1][0],
-			$p[1][1],
-			$p[1][2],
-			$alpha
-		);
-		imagefilledellipse( $im, (int) ( $hx * $w ), (int) ( $hy * $h ), $rad, $rad, $col );
+	// A low sun, placed from the hash so no two images sit identically.
+	$sun_x = (int) ( $w * ( 0.18 + ( hexdec( substr( $hash, 0, 2 ) ) / 255 ) * 0.64 ) );
+	$sun_r = (int) ( $w * 0.13 );
+	imagefilledellipse( $im, $sun_x, (int) ( $h * 0.42 ), $sun_r * 2, $sun_r * 2, $alloc( $cream, 96 ) );
+	imagefilledellipse( $im, $sun_x, (int) ( $h * 0.42 ), $sun_r, $sun_r, $alloc( $cream, 78 ) );
+
+	$horizon = (int) ( $h * 0.66 );
+
+	// Rolling hills behind whatever the scene puts in front of them.
+	$hill = static function ( $cx, $rw, $rh, $col ) use ( $im, $horizon ) {
+		imagefilledellipse( $im, $cx, $horizon + (int) ( $rh * 0.35 ), $rw, $rh, $col );
+	};
+	$hill( (int) ( $w * 0.18 ), (int) ( $w * 0.75 ), (int) ( $h * 0.42 ), $alloc( $mid, 40 ) );
+	$hill( (int) ( $w * 0.82 ), (int) ( $w * 0.8 ), (int) ( $h * 0.36 ), $alloc( $mid, 55 ) );
+
+	// Ground.
+	imagefilledrectangle( $im, 0, $horizon, $w, $h, $alloc( $deep ) );
+
+	$ink   = $alloc( $navy );
+	$light = $alloc( $sky );
+	$warm  = $alloc( $honey );
+	$hot   = $alloc( $brick );
+	$pale  = $alloc( $soft );
+
+	/*
+	 * A silhouette per section, so a story about the county courthouse does not
+	 * carry the same picture as one about the Salt Bowl. These are deliberately
+	 * flat and graphic — stand-in art that looks chosen rather than a stock
+	 * photo that is obviously wrong.
+	 */
+	switch ( $scene ) {
+		case 'civic': // Courthouse: portico, columns, cupola.
+			$bw = (int) ( $w * 0.42 );
+			$bx = (int) ( ( $w - $bw ) / 2 );
+			$by = (int) ( $h * 0.34 );
+			imagefilledrectangle( $im, $bx, $by, $bx + $bw, $horizon, $ink );
+			// Pediment.
+			imagefilledpolygon( $im, array( $bx - 14, $by, $bx + $bw + 14, $by, (int) ( $w / 2 ), $by - (int) ( $h * 0.11 ) ), $ink );
+			// Cupola.
+			imagefilledrectangle( $im, (int) ( $w / 2 ) - 14, $by - (int) ( $h * 0.2 ), (int) ( $w / 2 ) + 14, $by - (int) ( $h * 0.1 ), $ink );
+			imagefilledellipse( $im, (int) ( $w / 2 ), $by - (int) ( $h * 0.2 ), 46, 46, $ink );
+			for ( $i = 0; $i < 6; $i++ ) {
+				$cx = $bx + (int) ( $bw * ( 0.1 + $i * 0.16 ) );
+				imagefilledrectangle( $im, $cx, $by + 18, $cx + 12, $horizon - 10, $alloc( $sky, 84 ) );
+			}
+			break;
+
+		case 'sports': // Floodlit field with goal posts.
+			imagefilledrectangle( $im, 0, $horizon, $w, $h, $alloc( array( 20, 66, 48 ) ) );
+			for ( $i = 1; $i < 6; $i++ ) {
+				$lx = (int) ( $w * $i / 6 );
+				imagefilledrectangle( $im, $lx, $horizon, $lx + 3, $h, $alloc( $cream, 108 ) );
+			}
+			foreach ( array( 0.2, 0.8 ) as $px ) {
+				$x = (int) ( $w * $px );
+				imagefilledrectangle( $im, $x - 4, (int) ( $h * 0.3 ), $x + 4, $horizon, $ink );
+				imagefilledellipse( $im, $x, (int) ( $h * 0.28 ), 78, 34, $alloc( $honey, 40 ) );
+				imagefilledrectangle( $im, $x - 26, (int) ( $h * 0.27 ), $x + 26, (int) ( $h * 0.3 ), $ink );
+			}
+			$gx = (int) ( $w * 0.5 );
+			imagefilledrectangle( $im, $gx - 3, (int) ( $h * 0.46 ), $gx + 3, $horizon, $warm );
+			imagefilledrectangle( $im, $gx - 70, (int) ( $h * 0.46 ), $gx + 70, (int) ( $h * 0.48 ), $warm );
+			imagefilledrectangle( $im, $gx - 70, (int) ( $h * 0.34 ), $gx - 64, (int) ( $h * 0.47 ), $warm );
+			imagefilledrectangle( $im, $gx + 64, (int) ( $h * 0.34 ), $gx + 70, (int) ( $h * 0.47 ), $warm );
+			break;
+
+		case 'school': // Schoolhouse with a bell tower and a flag.
+			$bw = (int) ( $w * 0.34 );
+			$bx = (int) ( $w * 0.34 );
+			$by = (int) ( $h * 0.42 );
+			imagefilledrectangle( $im, $bx, $by, $bx + $bw, $horizon, $ink );
+			imagefilledpolygon( $im, array( $bx - 10, $by, $bx + $bw + 10, $by, $bx + (int) ( $bw / 2 ), $by - (int) ( $h * 0.12 ) ), $ink );
+			imagefilledrectangle( $im, $bx + (int) ( $bw / 2 ) - 16, $by - (int) ( $h * 0.24 ), $bx + (int) ( $bw / 2 ) + 16, $by - (int) ( $h * 0.1 ), $ink );
+			for ( $r = 0; $r < 2; $r++ ) {
+				for ( $c = 0; $c < 4; $c++ ) {
+					imagefilledrectangle(
+						$im,
+						$bx + 26 + $c * (int) ( $bw / 4.6 ), $by + 34 + $r * 62,
+						$bx + 60 + $c * (int) ( $bw / 4.6 ), $by + 78 + $r * 62,
+						$alloc( $honey, 60 )
+					);
+				}
+			}
+			$fx = (int) ( $w * 0.78 );
+			imagefilledrectangle( $im, $fx, (int) ( $h * 0.3 ), $fx + 4, $horizon, $ink );
+			imagefilledrectangle( $im, $fx + 4, (int) ( $h * 0.3 ), $fx + 70, (int) ( $h * 0.37 ), $hot );
+			break;
+
+		case 'business': // A small-town main street of storefronts.
+			$x = 0;
+			$i = 0;
+			while ( $x < $w ) {
+				$bwid = (int) ( $w * ( 0.1 + ( hexdec( substr( $hash, ( $i % 12 ) * 2, 2 ) ) / 255 ) * 0.09 ) );
+				$bhgt = (int) ( $h * ( 0.14 + ( hexdec( substr( $hash, ( ( $i + 3 ) % 12 ) * 2, 2 ) ) / 255 ) * 0.2 ) );
+				$by   = $horizon - $bhgt;
+				imagefilledrectangle( $im, $x, $by, $x + $bwid - 6, $horizon, $ink );
+				// Awning.
+				imagefilledrectangle( $im, $x, $by + (int) ( $bhgt * 0.55 ), $x + $bwid - 6, $by + (int) ( $bhgt * 0.68 ), 0 === $i % 2 ? $hot : $warm );
+				for ( $wdw = 0; $wdw < 3; $wdw++ ) {
+					imagefilledrectangle(
+						$im,
+						$x + 12 + $wdw * 26, $by + 14,
+						$x + 30 + $wdw * 26, $by + (int) ( $bhgt * 0.42 ),
+						$alloc( $sky, 92 )
+					);
+				}
+				$x += $bwid;
+				$i++;
+			}
+			break;
+
+		case 'records': // Filing grid, for the public-records desk.
+			imagefilledrectangle( $im, 0, $horizon, $w, $h, $alloc( $navy ) );
+			$cols = 5;
+			$rows = 3;
+			$pw   = (int) ( $w * 0.13 );
+			$ph   = (int) ( $h * 0.16 );
+			for ( $r = 0; $r < $rows; $r++ ) {
+				for ( $c = 0; $c < $cols; $c++ ) {
+					$px = (int) ( $w * 0.09 ) + $c * (int) ( $w * 0.17 );
+					$py = (int) ( $h * 0.16 ) + $r * (int) ( $h * 0.22 );
+					imagefilledrectangle( $im, $px, $py, $px + $pw, $py + $ph, $alloc( $cream, 88 ) );
+					for ( $l = 0; $l < 3; $l++ ) {
+						imagefilledrectangle(
+							$im, $px + 10, $py + 14 + $l * 16,
+							$px + $pw - ( 10 + $l * 14 ), $py + 20 + $l * 16,
+							$alloc( $navy, 40 )
+						);
+					}
+				}
+			}
+			break;
+
+		case 'road': // Highway running to the horizon.
+			imagefilledpolygon(
+				$im,
+				array(
+					(int) ( $w * 0.1 ), $h,
+					(int) ( $w * 0.9 ), $h,
+					(int) ( $w * 0.56 ), $horizon,
+					(int) ( $w * 0.44 ), $horizon,
+				),
+				$alloc( array( 34, 40, 52 ) )
+			);
+			for ( $i = 0; $i < 6; $i++ ) {
+				$t  = $i / 6;
+				$yy = (int) ( $horizon + ( $h - $horizon ) * ( $t * $t ) );
+				$hh = (int) ( 6 + 26 * $t );
+				$ww = (int) ( 3 + 12 * $t );
+				imagefilledrectangle( $im, (int) ( $w / 2 ) - $ww, $yy, (int) ( $w / 2 ) + $ww, $yy + $hh, $warm );
+			}
+			break;
+
+		default: // Community: a stand of trees on the ridge.
+			for ( $i = 0; $i < 9; $i++ ) {
+				$tx = (int) ( $w * ( 0.05 + $i * 0.11 ) ) + (int) ( hexdec( substr( $hash, $i * 2, 2 ) ) / 8 );
+				$th = (int) ( $h * ( 0.16 + ( hexdec( substr( $hash, ( $i + 2 ) * 2, 2 ) ) / 255 ) * 0.16 ) );
+				imagefilledrectangle( $im, $tx - 5, $horizon - (int) ( $th * 0.25 ), $tx + 5, $horizon + 8, $ink );
+				imagefilledellipse( $im, $tx, $horizon - $th, (int) ( $th * 1.1 ), (int) ( $th * 1.2 ), $ink );
+			}
+			break;
 	}
+
+	// A soft vignette at the foot, so white headline text always has something
+	// darker to sit on in the hero.
+	for ( $y = (int) ( $h * 0.72 ); $y < $h; $y++ ) {
+		$t = ( $y - $h * 0.72 ) / max( 1, $h - $h * 0.72 );
+		imageline( $im, 0, $y, $w, $y, $alloc( $deep, (int) ( 127 - 62 * $t ) ) );
+	}
+	unset( $light, $pale, $blue, $soft );
 
 	$upload = wp_upload_dir();
 	$name   = 'mysaline-demo-' . substr( $hash, 0, 10 ) . '.jpg';
 	$path   = trailingslashit( $upload['path'] ) . $name;
-	imagejpeg( $im, $path, 82 );
+	imagejpeg( $im, $path, 84 );
 	imagedestroy( $im );
 
 	$attach_id = wp_insert_attachment(
@@ -155,6 +324,30 @@ function ms_seed_image( $post_id, $seed, $w = 1200, $h = 675 ) {
 	set_post_thumbnail( $post_id, $attach_id );
 
 	return (int) $attach_id;
+}
+
+/**
+ * Map a category to one of the scene compositions.
+ *
+ * @param string $cat Category name.
+ * @return string
+ */
+function ms_seed_scene_for( $cat ) {
+	$map = array(
+		'Saline County'  => 'civic',
+		'Benton'         => 'civic',
+		'Bryant'         => 'road',
+		'Elections'      => 'civic',
+		'Public Records' => 'records',
+		'Sports'         => 'sports',
+		'Schools'        => 'school',
+		'Business News'  => 'business',
+		'Dining'         => 'business',
+		'Community'      => 'community',
+		'Columnists'     => 'community',
+	);
+
+	return isset( $map[ $cat ] ) ? $map[ $cat ] : 'community';
 }
 
 /**
@@ -487,7 +680,7 @@ foreach ( $posts as $i => $row ) {
 		update_post_meta( $id, '_ms_featured', '1' );
 	}
 
-	ms_seed_image( $id, 'post-' . $title );
+	ms_seed_image( $id, 'post-' . $title, 1200, 675, ms_seed_scene_for( $cat ) );
 	$made++;
 }
 WP_CLI::log( '  · ' . $made . ' posts (5 flagged as Featured)' );

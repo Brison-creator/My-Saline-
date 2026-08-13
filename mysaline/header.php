@@ -84,7 +84,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<div class="ms-header__actions">
 				<button class="ms-search-toggle" aria-expanded="false" aria-controls="ms-search-panel">
-					<span class="dashicons-before dashicons-search" aria-hidden="true"></span>
+					<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+						<circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/>
+						<path d="M15.4 15.4 L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+					</svg>
 					<span class="screen-reader-text"><?php esc_html_e( 'Search', 'mysaline' ); ?></span>
 				</button>
 			</div>
@@ -109,22 +112,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<nav class="ms-nav" role="navigation" aria-label="<?php esc_attr_e( 'Primary Menu', 'mysaline' ); ?>">
 		<div class="ms-container">
-			<button class="ms-menu-toggle" aria-expanded="false" aria-controls="ms-primary-menu">
-				<span class="dashicons-before dashicons-menu" aria-hidden="true"></span> <?php esc_html_e( 'Menu', 'mysaline' ); ?>
+			<button class="ms-menu-toggle" aria-expanded="false" aria-controls="ms-nav-panel">
+				<span class="ms-burger" aria-hidden="true"><span></span><span></span><span></span></span>
+				<span class="ms-menu-toggle__label"><?php esc_html_e( 'Menu', 'mysaline' ); ?></span>
 			</button>
-			<?php
-			wp_nav_menu(
-				array(
-					'theme_location' => 'primary',
-					'container'      => false,
-					'menu_id'        => 'ms-primary-menu',
-					'menu_class'     => 'ms-menu',
-					'fallback_cb'    => 'mysaline_primary_menu_fallback',
-				)
-			);
-			?>
+
+			<div class="ms-nav__panel" id="ms-nav-panel">
+				<?php
+				/*
+				 * Search sits at the top of the drawer on a phone. It is a top task
+				 * on a news site, and the magnifier in the masthead is a small
+				 * target competing with the logo for the same corner.
+				 */
+				?>
+				<div class="ms-nav__search"><?php get_search_form(); ?></div>
+
+				<?php
+				wp_nav_menu(
+					array(
+						'theme_location' => 'primary',
+						'container'      => false,
+						'menu_id'        => 'ms-primary-menu',
+						'menu_class'     => 'ms-menu',
+						'fallback_cb'    => 'mysaline_primary_menu_fallback',
+					)
+				);
+				?>
+
+				<div class="ms-nav__foot">
+					<?php get_template_part( 'template-parts/social-links' ); ?>
+				</div>
+			</div>
 		</div>
 	</nav>
+	<div class="ms-nav__scrim" hidden></div>
 
 	<div id="ms-search-panel" class="ms-search-panel">
 		<div class="ms-container">
