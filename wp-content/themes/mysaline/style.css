@@ -98,9 +98,10 @@ Tags: news, magazine, blog, custom-logo, custom-menu, featured-images, threaded-
 	--ms-maxw: 1200px;
 	--ms-gap: 1.75rem;
 	--ms-container-pad: 1.25rem;
-	--ms-radius: 10px;
-	--ms-radius-sm: 6px;
-	--ms-radius-lg: 16px;
+	--ms-radius: 14px;
+	--ms-radius-sm: 9px;
+	--ms-radius-lg: 20px;
+	--ms-radius-pill: 999px;
 
 	/* Shadows are warm-tinted; a blue-grey shadow on cream reads as dirt. */
 	--ms-shadow: 0 1px 2px rgba(76, 58, 32, 0.06), 0 6px 18px rgba(76, 58, 32, 0.07);
@@ -178,8 +179,8 @@ pre { background: var(--ms-sky-wash); padding: 1rem; border-radius: var(--ms-rad
 	background: var(--ms-accent);
 	color: #fff;
 	border: 0;
-	padding: .7rem 1.4rem;
-	border-radius: var(--ms-radius-sm);
+	padding: .7rem 1.5rem;
+	border-radius: var(--ms-radius-pill);
 	font-weight: 600;
 	font-size: .95rem;
 	cursor: pointer;
@@ -189,14 +190,14 @@ pre { background: var(--ms-sky-wash); padding: 1rem; border-radius: var(--ms-rad
 }
 .ms-btn:hover, button:hover, input[type="submit"]:hover { background: var(--ms-accent-dark); color: #fff; text-decoration: none; }
 .ms-btn:active { transform: translateY(1px); }
-.ms-btn--ghost { background: transparent; color: var(--ms-primary); border: 2px solid var(--ms-primary); padding: calc(.7rem - 2px) calc(1.4rem - 2px); }
+.ms-btn--ghost { background: transparent; color: var(--ms-primary); border: 2px solid var(--ms-primary); padding: calc(.7rem - 2px) calc(1.5rem - 2px); }
 .ms-btn--ghost:hover { background: var(--ms-primary); color: #fff; }
 
 input[type="text"], input[type="email"], input[type="search"], input[type="url"], input[type="tel"], input[type="password"], input[type="number"], textarea, select {
 	width: 100%;
-	padding: .65rem .8rem;
+	padding: .7rem 1rem;
 	border: 1px solid var(--ms-border);
-	border-radius: var(--ms-radius-sm);
+	border-radius: var(--ms-radius-pill);
 	font-size: 1rem;
 	font-family: inherit;
 	background: var(--ms-surface);
@@ -240,6 +241,12 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 
 .ms-nav { background: var(--ms-primary); position: sticky; top: 0; z-index: 200; border-bottom: 3px solid var(--ms-sky); }
 .ms-nav .ms-container { display: flex; align-items: center; }
+/* On desktop the panel is just a pass-through wrapper around the menu bar;
+   the search field and the social row inside it belong to the phone drawer. */
+.ms-nav__panel { display: flex; align-items: center; flex: 1; min-width: 0; }
+.ms-nav__search, .ms-nav__foot { display: none; }
+.ms-nav__scrim { display: none; }
+.ms-submenu-toggle { display: none; }
 .ms-menu { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; }
 .ms-menu li { position: relative; }
 .ms-menu a {
@@ -261,28 +268,49 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 
 /* Mega-menu: a dropdown with many children flows into columns instead of
    becoming an unusable vertical tower. Add the "mega" CSS class to a top-level
-   menu item in Appearance → Menus (Screen Options → CSS Classes). */
-.ms-menu li.mega > .sub-menu {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(190px, 1fr));
-	min-width: 420px;
-	padding: .6rem;
-	gap: 0 .5rem;
-}
-.ms-menu li.mega-3 > .sub-menu { grid-template-columns: repeat(3, minmax(180px, 1fr)); min-width: 600px; }
-.ms-menu li.mega > .sub-menu a { border-radius: var(--ms-radius-sm); }
-/* Keep a right-edge mega panel from overflowing the viewport. */
-.ms-menu > li:nth-last-child(-n+3).mega > .sub-menu,
-.ms-menu > li:nth-last-child(-n+3).mega-3 > .sub-menu { left: auto; right: 0; }
-@media (max-width: 782px) {
-	.ms-menu li.mega > .sub-menu,
-	.ms-menu li.mega-3 > .sub-menu { grid-template-columns: 1fr; min-width: 0; right: auto; left: auto; }
+   menu item in Appearance → Menus (Screen Options → CSS Classes).
+
+   Scoped to the desktop breakpoint deliberately. `display: grid` here is more
+   specific than the drawer's collapse rule, so unscoped it forced every mega
+   section open on a phone — which is exactly the wall of links the accordion
+   exists to prevent. */
+@media (min-width: 783px) {
+	.ms-menu li.mega > .sub-menu {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(190px, 1fr));
+		min-width: 420px;
+		padding: .6rem;
+		gap: 0 .5rem;
+	}
+	.ms-menu li.mega-3 > .sub-menu { grid-template-columns: repeat(3, minmax(180px, 1fr)); min-width: 600px; }
+	.ms-menu li.mega > .sub-menu a { border-radius: var(--ms-radius-sm); }
+	/* Keep a right-edge mega panel from overflowing the viewport. */
+	.ms-menu > li:nth-last-child(-n+3).mega > .sub-menu,
+	.ms-menu > li:nth-last-child(-n+3).mega-3 > .sub-menu { left: auto; right: 0; }
 }
 
 .ms-search-toggle, .ms-menu-toggle {
-	background: transparent; color: var(--ms-primary); border: 0; padding: .5rem; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-weight: 600;
+	background: transparent; color: var(--ms-primary); border: 0; padding: .5rem; cursor: pointer; display: inline-flex; align-items: center; gap: .5rem; font-weight: 600;
 }
+.ms-search-toggle:hover { background: transparent; color: var(--ms-primary-light); }
 .ms-nav .ms-menu-toggle { color: #fff; display: none; }
+.ms-nav .ms-menu-toggle:hover { background: var(--ms-primary-dark); color: #fff; }
+
+/* Three bars that become an X, so the button says what it will do next. */
+.ms-burger { display: inline-block; width: 20px; height: 14px; position: relative; flex: none; }
+.ms-burger span {
+	position: absolute; left: 0; width: 100%; height: 2px; border-radius: 2px;
+	background: currentColor; transition: transform .2s ease, opacity .15s ease, top .2s ease;
+}
+.ms-burger span:nth-child(1) { top: 0; }
+.ms-burger span:nth-child(2) { top: 6px; }
+.ms-burger span:nth-child(3) { top: 12px; }
+.ms-menu-toggle[aria-expanded="true"] .ms-burger span:nth-child(1) { top: 6px; transform: rotate(45deg); }
+.ms-menu-toggle[aria-expanded="true"] .ms-burger span:nth-child(2) { opacity: 0; }
+.ms-menu-toggle[aria-expanded="true"] .ms-burger span:nth-child(3) { top: 6px; transform: rotate(-45deg); }
+@media (prefers-reduced-motion: reduce) {
+	.ms-burger span { transition: none; }
+}
 .ms-search-panel { display: none; padding: 1rem 0; border-bottom: 1px solid var(--ms-border); background: var(--ms-sky-wash); }
 .ms-search-panel.is-open { display: block; }
 .ms-search-panel form { display: flex; gap: .5rem; max-width: 640px; margin: 0 auto; }
@@ -320,7 +348,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-hero__lead-body h2 a { color: #fff; }
 .ms-hero__side { display: grid; gap: 1rem; align-content: start; }
 .ms-hero__side-item { display: grid; grid-template-columns: 96px 1fr; gap: .85rem; align-items: center; }
-.ms-hero__side-item img { width: 96px; height: 72px; object-fit: cover; border-radius: var(--ms-radius-sm); }
+.ms-hero__side-item img { width: 96px; height: 72px; object-fit: cover; border-radius: var(--ms-radius); }
 .ms-hero__side-item h3 { font-size: 1.02rem; margin: 0; line-height: 1.25; }
 
 .ms-eyebrow, .ms-cat-badge {
@@ -365,7 +393,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 /* list style card (sidebar / compact) */
 .ms-list-item { display: grid; grid-template-columns: 84px 1fr; gap: .8rem; padding: .85rem 0; border-bottom: 1px solid var(--ms-border); }
 .ms-list-item:last-child { border-bottom: 0; }
-.ms-list-item img { width: 84px; height: 64px; object-fit: cover; border-radius: var(--ms-radius-sm); }
+.ms-list-item img { width: 84px; height: 64px; object-fit: cover; border-radius: var(--ms-radius); }
 .ms-list-item h4 { font-size: .98rem; margin: 0 0 .25rem; line-height: 1.28; }
 .ms-list-item .ms-card__meta { font-size: .76rem; }
 
@@ -403,21 +431,21 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-article__title { margin: .4rem 0 .6rem; }
 .ms-article__meta { color: var(--ms-muted); font-size: .9rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
 .ms-article__meta .ms-author-avatar { border-radius: 50%; width: 40px; height: 40px; }
-.ms-featured-media { margin: 0 0 1.75rem; border-radius: var(--ms-radius); overflow: hidden; }
+.ms-featured-media { margin: 0 0 1.75rem; border-radius: var(--ms-radius-lg); overflow: hidden; }
 .ms-featured-media figcaption { font-size: .82rem; color: var(--ms-muted); padding: .5rem .25rem; }
 .ms-article__content { font-size: 1.08rem; }
-.ms-article__content img { border-radius: var(--ms-radius-sm); height: auto; }
+.ms-article__content img { border-radius: var(--ms-radius); height: auto; }
 .ms-article__content h2, .ms-article__content h3 { margin-top: 1.8rem; }
 .ms-article__content ul, .ms-article__content ol { padding-left: 1.4rem; margin-bottom: 1.2rem; }
 .ms-article__content li { margin-bottom: .4rem; }
 .ms-tags { margin: 2rem 0; }
 .ms-tags a { display: inline-block; background: var(--ms-sky-wash); color: var(--ms-muted); padding: .3rem .7rem; border-radius: 999px; font-size: .82rem; margin: 0 .3rem .4rem 0; }
 .ms-tags a:hover { background: var(--ms-primary); color: #fff; text-decoration: none; }
-.ms-author-box { display: grid; grid-template-columns: 72px 1fr; gap: 1rem; background: var(--ms-sky-wash); padding: 1.25rem; border-radius: var(--ms-radius); margin: 2rem 0; }
+.ms-author-box { display: grid; grid-template-columns: 72px 1fr; gap: 1rem; background: var(--ms-sky-wash); padding: 1.35rem; border-radius: var(--ms-radius-lg); margin: 2rem 0; }
 .ms-author-box img { width: 72px; height: 72px; border-radius: 50%; }
 .ms-author-box h3 { margin: 0 0 .3rem; }
 .ms-post-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
-.ms-post-nav a { display: block; padding: 1rem 1.25rem; background: var(--ms-sky-wash); border-radius: var(--ms-radius); }
+.ms-post-nav a { display: block; padding: 1rem 1.25rem; background: var(--ms-sky-wash); border-radius: var(--ms-radius-lg); }
 .ms-post-nav .ms-post-nav__label { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ms-muted); }
 .ms-post-nav .ms-next { text-align: right; }
 .ms-related { margin: 2.5rem 0; }
@@ -490,8 +518,31 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-pattern-staff h3 { margin-top: 0; }
 
 /* 13. Sidebar & widgets -------------------------------------------------- */
-.ms-sidebar .widget, .ms-footer .widget { margin-bottom: 2rem; }
-.ms-widget-title { font-size: 1.15rem; margin: 0 0 1rem; padding-bottom: .5rem; border-bottom: 3px solid var(--ms-primary); }
+/* Sidebar widgets are cards, like everything else on the page. Loose text
+   floating on the cream background read as leftover space rather than as a
+   deliberate column. */
+.ms-sidebar .widget {
+	background: var(--ms-surface);
+	border: 1px solid var(--ms-border-soft);
+	border-radius: var(--ms-radius-lg);
+	box-shadow: var(--ms-shadow);
+	padding: 1.35rem;
+	margin-bottom: 1.5rem;
+}
+/* An ad is its own creative and brings its own shape, so the card would just
+   be a box around a box. */
+.ms-sidebar .widget_mysaline_ad {
+	background: none; border: 0; box-shadow: none; padding: 0;
+}
+.ms-footer .widget { margin-bottom: 2rem; }
+.ms-widget-title {
+	font-size: 1.1rem; margin: 0 0 1rem; padding-bottom: .55rem;
+	border-bottom: 3px solid var(--ms-sky-soft); position: relative;
+}
+.ms-sidebar .ms-widget-title::after {
+	content: ""; position: absolute; left: 0; bottom: -3px;
+	width: 44px; height: 3px; background: var(--ms-primary);
+}
 .ms-sidebar ul { list-style: none; margin: 0; padding: 0; }
 .ms-sidebar .widget > ul > li { padding: .5rem 0; border-bottom: 1px solid var(--ms-border); }
 .ms-sidebar .widget > ul > li:last-child { border-bottom: 0; }
@@ -501,10 +552,10 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-ad { text-align: center; margin: 1.5rem 0; }
 .ms-ad__label { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ms-muted); display: block; margin-bottom: .35rem; }
 .ms-ad img { margin: 0 auto; border-radius: var(--ms-radius-sm); }
-.ms-ad--leaderboard { background: var(--ms-surface); padding: 1rem; border-radius: var(--ms-radius); }
+.ms-ad--leaderboard { background: var(--ms-surface); padding: 1rem; border-radius: var(--ms-radius-lg); }
 
 /* In-feed ad occupying a grid cell alongside story cards */
-.ms-ad-cell { display: flex; align-items: center; justify-content: center; background: var(--ms-surface); border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1rem; }
+.ms-ad-cell { display: flex; align-items: center; justify-content: center; background: var(--ms-surface); border: 1px solid var(--ms-border); border-radius: var(--ms-radius-lg); padding: 1rem; }
 .ms-ad-cell .ms-ad { margin: 0; width: 100%; }
 
 /* Sticky mobile anchor ad */
@@ -526,7 +577,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 
 /* 15. Custom post types -------------------------------------------------- */
 /* Events */
-.ms-event-meta { display: grid; gap: .6rem; background: var(--ms-sky-wash); padding: 1.25rem; border-radius: var(--ms-radius); margin-bottom: 1.5rem; }
+.ms-event-meta { display: grid; gap: .6rem; background: var(--ms-sky-wash); padding: 1.35rem; border-radius: var(--ms-radius-lg); margin-bottom: 1.5rem; }
 .ms-event-meta__row { display: flex; gap: .6rem; align-items: baseline; }
 .ms-event-meta__row strong { min-width: 90px; color: var(--ms-primary); }
 .ms-event-card__date { background: var(--ms-primary); color: #fff; border-radius: var(--ms-radius-sm); padding: .4rem .6rem; text-align: center; line-height: 1; }
@@ -540,7 +591,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-obit-single__portrait { float: none; width: 200px; height: 200px; object-fit: cover; border-radius: var(--ms-radius); margin: 0 auto 1.25rem; }
 /* Businesses */
 .ms-biz-card { border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1.25rem; background: #fff; }
-.ms-biz-card__logo { width: 72px; height: 72px; object-fit: contain; border-radius: var(--ms-radius-sm); background: var(--ms-surface); margin-bottom: .8rem; }
+.ms-biz-card__logo { width: 72px; height: 72px; object-fit: contain; border-radius: var(--ms-radius); background: var(--ms-surface); margin-bottom: .8rem; }
 .ms-biz-meta { list-style: none; margin: 1rem 0 0; padding: 0; font-size: .9rem; }
 .ms-biz-meta li { padding: .3rem 0; display: flex; gap: .5rem; }
 .ms-biz-meta li strong { min-width: 74px; }
@@ -617,7 +668,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-comments { margin: 2.5rem 0; }
 .ms-comments .comment-list { list-style: none; margin: 0; padding: 0; }
 .ms-comments .comment-list ol.children { list-style: none; margin: 0 0 0 2rem; padding: 0; }
-.ms-comments .comment-body { background: var(--ms-sky-wash); padding: 1.1rem 1.25rem; border-radius: var(--ms-radius); margin-bottom: 1rem; }
+.ms-comments .comment-body { background: var(--ms-sky-wash); padding: 1.15rem 1.35rem; border-radius: var(--ms-radius-lg); margin-bottom: 1rem; }
 .ms-comments .comment-author { font-weight: 700; }
 .ms-comments .comment-meta { font-size: .8rem; color: var(--ms-muted); margin-bottom: .5rem; }
 .ms-comments .avatar { border-radius: 50%; margin-right: .6rem; vertical-align: middle; }
@@ -825,31 +876,90 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	.ms-topbar .ms-social a { width: 30px; height: 30px; }
 	.ms-topbar .ms-social svg { width: 15px; height: 15px; }
 
-	/* --- Primary nav: a full-width control, not a button adrift --- */
+	/* --- Primary nav: a drawer, not a wall of links ---
+	   Seven sections collapsed fit on one screen. Expanded, they were
+	   thirty-one links and the last section was four scrolls down. */
 	.ms-nav .ms-container { position: relative; justify-content: stretch; padding-left: 0; padding-right: 0; }
 	.ms-nav .ms-menu-toggle {
-		display: flex; width: 100%; justify-content: center; gap: .5rem;
+		display: flex; width: 100%; justify-content: center; gap: .55rem;
 		min-height: 48px; font-size: 1rem; letter-spacing: .02em;
 	}
-	.ms-menu {
-		display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--ms-primary-dark);
-		flex-direction: column; padding: .25rem 0; box-shadow: var(--ms-shadow-hover); z-index: 220;
-		max-height: calc(100vh - 120px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+
+	.ms-nav__panel {
+		display: none; position: absolute; left: 0; right: 0; top: 100%;
+		background: var(--ms-primary-dark); flex-direction: column;
+		padding: 0 0 .5rem; box-shadow: var(--ms-shadow-hover); z-index: 220;
+		max-height: calc(100vh - 108px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
 	}
-	.ms-menu.is-open { display: flex; }
-	.ms-menu li { width: 100%; }
+	.ms-nav__panel.is-open { display: flex; }
+
+	/* Below the nav, not above it. .ms-nav is sticky with z-index 200, which
+	   makes it a stacking context, so the drawer's own z-index is scoped inside
+	   it — a scrim above 200 covers the drawer it is supposed to sit behind. */
+	.ms-nav__scrim {
+		display: block; position: fixed; inset: 0; z-index: 190;
+		background: rgba(9, 28, 52, .5);
+	}
+	.ms-nav__scrim[hidden] { display: none; }
+	/* Locked while the drawer is open so the page behind does not scroll with it. */
+	body.ms-nav-open { overflow: hidden; }
+
+	/* Search first: it is the fastest route to a specific story. */
+	.ms-nav__search { display: block; padding: .85rem 1.1rem; background: rgba(0,0,0,.18); }
+	.ms-nav__search form { display: flex; gap: .5rem; }
+	.ms-nav__search input[type="search"] { flex: 1; min-width: 0; }
+	.ms-nav__search .ms-btn,
+	.ms-nav__search input[type="submit"],
+	.ms-nav__search button { flex: none; }
+
+	.ms-menu { display: flex; flex-direction: column; width: 100%; }
+	.ms-menu li { width: 100%; position: relative; }
 	.ms-menu a {
-		display: flex; align-items: center; min-height: 48px; padding: .5rem 1.25rem;
-		border-bottom: 1px solid rgba(255,255,255,.08);
+		display: flex; align-items: center; min-height: 52px; padding: .5rem 1.1rem;
+		border-bottom: 1px solid rgba(255,255,255,.08); font-size: 1.02rem;
 	}
 	.ms-menu a:hover, .ms-menu .current-menu-item > a {
 		background: var(--ms-primary-light); border-bottom-color: rgba(255,255,255,.08);
 	}
+
+	/* The chevron is its own control, sized for a thumb and sitting beside the
+	   link rather than on top of it — so "News" still goes to News. */
+	.ms-submenu-toggle {
+		display: flex; align-items: center; justify-content: center;
+		position: absolute; top: 0; right: 0; width: 56px; height: 52px;
+		background: transparent; border: 0; border-bottom: 1px solid rgba(255,255,255,.08);
+		border-left: 1px solid rgba(255,255,255,.08);
+		color: #fff; padding: 0; cursor: pointer; min-height: 0;
+	}
+	.ms-submenu-toggle:hover { background: rgba(255,255,255,.08); color: #fff; }
+	.ms-submenu-toggle svg { transition: transform .18s ease; }
+	.ms-submenu-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+	@media (prefers-reduced-motion: reduce) {
+		.ms-submenu-toggle svg { transition: none; }
+	}
+	/* Keep the label clear of the chevron. */
+	.ms-menu .menu-item-has-children > a { padding-right: 64px; }
+
 	.ms-menu .sub-menu {
 		position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none;
-		background: rgba(0,0,0,.22); padding-left: 0; min-width: 0;
+		background: rgba(0,0,0,.24); padding-left: 0; min-width: 0; width: 100%;
 	}
-	.ms-menu .sub-menu a { padding-left: 2.25rem; font-weight: 500; }
+	.ms-menu .sub-menu a { padding-left: 2.1rem; font-weight: 500; font-size: .96rem; min-height: 48px; }
+	/* Collapsed by default, but only once JS has added the disclosure buttons —
+	   without JS every section stays open and nothing becomes unreachable. */
+	.ms-menu.is-accordion .sub-menu { display: none; }
+	.ms-menu.is-accordion li.is-open > .sub-menu { display: block; }
+
+	.ms-nav__foot {
+		display: flex; justify-content: center; padding: 1rem 1.1rem .4rem;
+	}
+	.ms-nav__foot .ms-social a { background: rgba(255,255,255,.1); color: #fff; width: 42px; height: 42px; }
+	.ms-nav__foot .ms-social a:hover { background: var(--ms-primary-light); }
+
+	/* The drawer now carries search and social, so the top bar keeps only what
+	   it is uniquely good for: the date and the current conditions. */
+	.ms-topbar .ms-social { display: none; }
 
 	/* --- Content --- */
 	.ms-grid--3, .ms-grid--2, .ms-grid--4 { grid-template-columns: 1fr; }
@@ -1006,35 +1116,4 @@ h1, h2, h3, h4, p, li, td, figcaption, .ms-card__title, .ms-brand__title { overf
 	.ms-fav__options { grid-template-columns: 1fr; }
 	.ms-fav__tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: .25rem; }
 	.ms-fav__tab { white-space: nowrap; }
-}
-
-/* 21. Responsive --------------------------------------------------------- */
-@media (max-width: 1024px) {
-	.ms-footer__widgets { grid-template-columns: 1fr 1fr; }
-	.ms-grid--4 { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 900px) {
-	.ms-content-sidebar { grid-template-columns: minmax(0, 1fr); }
-	.ms-hero { grid-template-columns: 1fr; }
-	.ms-hero__lead { min-height: 320px; }
-	.ms-sticky { position: static; }
-}
-@media (max-width: 782px) {
-	body { font-size: 16px; }
-	.ms-nav .ms-menu-toggle { display: inline-flex; }
-	.ms-menu {
-		display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--ms-primary-dark);
-		flex-direction: column; padding: .5rem 0; box-shadow: var(--ms-shadow); z-index: 220;
-	}
-	.ms-menu.is-open { display: flex; }
-	.ms-menu li { width: 100%; }
-	.ms-menu .sub-menu { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none; background: rgba(0,0,0,.2); padding-left: 1rem; }
-	.ms-nav .ms-container { position: relative; justify-content: flex-end; }
-	.ms-grid--3, .ms-grid--2, .ms-grid--4 { grid-template-columns: 1fr; }
-	.ms-hero__side-item { grid-template-columns: 80px 1fr; }
-}
-@media (max-width: 600px) {
-	.ms-footer__widgets { grid-template-columns: 1fr; }
-	.ms-post-nav { grid-template-columns: 1fr; }
-	.ms-header__inner { flex-wrap: wrap; }
 }

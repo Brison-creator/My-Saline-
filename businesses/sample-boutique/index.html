@@ -28,7 +28,7 @@
 <meta property="og:image:width" content="600">
 <meta property="og:image:height" content="600">
 <meta property="article:published_time" content="2026-08-10T11:30:49+00:00">
-<meta property="article:modified_time" content="2026-08-13T20:54:04+00:00">
+<meta property="article:modified_time" content="2026-08-13T21:06:38+00:00">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Sample Boutique &#8211; MySaline">
 <meta name="twitter:description" content="This is sample article copy used to populate the development site. It stands in for real reporting so the layout, typography and spacing can be reviewed with realistic text lengths. Paragraphs run at…">
@@ -86,9 +86,9 @@ document.addEventListener('submit',function(e){e.preventDefault();},true);
 											<span class="ms-topbar__date">Thursday, August 13, 2026</span>
 										<span class="ms-wx-chip" title="Haze"><svg class="ms-wx__icon" viewbox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M6.5 18h11a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.5-1.2A3.6 3.6 0 0 0 6.5 18Z" fill="currentColor" /><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20.6h14M7 22.9h10" /></g></svg><span class="ms-wx-chip__temp">99&deg;F</span><span class="ms-wx-chip__place">Benton</span></span>					 <span class="ms-topbar__text">501-303-4010</span>				</div>
 				<div class="ms-topbar__right">
-					<ul id="menu-top-bar" class="ms-topbar__menu"><li id="menu-item-2770" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2770"><a href="/about-mysaline/">About</a></li>
-<li id="menu-item-2771" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2771"><a href="/advertise-with-us/">Advertise</a></li>
-<li id="menu-item-2772" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2772"><a href="/contact-us/">Contact</a></li>
+					<ul id="menu-top-bar" class="ms-topbar__menu"><li id="menu-item-2857" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2857"><a href="/about-mysaline/">About</a></li>
+<li id="menu-item-2858" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2858"><a href="/advertise-with-us/">Advertise</a></li>
+<li id="menu-item-2859" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2859"><a href="/contact-us/">Contact</a></li>
 </ul><div class="ms-social">
 			<a href="https://facebook.com/MySaline" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
 			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 10-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0022 12z"/></svg>		</a>
@@ -111,7 +111,10 @@ document.addEventListener('submit',function(e){e.preventDefault();},true);
 
 			<div class="ms-header__actions">
 				<button class="ms-search-toggle" aria-expanded="false" aria-controls="ms-search-panel">
-					<span class="dashicons-before dashicons-search" aria-hidden="true"></span>
+					<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+						<circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/>
+						<path d="M15.4 15.4 L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+					</svg>
 					<span class="screen-reader-text">Search</span>
 				</button>
 			</div>
@@ -124,58 +127,84 @@ document.addEventListener('submit',function(e){e.preventDefault();},true);
 
 	<nav class="ms-nav" role="navigation" aria-label="Primary Menu">
 		<div class="ms-container">
-			<button class="ms-menu-toggle" aria-expanded="false" aria-controls="ms-primary-menu">
-				<span class="dashicons-before dashicons-menu" aria-hidden="true"></span> Menu			</button>
-			<ul id="ms-primary-menu" class="ms-menu"><li id="menu-item-2737" class="mega-3 menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2737"><a href="/news/" aria-haspopup="true">News</a>
+			<button class="ms-menu-toggle" aria-expanded="false" aria-controls="ms-nav-panel">
+				<span class="ms-burger" aria-hidden="true"><span></span><span></span><span></span></span>
+				<span class="ms-menu-toggle__label">Menu</span>
+			</button>
+
+			<div class="ms-nav__panel" id="ms-nav-panel">
+								<div class="ms-nav__search"><form role="search" method="get" class="ms-searchform" action="/">
+	<label class="screen-reader-text" for="ms-search-field">Search for:</label>
+	<input type="search" id="ms-search-field" class="ms-search-field" placeholder="Search MySaline…" value="" name="s" />
+	<button type="submit" class="ms-btn">Search</button>
+</form>
+</div>
+
+				<ul id="ms-primary-menu" class="ms-menu"><li id="menu-item-2824" class="mega-3 menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2824"><a href="/news/" aria-haspopup="true">News</a>
 <ul class="sub-menu">
-	<li id="menu-item-2738" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2738"><a href="/category/saline-county/">Saline County</a></li>
-	<li id="menu-item-2739" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2739"><a href="/category/benton/">Benton</a></li>
-	<li id="menu-item-2740" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2740"><a href="/category/bryant/">Bryant</a></li>
-	<li id="menu-item-2741" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2741"><a href="/category/sports/">Sports</a></li>
-	<li id="menu-item-2742" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2742"><a href="/category/schools/">Schools</a></li>
-	<li id="menu-item-2743" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2743"><a href="/category/dining/">Dining</a></li>
-	<li id="menu-item-2744" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2744"><a href="/category/community/">Community</a></li>
-	<li id="menu-item-2745" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2745"><a href="/category/columnists/">Columnists</a></li>
-	<li id="menu-item-2746" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2746"><a href="/news/">All Posts</a></li>
+	<li id="menu-item-2825" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2825"><a href="/category/saline-county/">Saline County</a></li>
+	<li id="menu-item-2826" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2826"><a href="/category/benton/">Benton</a></li>
+	<li id="menu-item-2827" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2827"><a href="/category/bryant/">Bryant</a></li>
+	<li id="menu-item-2828" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2828"><a href="/category/sports/">Sports</a></li>
+	<li id="menu-item-2829" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2829"><a href="/category/schools/">Schools</a></li>
+	<li id="menu-item-2830" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2830"><a href="/category/dining/">Dining</a></li>
+	<li id="menu-item-2831" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2831"><a href="/category/community/">Community</a></li>
+	<li id="menu-item-2832" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2832"><a href="/category/columnists/">Columnists</a></li>
+	<li id="menu-item-2833" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2833"><a href="/news/">All Posts</a></li>
 </ul>
 </li>
-<li id="menu-item-2747" class="mega menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2747"><a href="/category/public-records/" aria-haspopup="true">Public Records</a>
+<li id="menu-item-2834" class="mega menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2834"><a href="/category/public-records/" aria-haspopup="true">Public Records</a>
 <ul class="sub-menu">
-	<li id="menu-item-2748" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2748"><a href="/category/public-records/">Mugshots Archive</a></li>
-	<li id="menu-item-2749" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2749"><a href="/category/public-records/">Court Filings</a></li>
-	<li id="menu-item-2750" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2750"><a href="/category/public-records/">911 Calls</a></li>
-	<li id="menu-item-2751" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2751"><a href="/category/public-records/">Marriage Licenses</a></li>
-	<li id="menu-item-2752" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2752"><a href="/category/public-records/">Sex Offender Registry</a></li>
-	<li id="menu-item-2753" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2753"><a href="/category/public-records/">Jobs Listings</a></li>
+	<li id="menu-item-2835" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2835"><a href="/category/public-records/">Mugshots Archive</a></li>
+	<li id="menu-item-2836" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2836"><a href="/category/public-records/">Court Filings</a></li>
+	<li id="menu-item-2837" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2837"><a href="/category/public-records/">911 Calls</a></li>
+	<li id="menu-item-2838" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2838"><a href="/category/public-records/">Marriage Licenses</a></li>
+	<li id="menu-item-2839" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2839"><a href="/category/public-records/">Sex Offender Registry</a></li>
+	<li id="menu-item-2840" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2840"><a href="/category/public-records/">Jobs Listings</a></li>
 </ul>
 </li>
-<li id="menu-item-2754" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2754"><a href="/obituaries/">Obituaries</a></li>
-<li id="menu-item-2755" class="mega menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2755"><a href="/events/" aria-haspopup="true">Things To Do</a>
+<li id="menu-item-2841" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2841"><a href="/obituaries/">Obituaries</a></li>
+<li id="menu-item-2842" class="mega menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2842"><a href="/events/" aria-haspopup="true">Things To Do</a>
 <ul class="sub-menu">
-	<li id="menu-item-2756" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2756"><a href="/events/">Events Calendar</a></li>
-	<li id="menu-item-2757" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2757"><a href="/things-to-do/yard-sales/">Yard Sales</a></li>
-	<li id="menu-item-2758" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2758"><a href="/category/dining/">Dining Guide</a></li>
-	<li id="menu-item-2759" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2759"><a href="/things-to-do/daily-puzzle/">Daily Puzzle</a></li>
-	<li id="menu-item-2760" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2760"><a href="/things-to-do/submit-an-event/">Submit an Event</a></li>
+	<li id="menu-item-2843" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2843"><a href="/events/">Events Calendar</a></li>
+	<li id="menu-item-2844" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2844"><a href="/things-to-do/yard-sales/">Yard Sales</a></li>
+	<li id="menu-item-2845" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2845"><a href="/category/dining/">Dining Guide</a></li>
+	<li id="menu-item-2846" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2846"><a href="/things-to-do/daily-puzzle/">Daily Puzzle</a></li>
+	<li id="menu-item-2847" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2847"><a href="/things-to-do/submit-an-event/">Submit an Event</a></li>
 </ul>
 </li>
-<li id="menu-item-2761" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2761"><a href="/category/business-news/" aria-haspopup="true">Business</a>
+<li id="menu-item-2848" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2848"><a href="/category/business-news/" aria-haspopup="true">Business</a>
 <ul class="sub-menu">
-	<li id="menu-item-2762" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2762"><a href="/category/business-news/">Business News</a></li>
-	<li id="menu-item-2763" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2763"><a href="/businesses/">Business Directory</a></li>
-	<li id="menu-item-2764" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2764"><a href="/advertise-with-us/">Advertise with us</a></li>
+	<li id="menu-item-2849" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2849"><a href="/category/business-news/">Business News</a></li>
+	<li id="menu-item-2850" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2850"><a href="/businesses/">Business Directory</a></li>
+	<li id="menu-item-2851" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2851"><a href="/advertise-with-us/">Advertise with us</a></li>
 </ul>
 </li>
-<li id="menu-item-2765" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2765"><a href="/category/elections/" aria-haspopup="true">Government</a>
+<li id="menu-item-2852" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2852"><a href="/category/elections/" aria-haspopup="true">Government</a>
 <ul class="sub-menu">
-	<li id="menu-item-2766" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2766"><a href="/category/elections/">2026 Elections</a></li>
-	<li id="menu-item-2767" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2767"><a href="/government/elected-officials/">Elected Officials</a></li>
-	<li id="menu-item-2768" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2768"><a href="/government/district-ward-maps/">District &#038; Ward Maps</a></li>
+	<li id="menu-item-2853" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2853"><a href="/category/elections/">2026 Elections</a></li>
+	<li id="menu-item-2854" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2854"><a href="/government/elected-officials/">Elected Officials</a></li>
+	<li id="menu-item-2855" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2855"><a href="/government/district-ward-maps/">District &#038; Ward Maps</a></li>
 </ul>
 </li>
-<li id="menu-item-2769" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2769"><a href="/saline-county-favorites-vote/">⭐ Favorites</a></li>
-</ul>		</div>
+<li id="menu-item-2856" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2856"><a href="/saline-county-favorites-vote/">⭐ Favorites</a></li>
+</ul>
+				<div class="ms-nav__foot">
+					<div class="ms-social">
+			<a href="https://facebook.com/MySaline" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 10-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0022 12z"/></svg>		</a>
+			<a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.3 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.3-2.2-.4a3.7 3.7 0 01-1.4-.9 3.7 3.7 0 01-.9-1.4c-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.3-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1C2.6 9.9 2.6 10.3 2.6 12s0 2.1.1 3.3c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-3.3s0-2.1-.1-3.3c-.1-1.1-.2-1.7-.4-2.1a3.5 3.5 0 00-.8-1.3 3.5 3.5 0 00-1.3-.8c-.4-.2-1-.3-2.1-.4-1.2-.1-1.6-.1-4.7-.1zm0 3.1a4.9 4.9 0 110 9.8 4.9 4.9 0 010-9.8zm0 8a3.1 3.1 0 100-6.2 3.1 3.1 0 000 6.2zm6.3-8.2a1.15 1.15 0 11-2.3 0 1.15 1.15 0 012.3 0z"/></svg>		</a>
+			<a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="X">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.22-6.82-5.97 6.82H1.66l7.73-8.83L1.25 2.25h6.83l4.71 6.23 5.45-6.23zm-1.16 17.52h1.83L7.01 4.13H5.05l12.03 15.64z"/></svg>		</a>
+			<a href="/feed/index.xml" target="_blank" rel="noopener noreferrer" aria-label="RSS">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 17.82a2.18 2.18 0 11-4.36 0 2.18 2.18 0 014.36 0zM2 9.86v2.87c4.63 0 8.4 3.77 8.4 8.4h2.87c0-6.22-5.05-11.27-11.27-11.27zM2 4v2.87c7.8 0 14.13 6.34 14.13 14.13H19C19 11.51 11.37 4 2 4z"/></svg>		</a>
+	</div>
+				</div>
+			</div>
+		</div>
 	</nav>
+	<div class="ms-nav__scrim" hidden></div>
 
 	<div id="ms-search-panel" class="ms-search-panel">
 		<div class="ms-container">
@@ -269,10 +298,10 @@ Benton, AR 72015</span></li>
 
 																						<div class="ms-footer__col">
 								<h2 class="ms-widget-title">Sections</h2>
-								<ul id="menu-footer" class="menu"><li id="menu-item-2773" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2773"><a href="/category/business-news/">Business News</a></li>
-<li id="menu-item-2774" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2774"><a href="/category/dining/">Dining</a></li>
-<li id="menu-item-2775" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2775"><a href="/category/elections/">Elections</a></li>
-<li id="menu-item-2776" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2776"><a href="/category/community/">Community</a></li>
+								<ul id="menu-footer" class="menu"><li id="menu-item-2860" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2860"><a href="/category/business-news/">Business News</a></li>
+<li id="menu-item-2861" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2861"><a href="/category/dining/">Dining</a></li>
+<li id="menu-item-2862" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2862"><a href="/category/elections/">Elections</a></li>
+<li id="menu-item-2863" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2863"><a href="/category/community/">Community</a></li>
 </ul>							</div>
 																																																							
 				<div class="ms-footer__col">
@@ -302,6 +331,10 @@ Benton, AR 72015</span></li>
 <div class="ms-ad-sticky" id="ms-ad-sticky"><button type="button" class="ms-ad-sticky__close" aria-label="Close advertisement">&times;</button><div class="ms-ad ms-ad--sticky_mobile "><span class="ms-ad__label">Advertisement</span><div style="background:#b2452f;color:#fff;border-radius:10px;padding:.6rem .9rem;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:.85rem;text-align:left;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif"><div><div style="font:700 1rem/1.2 Georgia,serif;letter-spacing:.01em">Casa Verde</div><div style="font-size:.86rem;opacity:.85;margin-top:.2rem">Lunch specials until 3pm daily</div></div><span style="flex:none;background:#8fcde7;color:#0d2e40;font:700 .78rem/1 -apple-system,sans-serif;padding:.6rem .9rem;border-radius:999px;white-space:nowrap">Order online</span></div></div></div>
 <script type="speculationrules">
 {"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/mysaline/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script id="mysaline-main-js-extra">
+var mysalineNavStrings = {"expand":"Show submenu for","collapse":"Hide submenu for"};
+//# sourceURL=mysaline-main-js-extra
 </script>
 <script id="mysaline-main-js" src="/wp-content/themes/mysaline/assets/js/main.js?ver=1.0.0"></script>
 	<script>
