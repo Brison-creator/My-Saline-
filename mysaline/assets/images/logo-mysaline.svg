@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="MySaline — Local News Worth Its Salt.">
+  <title>MySaline — Local News Worth Its Salt.</title>
+  <defs>
+    <linearGradient id="ms-cube-top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cfe7f7"/>
+    </linearGradient>
+    <linearGradient id="ms-cube-left" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bbdcf5"/>
+      <stop offset="1" stop-color="#8ec4ea"/>
+    </linearGradient>
+    <linearGradient id="ms-cube-right" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9fd3f0"/>
+      <stop offset="1" stop-color="#6aa9d8"/>
+    </linearGradient>
+  </defs>
+
+  <g font-family="Georgia, 'Times New Roman', Times, serif" font-weight="700" font-size="150">
+    <!-- textLength pins each run to a fixed advance so the salt crystal lands
+         on the dotless i on every machine, whatever the serif resolves to. -->
+    <text x="43"  y="190" textLength="229" lengthAdjust="spacingAndGlyphs" fill="#0b5ce8">My</text>
+    <text x="298" y="190" textLength="235" lengthAdjust="spacingAndGlyphs" fill="#0f2b4e">Sal</text>
+    <text x="533" y="190" textLength="50"  lengthAdjust="spacingAndGlyphs" fill="#0f2b4e">&#x131;</text>
+    <text x="583" y="190" textLength="175" lengthAdjust="spacingAndGlyphs" fill="#0f2b4e">ne</text>
+  </g>
+
+  <!-- Salt crystal, dotting the i. Isometric: top face lit, left mid, right shaded. -->
+  <g transform="translate(566 88)">
+    <path d="M0,-26 L22.5,-13 L0,0 L-22.5,-13 Z" fill="url(#ms-cube-top)"/>
+    <path d="M-22.5,-13 L0,0 L0,26 L-22.5,13 Z" fill="url(#ms-cube-left)"/>
+    <path d="M22.5,-13 L22.5,13 L0,26 L0,0 Z" fill="url(#ms-cube-right)"/>
+    <path d="M0,-26 L22.5,-13 L22.5,13 L0,26 L-22.5,13 L-22.5,-13 Z"
+          fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="1.5"/>
+  </g>
+
+  <text x="400" y="278" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', Times, serif" font-style="italic"
+        font-size="46" fill="#0f2b4e">Local News Worth Its Salt.</text>
+</svg>

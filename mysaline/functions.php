@@ -48,6 +48,7 @@ $mysaline_modules = array(
 	'ads',                // Advertisement zone helpers.
 	'breaking-news',      // Breaking-news data helpers.
 	'events',             // Event query/date helpers.
+	'weather',            // Local conditions from the National Weather Service.
 	'homepage',           // Featured hero + configurable homepage sections.
 	'favorites',          // Saline County Favorites voting ballot.
 	'seo',                // Open Graph, Twitter cards, JSON-LD structured data.

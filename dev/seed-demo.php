@@ -611,15 +611,15 @@ WP_CLI::log( '  · ' . count( $businesses ) . ' businesses in ' . count( $biz_ca
  * palette, sized to the shape of their zone.
  */
 $zones = array(
-	'header'        => array( 'Header leaderboard', 'wide',   'Saline Family Dental', 'Same-day appointments in Benton', 'Book a visit', '#16455f' ),
+	'header'        => array( 'Header leaderboard', 'wide',   'Saline Family Dental', 'Same-day appointments in Benton', 'Book a visit', '#0f2b4e' ),
 	'homepage_top'  => array( 'Homepage — below hero', 'wide', 'Hurley Heat &amp; Air', 'Free system check through August', 'Schedule now', '#2e7396' ),
-	'homepage_mid'  => array( 'Homepage — between sections', 'wide', 'First Community Bank', 'Local decisions, made locally', 'Open an account', '#16455f' ),
+	'homepage_mid'  => array( 'Homepage — between sections', 'wide', 'First Community Bank', 'Local decisions, made locally', 'Open an account', '#0f2b4e' ),
 	'sidebar'       => array( 'Sidebar', 'box',           'Bryant Auto Care', 'Oil change &amp; tire rotation, $59', 'Get directions', '#2e7396' ),
 	'in_content'    => array( 'In-content', 'wide',       'Cornerstone Realty', 'Thinking of selling this fall?', 'Free home valuation', '#1f5874' ),
 	'below_content' => array( 'Below article', 'wide',    'Saline County Fair', 'August 22–26 · Free parking', 'See the schedule', '#b2452f' ),
 	'in_feed'       => array( 'In-feed', 'wide',          'The Sweet Spot Bakery', 'Fresh kolaches every morning', 'View the menu', '#8c3524' ),
 	'directory'     => array( 'Directory listings', 'box','Benton Lawn &amp; Landscape', 'Weekly mowing from $40', 'Request a quote', '#1c7a52' ),
-	'newsletter'    => array( 'Newsletter sponsor', 'wide','Riverside Insurance', 'Auto, home and farm coverage', 'Compare rates', '#16455f' ),
+	'newsletter'    => array( 'Newsletter sponsor', 'wide','Riverside Insurance', 'Auto, home and farm coverage', 'Compare rates', '#0f2b4e' ),
 	'sticky_mobile' => array( 'Mobile sticky anchor', 'thin', 'Casa Verde', 'Lunch specials until 3pm daily', 'Order online', '#b2452f' ),
 	'footer'        => array( 'Footer', 'wide',           'Saline Memorial Chapel', 'Serving families since 1946', 'Contact us', '#1f5874' ),
 );
@@ -948,10 +948,37 @@ update_option( 'page_for_posts', $news_id );
 // archive, so a fresh install with WordPress's placeholder would ship a
 // description reading "Just another WordPress site".
 update_option( 'blogname', 'MySaline' );
-update_option(
-	'blogdescription',
-	'News, events, obituaries and business listings for Saline County, Arkansas.'
-);
+update_option( 'blogdescription', 'Local News Worth Its Salt.' );
+
+/*
+ * Install the wordmark as the site logo.
+ *
+ * header.php only renders the text brand when there is no custom logo, so the
+ * tagline is not repeated under a logo that already contains it.
+ */
+$logo_src = MYSALINE_DIR . 'assets/images/logo-mysaline.png';
+if ( is_readable( $logo_src ) && ! get_theme_mod( 'custom_logo' ) ) {
+	$upload    = wp_upload_dir();
+	$logo_path = trailingslashit( $upload['path'] ) . 'mysaline-logo.png';
+	copy( $logo_src, $logo_path );
+
+	$logo_id = wp_insert_attachment(
+		array(
+			'post_mime_type' => 'image/png',
+			'post_title'     => 'MySaline logo',
+			'post_status'    => 'inherit',
+		),
+		$logo_path
+	);
+
+	if ( $logo_id && ! is_wp_error( $logo_id ) ) {
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		wp_update_attachment_metadata( $logo_id, wp_generate_attachment_metadata( $logo_id, $logo_path ) );
+		update_post_meta( $logo_id, '_wp_attachment_image_alt', 'MySaline — Local News Worth Its Salt.' );
+		set_theme_mod( 'custom_logo', (int) $logo_id );
+		WP_CLI::log( '  · site logo installed' );
+	}
+}
 WP_CLI::log( '  · pages created; static homepage set' );
 
 /* -------------------------------------------------------------------------
@@ -1117,7 +1144,7 @@ WP_CLI::log( '  · 3 menus assigned (primary with dropdowns, top bar, footer)' )
 
 $mods = array(
 	// Identity / branding.
-	'mysaline_color_primary'        => '#16455f',
+	'mysaline_color_primary'        => '#0f2b4e',
 	'mysaline_color_accent'         => '#b2452f',
 	'mysaline_show_tagline'         => true,
 
@@ -1248,10 +1275,27 @@ update_option(
 		'_multiwidget' => 1,
 	)
 );
+update_option(
+	'widget_mysaline_weather',
+	array(
+		2        => array( 'title' => 'Saline County Weather' ),
+		'_multiwidget' => 1,
+	)
+);
+
+// Prime the forecast so the first page view has something to show. Normally a
+// cron tick does this; the seeder calls it directly because a freshly seeded
+// site is looked at immediately.
+if ( function_exists( 'mysaline_weather_refresh' ) ) {
+	$wx = mysaline_weather_refresh();
+	WP_CLI::log( $wx && ! empty( $wx['temp'] )
+		? '  · weather primed: ' . $wx['temp'] . '°' . $wx['unit'] . ' ' . $wx['summary'] . ' in ' . $wx['place']
+		: '  · weather unavailable right now (the widget stays hidden until it is)' );
+}
 
 $sidebars = get_option( 'sidebars_widgets', array() );
-$sidebars['sidebar-main'] = array( 'mysaline_ad-2', 'mysaline_recent-2', 'mysaline_events-2' );
-$sidebars['sidebar-home'] = array( 'mysaline_ad-2', 'mysaline_events-2' );
+$sidebars['sidebar-main'] = array( 'mysaline_weather-2', 'mysaline_ad-2', 'mysaline_recent-2', 'mysaline_events-2' );
+$sidebars['sidebar-home'] = array( 'mysaline_weather-2', 'mysaline_ad-2', 'mysaline_events-2' );
 $sidebars['footer-4']     = array( 'mysaline_social-2' );
 update_option( 'sidebars_widgets', $sidebars );
 WP_CLI::log( '  · widgets placed in sidebars and footer' );

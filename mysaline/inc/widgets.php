@@ -364,12 +364,83 @@ class MySaline_Events_Widget extends WP_Widget {
 /**
  * Register all custom widgets.
  */
+
+/**
+ * Local weather widget.
+ */
+class MySaline_Weather_Widget extends WP_Widget {
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		parent::__construct(
+			'mysaline_weather',
+			__( 'MySaline: Local Weather', 'mysaline' ),
+			array( 'description' => __( 'Current conditions and forecast from the National Weather Service.', 'mysaline' ) )
+		);
+	}
+
+	/**
+	 * Output.
+	 *
+	 * @param array $args     Sidebar args.
+	 * @param array $instance Settings.
+	 */
+	public function widget( $args, $instance ) {
+		$card = mysaline_weather_card();
+
+		// A widget with nothing to say prints nothing, not an empty box.
+		if ( '' === $card ) {
+			return;
+		}
+
+		$title = isset( $instance['title'] ) ? $instance['title'] : __( 'Local Weather', 'mysaline' );
+
+		echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( $title ) {
+			echo $args['before_title'] . esc_html( $title ) . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+		echo wp_kses( $card, mysaline_weather_kses() );
+		echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/**
+	 * Form.
+	 *
+	 * @param array $instance Settings.
+	 */
+	public function form( $instance ) {
+		$title = isset( $instance['title'] ) ? $instance['title'] : __( 'Local Weather', 'mysaline' );
+		?>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'mysaline' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"
+				name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text"
+				value="<?php echo esc_attr( $title ); ?>" />
+		</p>
+		<p class="description"><?php esc_html_e( 'Set the location under Customize → MySaline Options → Local Weather.', 'mysaline' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Save.
+	 *
+	 * @param array $new Submitted values.
+	 * @param array $old Previous values.
+	 * @return array
+	 */
+	public function update( $new, $old ) {
+		return array( 'title' => sanitize_text_field( isset( $new['title'] ) ? $new['title'] : '' ) );
+	}
+}
+
 function mysaline_register_widgets() {
 	register_widget( 'MySaline_Ad_Widget' );
 	register_widget( 'MySaline_Newsletter_Widget' );
 	register_widget( 'MySaline_Social_Widget' );
 	register_widget( 'MySaline_Recent_Widget' );
 	register_widget( 'MySaline_Events_Widget' );
+	register_widget( 'MySaline_Weather_Widget' );
 }
 add_action( 'widgets_init', 'mysaline_register_widgets' );
 

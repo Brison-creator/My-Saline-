@@ -11,15 +11,15 @@
 			"defaultPalette": true,
 			"custom": true,
 			"palette": [
-				{ "slug": "primary", "color": "#16455f", "name": "Harbor Blue" },
-				{ "slug": "primary-dark", "color": "#0d2e40", "name": "Deep Harbor" },
-				{ "slug": "sky", "color": "#8fcde7", "name": "Baby Blue" },
-				{ "slug": "sky-soft", "color": "#cbe7f5", "name": "Sky Tint" },
+				{ "slug": "primary", "color": "#0f2b4e", "name": "MySaline Navy" },
+				{ "slug": "primary-dark", "color": "#091c34", "name": "Deep Navy" },
+				{ "slug": "sky", "color": "#9fd3f0", "name": "Salt Crystal" },
+				{ "slug": "sky-soft", "color": "#cfe7f7", "name": "Sky Tint" },
 				{ "slug": "cream", "color": "#fbf7ef", "name": "Cream" },
 				{ "slug": "cream-deep", "color": "#f3ebdd", "name": "Deep Cream" },
 				{ "slug": "accent", "color": "#b2452f", "name": "Brick" },
 				{ "slug": "highlight", "color": "#e3a93c", "name": "Honey" },
-				{ "slug": "surface", "color": "#eaf5fb", "name": "Sky Wash" },
+				{ "slug": "surface", "color": "#eaf4fc", "name": "Sky Wash" },
 				{ "slug": "text", "color": "#1e2c36", "name": "Ink" },
 				{ "slug": "muted", "color": "#5c6b77", "name": "Muted" },
 				{ "slug": "white", "color": "#ffffff", "name": "White" }
@@ -48,10 +48,10 @@
 			"lineHeight": "1.65"
 		},
 		"elements": {
-			"link": { "color": { "text": "#2e7396" } },
-			"h1": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#16455f" } },
-			"h2": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#16455f" } },
-			"h3": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#16455f" } }
+			"link": { "color": { "text": "#0b5ce8" } },
+			"h1": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#0f2b4e" } },
+			"h2": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#0f2b4e" } },
+			"h3": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#0f2b4e" } }
 		}
 	}
 }

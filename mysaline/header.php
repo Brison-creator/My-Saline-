@@ -32,6 +32,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<span class="ms-topbar__date"><?php echo esc_html( date_i18n( 'l, F j, Y' ) ); ?></span>
 					<?php endif; ?>
 					<?php
+					// Renders nothing at all if the forecast is unavailable.
+					echo wp_kses( mysaline_weather_chip(), mysaline_weather_kses() );
+					?>
+					<?php
 					$topbar_text = get_theme_mod( 'mysaline_topbar_text', '' );
 					if ( $topbar_text ) {
 						echo ' <span class="ms-topbar__text">' . esc_html( $topbar_text ) . '</span>';

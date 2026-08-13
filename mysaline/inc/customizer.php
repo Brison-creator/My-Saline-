@@ -124,6 +124,7 @@ function mysaline_customize_register( $wp_customize ) {
 	mysaline_customize_sections( $wp_customize );
 	mysaline_customize_newsletter( $wp_customize );
 	mysaline_customize_social( $wp_customize );
+	mysaline_customize_weather( $wp_customize );
 	mysaline_customize_ads( $wp_customize );
 	mysaline_customize_footer( $wp_customize );
 }
@@ -147,7 +148,7 @@ function mysaline_customize_branding( $wp_customize ) {
 	$wp_customize->add_setting(
 		'mysaline_color_primary',
 		array(
-			'default'           => '#16455f',
+			'default'           => '#0f2b4e',
 			'sanitize_callback' => 'sanitize_hex_color',
 			'transport'         => 'postMessage',
 		)
@@ -890,6 +891,141 @@ function mysaline_customize_social( $wp_customize ) {
 			)
 		);
 	}
+}
+
+/**
+ * Local weather.
+ *
+ * @param WP_Customize_Manager $wp_customize Manager.
+ */
+function mysaline_customize_weather( $wp_customize ) {
+	$wp_customize->add_section(
+		'mysaline_weather',
+		array(
+			'title'       => __( 'Local Weather', 'mysaline' ),
+			'panel'       => 'mysaline_panel',
+			'description' => __( 'Live conditions from the National Weather Service. Free, no account and no API key — it is public US government data. Coordinates default to Benton; look yours up on any map and paste them in.', 'mysaline' ),
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_weather_enable',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'mysaline_sanitize_checkbox',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_weather_enable',
+		array(
+			'type'    => 'checkbox',
+			'label'   => __( 'Show local weather', 'mysaline' ),
+			'section' => 'mysaline_weather',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_weather_place',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_weather_place',
+		array(
+			'type'        => 'text',
+			'label'       => __( 'Location label', 'mysaline' ),
+			'description' => __( 'Leave blank to use the town the weather service reports.', 'mysaline' ),
+			'section'     => 'mysaline_weather',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_weather_lat',
+		array(
+			'default'           => MYSALINE_WX_DEFAULT_LAT,
+			'sanitize_callback' => 'mysaline_sanitize_latitude',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_weather_lat',
+		array(
+			'type'    => 'text',
+			'label'   => __( 'Latitude', 'mysaline' ),
+			'section' => 'mysaline_weather',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_weather_lon',
+		array(
+			'default'           => MYSALINE_WX_DEFAULT_LON,
+			'sanitize_callback' => 'mysaline_sanitize_longitude',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_weather_lon',
+		array(
+			'type'    => 'text',
+			'label'   => __( 'Longitude', 'mysaline' ),
+			'section' => 'mysaline_weather',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_weather_units',
+		array(
+			'default'           => 'F',
+			'sanitize_callback' => 'mysaline_sanitize_weather_units',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_weather_units',
+		array(
+			'type'    => 'select',
+			'label'   => __( 'Units', 'mysaline' ),
+			'section' => 'mysaline_weather',
+			'choices' => array(
+				'F' => __( 'Fahrenheit', 'mysaline' ),
+				'C' => __( 'Celsius', 'mysaline' ),
+			),
+		)
+	);
+}
+
+/**
+ * Keep a latitude inside the range the weather service accepts.
+ *
+ * @param mixed $value Raw value.
+ * @return string
+ */
+function mysaline_sanitize_latitude( $value ) {
+	$n = is_numeric( $value ) ? (float) $value : (float) MYSALINE_WX_DEFAULT_LAT;
+
+	return (string) max( -90, min( 90, $n ) );
+}
+
+/**
+ * Keep a longitude inside the range the weather service accepts.
+ *
+ * @param mixed $value Raw value.
+ * @return string
+ */
+function mysaline_sanitize_longitude( $value ) {
+	$n = is_numeric( $value ) ? (float) $value : (float) MYSALINE_WX_DEFAULT_LON;
+
+	return (string) max( -180, min( 180, $n ) );
+}
+
+/**
+ * Restrict the unit choice to the two offered.
+ *
+ * @param mixed $value Raw value.
+ * @return string
+ */
+function mysaline_sanitize_weather_units( $value ) {
+	return 'C' === $value ? 'C' : 'F';
 }
 
 /**

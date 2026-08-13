@@ -44,7 +44,7 @@ add_action( 'wp_enqueue_scripts', 'mysaline_enqueue_assets' );
  * @return string CSS.
  */
 function mysaline_dynamic_css() {
-	$primary = get_theme_mod( 'mysaline_color_primary', '#16455f' );
+	$primary = get_theme_mod( 'mysaline_color_primary', '#0f2b4e' );
 	$accent  = get_theme_mod( 'mysaline_color_accent', '#b2452f' );
 
 	$primary_dark  = mysaline_adjust_brightness( $primary, -22 );
