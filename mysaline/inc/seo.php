@@ -59,18 +59,27 @@ function mysaline_seo_plugin_active() {
  * @return string
  */
 function mysaline_meta_description() {
-	if ( is_singular() ) {
+	// The front page is checked before is_singular(), because a static front
+	// page is a singular post whose body is usually empty — the homepage is
+	// built by front-page.php, not by page content — and describing the site's
+	// front door with an empty string is the worst possible answer.
+	if ( ! is_front_page() && is_singular() ) {
 		$post = get_post();
-		if ( ! $post ) {
-			return get_bloginfo( 'description' );
+		if ( $post ) {
+			$text = has_excerpt( $post )
+				? get_the_excerpt( $post )
+				: wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
+			$text = trim( wp_html_excerpt( $text, 200, '…' ) );
+			if ( '' !== $text ) {
+				return $text;
+			}
 		}
-		$text = has_excerpt( $post ) ? get_the_excerpt( $post ) : wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
-		return trim( wp_html_excerpt( $text, 200, '…' ) );
+		// A post with no excerpt and no body still deserves a description.
 	}
 
 	if ( is_category() || is_tag() || is_tax() ) {
-		$desc = wp_strip_all_tags( term_description() );
-		if ( $desc ) {
+		$desc = trim( wp_strip_all_tags( term_description() ) );
+		if ( '' !== $desc ) {
 			return trim( wp_html_excerpt( $desc, 200, '…' ) );
 		}
 		return sprintf(
@@ -81,10 +90,35 @@ function mysaline_meta_description() {
 		);
 	}
 
+	if ( is_post_type_archive() ) {
+		$obj = get_queried_object();
+		if ( $obj instanceof WP_Post_Type ) {
+			$desc = trim( wp_strip_all_tags( (string) $obj->description ) );
+			if ( '' !== $desc ) {
+				return trim( wp_html_excerpt( $desc, 200, '…' ) );
+			}
+			return sprintf(
+				/* translators: 1: archive name, e.g. "Obituaries", 2: site name. */
+				__( '%1$s from %2$s.', 'mysaline' ),
+				$obj->labels->name,
+				get_bloginfo( 'name' )
+			);
+		}
+	}
+
 	if ( is_author() ) {
-		$bio = get_the_author_meta( 'description' );
-		if ( $bio ) {
-			return trim( wp_html_excerpt( wp_strip_all_tags( $bio ), 200, '…' ) );
+		$bio = trim( wp_strip_all_tags( (string) get_the_author_meta( 'description' ) ) );
+		if ( '' !== $bio ) {
+			return trim( wp_html_excerpt( $bio, 200, '…' ) );
+		}
+		$name = get_the_author_meta( 'display_name' );
+		if ( $name ) {
+			return sprintf(
+				/* translators: 1: author name, 2: site name. */
+				__( 'Stories by %1$s for %2$s.', 'mysaline' ),
+				$name,
+				get_bloginfo( 'name' )
+			);
 		}
 	}
 
@@ -93,7 +127,19 @@ function mysaline_meta_description() {
 		return sprintf( __( 'Search results for “%s”.', 'mysaline' ), get_search_query() );
 	}
 
-	return get_bloginfo( 'description' );
+	$tagline = trim( wp_strip_all_tags( get_bloginfo( 'description' ) ) );
+	if ( '' !== $tagline ) {
+		return $tagline;
+	}
+
+	// A site with no tagline set would otherwise describe the homepage and
+	// every archive with an empty string, which is worse for sharing than
+	// describing it generically.
+	return sprintf(
+		/* translators: %s: site name. */
+		__( 'Local news, community events, obituaries and business listings from %s.', 'mysaline' ),
+		get_bloginfo( 'name' )
+	);
 }
 
 /**
@@ -169,7 +215,7 @@ function mysaline_social_meta() {
 	}
 
 	$title = wp_get_document_title();
-	$desc  = mysaline_meta_description();
+	$desc  = trim( (string) mysaline_meta_description() );
 	$url   = mysaline_canonical_url();
 	$image = mysaline_share_image();
 	$type  = is_singular() && ! is_front_page() ? 'article' : 'website';
@@ -177,11 +223,17 @@ function mysaline_social_meta() {
 	echo "\n<!-- MySaline social meta -->\n";
 	printf( '<link rel="canonical" href="%s">' . "\n", esc_url( $url ) );
 
-	printf( '<meta name="description" content="%s">' . "\n", esc_attr( $desc ) );
+	// An empty description tag is worse than none at all, so only emit when
+	// there is something to say.
+	if ( '' !== $desc ) {
+		printf( '<meta name="description" content="%s">' . "\n", esc_attr( $desc ) );
+	}
 
 	printf( '<meta property="og:type" content="%s">' . "\n", esc_attr( $type ) );
 	printf( '<meta property="og:title" content="%s">' . "\n", esc_attr( $title ) );
-	printf( '<meta property="og:description" content="%s">' . "\n", esc_attr( $desc ) );
+	if ( '' !== $desc ) {
+		printf( '<meta property="og:description" content="%s">' . "\n", esc_attr( $desc ) );
+	}
 	printf( '<meta property="og:url" content="%s">' . "\n", esc_url( $url ) );
 	printf( '<meta property="og:site_name" content="%s">' . "\n", esc_attr( get_bloginfo( 'name' ) ) );
 	printf( '<meta property="og:locale" content="%s">' . "\n", esc_attr( str_replace( '-', '_', get_bloginfo( 'language' ) ) ) );
@@ -224,7 +276,9 @@ function mysaline_social_meta() {
 		$image ? 'summary_large_image' : 'summary'
 	);
 	printf( '<meta name="twitter:title" content="%s">' . "\n", esc_attr( $title ) );
-	printf( '<meta name="twitter:description" content="%s">' . "\n", esc_attr( $desc ) );
+	if ( '' !== $desc ) {
+		printf( '<meta name="twitter:description" content="%s">' . "\n", esc_attr( $desc ) );
+	}
 	if ( $image ) {
 		printf( '<meta name="twitter:image" content="%s">' . "\n", esc_url( $image['url'] ) );
 	}

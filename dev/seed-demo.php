@@ -239,8 +239,112 @@ $posts = array(
 	array( 'This week in 911 calls', 'Public Records', false ),
 );
 
+/*
+ * A newsroom, not one account called "admin".
+ *
+ * The byline shows on every card, every single story and the author archive
+ * masthead, so a single unnamed author makes the whole demo look unfinished —
+ * and author.php's bio masthead has nothing to render. Each writer covers the
+ * beats listed against them; anything uncovered falls to the first writer.
+ */
+$staff = array(
+	'dhollis'  => array(
+		'name'  => 'Dana Hollis',
+		'first' => 'Dana',
+		'last'  => 'Hollis',
+		'role'  => 'editor',
+		'bio'   => 'Dana Hollis is MySaline’s managing editor. She has covered city
+			hall, county government and elections in Saline County since 2011, and
+			edits the newsroom’s public records reporting.',
+		'beats' => array( 'Benton', 'Bryant', 'Saline County', 'Elections', 'Public Records' ),
+	),
+	'mcallum'  => array(
+		'name'  => 'Marcus Callum',
+		'first' => 'Marcus',
+		'last'  => 'Callum',
+		'role'  => 'author',
+		'bio'   => 'Marcus Callum writes about high school sports for MySaline. He
+			has covered the Salt Bowl every year since 2014 and grew up two blocks
+			from the field he now writes about.',
+		'beats' => array( 'Sports' ),
+	),
+	'rgarrett' => array(
+		'name'  => 'Rachel Garrett',
+		'first' => 'Rachel',
+		'last'  => 'Garrett',
+		'role'  => 'author',
+		'bio'   => 'Rachel Garrett covers business, dining and schools. She reports
+			on new storefronts, restaurant openings and the two school districts
+			that serve Saline County.',
+		'beats' => array( 'Business News', 'Dining', 'Schools', 'Community' ),
+	),
+	'twhitley' => array(
+		'name'  => 'Tom Whitley',
+		'first' => 'Tom',
+		'last'  => 'Whitley',
+		'role'  => 'author',
+		'bio'   => 'Tom Whitley writes the How the Ball Bounces column. He has been
+			arguing about youth sports in print, and at the ballpark, for twenty
+			years.',
+		'beats' => array( 'Columnists' ),
+	),
+);
+
+$beat_author = array();
+$staff_ids   = array();
+
+foreach ( $staff as $login => $person ) {
+	$user_id = username_exists( $login );
+	if ( ! $user_id ) {
+		$user_id = wp_insert_user(
+			array(
+				'user_login' => $login,
+				'user_pass'  => wp_generate_password( 24 ),
+				'user_email' => $login . '@mysaline.example',
+				'role'       => $person['role'],
+			)
+		);
+	}
+	if ( is_wp_error( $user_id ) ) {
+		continue;
+	}
+	$user_id = (int) $user_id;
+
+	wp_update_user(
+		array(
+			'ID'           => $user_id,
+			'display_name' => $person['name'],
+			'first_name'   => $person['first'],
+			'last_name'    => $person['last'],
+			// Collapse the seeded whitespace so bios read as one paragraph.
+			'description'  => preg_replace( '/\s+/', ' ', trim( $person['bio'] ) ),
+			'user_url'     => '',
+		)
+	);
+
+	$staff_ids[] = $user_id;
+	foreach ( $person['beats'] as $beat ) {
+		$beat_author[ $beat ] = $user_id;
+	}
+}
+
+// WP-CLI runs with no current user, so post_author would otherwise default to 0
+// and the byline would render empty.
+$seed_author = ! empty( $staff_ids ) ? $staff_ids[0] : 1;
+
+// The stock admin account still owns the install; stop it looking like a writer.
 $seed_admins = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
-$seed_author = ! empty( $seed_admins ) ? (int) $seed_admins[0] : 1;
+if ( ! empty( $seed_admins ) ) {
+	wp_update_user(
+		array(
+			'ID'           => (int) $seed_admins[0],
+			'display_name' => 'MySaline Staff',
+			'user_url'     => '',
+		)
+	);
+}
+
+WP_CLI::log( '  · ' . count( $staff_ids ) . ' newsroom accounts with bios' );
 
 $made = 0;
 foreach ( $posts as $i => $row ) {
@@ -250,9 +354,7 @@ foreach ( $posts as $i => $row ) {
 		$title,
 		'post',
 		array(
-			// WP-CLI runs with no current user, so post_author would default to 0
-			// and the byline would be empty. Attribute to the first admin.
-			'post_author'  => $seed_author,
+			'post_author'  => isset( $beat_author[ $cat ] ) ? $beat_author[ $cat ] : $seed_author,
 			'post_content' => ms_seed_body( 5 ),
 			'post_excerpt' => 'Sample excerpt used to populate the development site so card and archive layouts can be reviewed with realistic text.',
 			'post_date'    => gmdate( 'Y-m-d H:i:s', strtotime( '-' . $i . ' days' ) ),
@@ -705,6 +807,15 @@ ms_seed_post(
 update_option( 'show_on_front', 'page' );
 update_option( 'page_on_front', $home_id );
 update_option( 'page_for_posts', $news_id );
+
+// The tagline is the fallback meta description for the homepage and every
+// archive, so a fresh install with WordPress's placeholder would ship a
+// description reading "Just another WordPress site".
+update_option( 'blogname', 'MySaline' );
+update_option(
+	'blogdescription',
+	'News, events, obituaries and business listings for Saline County, Arkansas.'
+);
 WP_CLI::log( '  · pages created; static homepage set' );
 
 /* -------------------------------------------------------------------------
