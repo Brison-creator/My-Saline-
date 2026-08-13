@@ -47,19 +47,47 @@ Tags: news, magazine, blog, custom-logo, custom-menu, featured-images, threaded-
    ========================================================================= */
 
 /* 1. Design tokens ------------------------------------------------------- */
+/*
+ * Palette: baby blue on cream.
+ *
+ * Cream is the page and white is the card, so content sits *above* the page
+ * rather than dissolving into it — that inversion is what stops a light,
+ * friendly palette from reading as washed out. Baby blue never carries body
+ * text; it is a surface, and the deep harbor blue is what goes on top of it.
+ *
+ * Every text/background pairing below meets WCAG AA (4.5:1), including the
+ * muted grey on cream (5.1:1) and the link blue on cream (4.9:1), which are
+ * the two that a light palette usually gets wrong.
+ */
 :root {
-	--ms-primary: #0b2545;
-	--ms-primary-dark: #071a33;
-	--ms-primary-light: #17457f;
-	--ms-accent: #c8102e;
-	--ms-accent-dark: #9c0c24;
-	--ms-highlight: #f2b705;
-	--ms-bg: #ffffff;
-	--ms-surface: #f4f6f9;
-	--ms-surface-2: #eaeef4;
-	--ms-text: #1a1d23;
-	--ms-muted: #5b6472;
-	--ms-border: #e2e6ec;
+	/* Brand blues */
+	--ms-primary: #16455f;         /* Masthead, headings — 9.5:1 on cream */
+	--ms-primary-dark: #0d2e40;
+	--ms-primary-light: #2e7396;   /* Links — 4.9:1 on cream */
+	--ms-sky: #8fcde7;             /* Baby blue: the signature */
+	--ms-sky-soft: #cbe7f5;        /* Tints for bands, chips, hovers */
+	--ms-sky-wash: #eaf5fb;
+	--ms-sky-ink: #b8dcf0;         /* Legible on the dark blue bars */
+
+	/* Creams */
+	--ms-bg: #fbf7ef;              /* The page */
+	--ms-surface: #ffffff;         /* Cards lift off the cream */
+	--ms-surface-2: #f3ebdd;       /* Deeper cream band */
+	--ms-border: #e6dcc9;
+	--ms-border-soft: #f0e8da;
+
+	/* Ink */
+	--ms-text: #1e2c36;
+	--ms-muted: #5c6b77;
+
+	/* Accents */
+	--ms-accent: #b2452f;          /* Warm brick — breaking, urgent */
+	--ms-accent-dark: #8c3524;
+	--ms-highlight: #e3a93c;       /* Honey */
+	--ms-success: #1c7a52;
+	--ms-success-dark: #0f5236;
+	--ms-success-wash: #e7f4ee;
+
 	--ms-link: var(--ms-primary-light);
 	--ms-link-hover: var(--ms-accent);
 
@@ -68,10 +96,15 @@ Tags: news, magazine, blog, custom-logo, custom-menu, featured-images, threaded-
 
 	--ms-maxw: 1200px;
 	--ms-gap: 1.75rem;
-	--ms-radius: 8px;
-	--ms-radius-sm: 4px;
-	--ms-shadow: 0 1px 3px rgba(11, 37, 69, 0.08), 0 6px 20px rgba(11, 37, 69, 0.06);
-	--ms-shadow-hover: 0 4px 10px rgba(11, 37, 69, 0.12), 0 12px 32px rgba(11, 37, 69, 0.10);
+	--ms-container-pad: 1.25rem;
+	--ms-radius: 10px;
+	--ms-radius-sm: 6px;
+	--ms-radius-lg: 16px;
+
+	/* Shadows are warm-tinted; a blue-grey shadow on cream reads as dirt. */
+	--ms-shadow: 0 1px 2px rgba(76, 58, 32, 0.06), 0 6px 18px rgba(76, 58, 32, 0.07);
+	--ms-shadow-hover: 0 4px 10px rgba(76, 58, 32, 0.10), 0 16px 36px rgba(76, 58, 32, 0.11);
+	--ms-shadow-sky: 0 6px 22px rgba(22, 69, 95, 0.16);
 }
 
 /* 2. Reset & base -------------------------------------------------------- */
@@ -110,15 +143,15 @@ p { margin: 0 0 1.2em; }
 blockquote {
 	margin: 1.5rem 0;
 	padding: .5rem 0 .5rem 1.25rem;
-	border-left: 4px solid var(--ms-accent);
+	border-left: 4px solid var(--ms-sky);
 	color: var(--ms-muted);
 	font-style: italic;
 }
 code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
-pre { background: var(--ms-surface); padding: 1rem; border-radius: var(--ms-radius-sm); overflow: auto; }
+pre { background: var(--ms-sky-wash); padding: 1rem; border-radius: var(--ms-radius-sm); overflow: auto; }
 
 /* 4. Layout helpers ------------------------------------------------------ */
-.ms-container { width: 100%; max-width: var(--ms-maxw); margin: 0 auto; padding: 0 1.25rem; }
+.ms-container { width: 100%; max-width: var(--ms-maxw); margin: 0 auto; padding: 0 var(--ms-container-pad); }
 .ms-site-main { padding: 2rem 0 3rem; }
 .ms-content-sidebar {
 	display: grid;
@@ -165,7 +198,7 @@ input[type="text"], input[type="email"], input[type="search"], input[type="url"]
 	border-radius: var(--ms-radius-sm);
 	font-size: 1rem;
 	font-family: inherit;
-	background: #fff;
+	background: var(--ms-surface);
 	color: var(--ms-text);
 }
 input:focus, textarea:focus, select:focus { outline: 2px solid var(--ms-primary-light); outline-offset: 1px; border-color: var(--ms-primary-light); }
@@ -174,11 +207,11 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 /* 6. Site header & navigation ------------------------------------------- */
 .ms-topbar {
 	background: var(--ms-primary-dark);
-	color: #cdd6e4;
+	color: var(--ms-sky-ink);
 	font-size: .82rem;
 }
 .ms-topbar .ms-container { display: flex; align-items: center; justify-content: space-between; min-height: 38px; gap: 1rem; flex-wrap: wrap; }
-.ms-topbar a { color: #cdd6e4; }
+.ms-topbar a { color: var(--ms-sky-ink); }
 .ms-topbar a:hover { color: #fff; }
 .ms-topbar__date { letter-spacing: .02em; }
 /* The top-bar nav is a wp_nav_menu <ul>; without this it renders as a
@@ -200,11 +233,11 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-brand__title a { color: inherit; text-decoration: none; }
 .ms-brand__tagline { margin: .2rem 0 0; font-size: .8rem; color: var(--ms-muted); text-transform: uppercase; letter-spacing: .08em; }
 .ms-header__actions { display: flex; align-items: center; gap: .75rem; }
-.ms-header__promo { border-top: 1px solid var(--ms-border); background: var(--ms-surface); }
+.ms-header__promo { border-top: 1px solid var(--ms-border); background: var(--ms-surface-2); }
 .ms-header__promo .ms-ad { margin: .75rem auto; max-width: 970px; }
 .ms-header__promo .ms-ad img { margin: 0 auto; }
 
-.ms-nav { background: var(--ms-primary); position: sticky; top: 0; z-index: 200; }
+.ms-nav { background: var(--ms-primary); position: sticky; top: 0; z-index: 200; border-bottom: 3px solid var(--ms-sky); }
 .ms-nav .ms-container { display: flex; align-items: center; }
 .ms-menu { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; }
 .ms-menu li { position: relative; }
@@ -213,7 +246,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	border-bottom: 3px solid transparent;
 }
 .ms-menu a:hover, .ms-menu .current-menu-item > a, .ms-menu .current_page_item > a {
-	background: var(--ms-primary-dark); border-bottom-color: var(--ms-highlight); color: #fff;
+	background: var(--ms-primary-dark); border-bottom-color: var(--ms-sky); color: #fff;
 }
 .ms-menu .sub-menu {
 	position: absolute; left: 0; top: 100%; min-width: 220px; background: var(--ms-primary-dark);
@@ -249,7 +282,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	background: transparent; color: var(--ms-primary); border: 0; padding: .5rem; cursor: pointer; display: inline-flex; align-items: center; gap: .4rem; font-weight: 600;
 }
 .ms-nav .ms-menu-toggle { color: #fff; display: none; }
-.ms-search-panel { display: none; padding: 1rem 0; border-bottom: 1px solid var(--ms-border); background: var(--ms-surface); }
+.ms-search-panel { display: none; padding: 1rem 0; border-bottom: 1px solid var(--ms-border); background: var(--ms-sky-wash); }
 .ms-search-panel.is-open { display: block; }
 .ms-search-panel form { display: flex; gap: .5rem; max-width: 640px; margin: 0 auto; }
 
@@ -261,7 +294,9 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	background: var(--ms-accent-dark); font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
 	padding: .6rem 1rem; display: flex; align-items: center; white-space: nowrap; font-size: .8rem;
 }
-.ms-breaking__track { overflow: hidden; flex: 1; display: flex; align-items: center; }
+/* min-width:0 is required: a flex item defaults to min-width:auto, so the
+   nowrap marquee inside pushed the bar wider than the viewport. */
+.ms-breaking__track { overflow: hidden; flex: 1; min-width: 0; display: flex; align-items: center; }
 .ms-breaking__items { display: flex; gap: 2.5rem; padding: .6rem 1rem; white-space: nowrap; animation: ms-marquee 30s linear infinite; }
 .ms-breaking__track:hover .ms-breaking__items { animation-play-state: paused; }
 .ms-breaking a { color: #fff; font-weight: 600; }
@@ -273,11 +308,11 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 
 /* 8. Homepage: featured / hero ------------------------------------------ */
 .ms-hero { display: grid; grid-template-columns: 2fr 1fr; gap: var(--ms-gap); margin-bottom: 3rem; }
-.ms-hero__lead { position: relative; border-radius: var(--ms-radius); overflow: hidden; min-height: 420px; display: flex; align-items: flex-end; background: var(--ms-primary); }
+.ms-hero__lead { position: relative; border-radius: var(--ms-radius-lg); overflow: hidden; box-shadow: var(--ms-shadow-sky); min-height: 420px; display: flex; align-items: flex-end; background: var(--ms-primary); }
 .ms-hero__lead img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ms-hero__lead-body {
 	position: relative; z-index: 2; padding: 2rem; color: #fff;
-	background: linear-gradient(to top, rgba(7,26,51,.92) 10%, rgba(7,26,51,.45) 55%, rgba(7,26,51,0) 100%);
+	background: linear-gradient(to top, rgba(13,46,64,.94) 8%, rgba(13,46,64,.55) 52%, rgba(13,46,64,0) 100%);
 	width: 100%;
 }
 .ms-hero__lead-body h2 { color: #fff; font-size: clamp(1.6rem, 3vw, 2.3rem); margin-bottom: .4rem; }
@@ -288,11 +323,17 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-hero__side-item h3 { font-size: 1.02rem; margin: 0; line-height: 1.25; }
 
 .ms-eyebrow, .ms-cat-badge {
-	display: inline-block; background: var(--ms-accent); color: #fff; font-size: .7rem; font-weight: 700;
-	text-transform: uppercase; letter-spacing: .06em; padding: .25rem .6rem; border-radius: var(--ms-radius-sm);
+	display: inline-block; background: var(--ms-sky-soft); color: var(--ms-primary); font-size: .7rem; font-weight: 700;
+	text-transform: uppercase; letter-spacing: .06em; padding: .28rem .65rem; border-radius: 999px;
 	margin-bottom: .6rem; font-family: var(--ms-font-body);
 }
-.ms-cat-badge a { color: #fff; }
+.ms-cat-badge a { color: var(--ms-primary); }
+.ms-cat-badge a:hover { color: var(--ms-primary-dark); text-decoration: none; }
+/* Over a photo the tint needs to be opaque enough to stay readable. */
+.ms-card__media .ms-cat-badge, .ms-hero__lead-body .ms-cat-badge { background: var(--ms-sky); }
+/* Reserved for genuinely urgent labelling, so it keeps its meaning. */
+.ms-cat-badge--urgent { background: var(--ms-accent); color: #fff; }
+.ms-cat-badge--urgent a { color: #fff; }
 
 /* 9. Article cards & grids ---------------------------------------------- */
 .ms-grid { display: grid; gap: var(--ms-gap); }
@@ -300,8 +341,13 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-grid--2 { grid-template-columns: repeat(2, 1fr); }
 .ms-grid--4 { grid-template-columns: repeat(4, 1fr); }
 
-.ms-card { background: var(--ms-bg); border: 1px solid var(--ms-border); border-radius: var(--ms-radius); overflow: hidden; display: flex; flex-direction: column; transition: box-shadow .18s ease, transform .18s ease; }
-.ms-card:hover { box-shadow: var(--ms-shadow-hover); transform: translateY(-3px); }
+.ms-card {
+	background: var(--ms-surface); border: 1px solid var(--ms-border-soft);
+	border-radius: var(--ms-radius-lg); overflow: hidden; display: flex; flex-direction: column;
+	box-shadow: var(--ms-shadow);
+	transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+}
+.ms-card:hover { box-shadow: var(--ms-shadow-hover); transform: translateY(-3px); border-color: var(--ms-sky); }
 .ms-card__media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--ms-surface-2); }
 .ms-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
 .ms-card:hover .ms-card__media img { transform: scale(1.04); }
@@ -323,7 +369,15 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-list-item .ms-card__meta { font-size: .76rem; }
 
 /* 10. Homepage sections -------------------------------------------------- */
-.ms-section-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.35rem; border-bottom: 3px solid var(--ms-primary); padding-bottom: .5rem; }
+.ms-section-head {
+	display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+	margin-bottom: 1.35rem; padding-bottom: .6rem; position: relative;
+	border-bottom: 3px solid var(--ms-sky-soft);
+}
+.ms-section-head::after {
+	content: ""; position: absolute; left: 0; bottom: -3px; width: 64px; height: 3px;
+	background: var(--ms-primary);
+}
 .ms-section-head h2 { margin: 0; font-size: 1.55rem; position: relative; }
 .ms-section-head__link { font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ms-accent); white-space: nowrap; }
 .ms-mixed { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--ms-gap); align-items: start; }
@@ -338,7 +392,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	text-align: center; padding: 1.25rem 1rem; background: var(--ms-surface); border: 1px solid var(--ms-border);
 	border-radius: var(--ms-radius); color: var(--ms-primary); font-weight: 700; text-decoration: none; transition: all .15s ease;
 }
-.ms-quicklink:hover { background: var(--ms-primary); color: #fff; text-decoration: none; transform: translateY(-2px); box-shadow: var(--ms-shadow-hover); }
+.ms-quicklink:hover { background: var(--ms-sky-wash); border-color: var(--ms-sky); color: var(--ms-primary); text-decoration: none; transform: translateY(-2px); box-shadow: var(--ms-shadow-hover); }
 .ms-quicklink__icon { font-size: 1.9rem; line-height: 1; }
 .ms-quicklink__title { font-size: .98rem; }
 @media (max-width: 782px) { .ms-quicklinks { grid-template-columns: repeat(2, 1fr); } }
@@ -356,19 +410,25 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-article__content ul, .ms-article__content ol { padding-left: 1.4rem; margin-bottom: 1.2rem; }
 .ms-article__content li { margin-bottom: .4rem; }
 .ms-tags { margin: 2rem 0; }
-.ms-tags a { display: inline-block; background: var(--ms-surface); color: var(--ms-muted); padding: .3rem .7rem; border-radius: 999px; font-size: .82rem; margin: 0 .3rem .4rem 0; }
+.ms-tags a { display: inline-block; background: var(--ms-sky-wash); color: var(--ms-muted); padding: .3rem .7rem; border-radius: 999px; font-size: .82rem; margin: 0 .3rem .4rem 0; }
 .ms-tags a:hover { background: var(--ms-primary); color: #fff; text-decoration: none; }
-.ms-author-box { display: grid; grid-template-columns: 72px 1fr; gap: 1rem; background: var(--ms-surface); padding: 1.25rem; border-radius: var(--ms-radius); margin: 2rem 0; }
+.ms-author-box { display: grid; grid-template-columns: 72px 1fr; gap: 1rem; background: var(--ms-sky-wash); padding: 1.25rem; border-radius: var(--ms-radius); margin: 2rem 0; }
 .ms-author-box img { width: 72px; height: 72px; border-radius: 50%; }
 .ms-author-box h3 { margin: 0 0 .3rem; }
 .ms-post-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
-.ms-post-nav a { display: block; padding: 1rem 1.25rem; background: var(--ms-surface); border-radius: var(--ms-radius); }
+.ms-post-nav a { display: block; padding: 1rem 1.25rem; background: var(--ms-sky-wash); border-radius: var(--ms-radius); }
 .ms-post-nav .ms-post-nav__label { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ms-muted); }
 .ms-post-nav .ms-next { text-align: right; }
 .ms-related { margin: 2.5rem 0; }
 
 /* 12. Archives & search -------------------------------------------------- */
-.ms-page-header { background: var(--ms-surface); border-bottom: 1px solid var(--ms-border); padding: 2rem 0; margin-bottom: 0; }
+.ms-page-header { background: var(--ms-sky-wash); border-bottom: 1px solid var(--ms-border); padding: 2rem 0; margin-bottom: 0; }
+/* Used when the header sits *inside* .ms-container and has to break out of
+   the gutter. Hardcoding the offset made it overshoot by 5px once the
+   mobile gutter changed, which pushed the whole document sideways. */
+.ms-page-header--bleed {
+	margin: -2rem calc(var(--ms-container-pad) * -1) 2rem;
+}
 .ms-page-header h1 { margin: 0; }
 .ms-page-header p { margin: .5rem 0 0; color: var(--ms-muted); }
 .ms-breadcrumbs { font-size: .82rem; color: var(--ms-muted); margin-bottom: .5rem; }
@@ -385,7 +445,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	background: var(--ms-surface); border: 1px solid var(--ms-border);
 	color: var(--ms-primary); font-size: .87rem; font-weight: 600;
 }
-.ms-chip:hover { background: var(--ms-surface-2); text-decoration: none; }
+.ms-chip:hover { background: var(--ms-sky-soft); text-decoration: none; }
 .ms-chip.is-active { background: var(--ms-primary); color: #fff; border-color: var(--ms-primary); }
 
 /* 12c. Section hubs & full-width pages ----------------------------------- */
@@ -394,7 +454,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-hub-intro { max-width: 68ch; margin-bottom: 2rem; }
 .ms-hubgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
 .ms-hub {
-	display: block; padding: 1.35rem 1.3rem; background: #fff;
+	display: block; padding: 1.35rem 1.3rem; background: var(--ms-surface);
 	border: 1px solid var(--ms-border); border-radius: var(--ms-radius);
 	transition: box-shadow .16s ease, transform .16s ease;
 }
@@ -406,7 +466,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 /* 12d. Author / columnist archive header --------------------------------- */
 .ms-author-header {
 	display: grid; grid-template-columns: 96px 1fr; gap: 1.5rem; align-items: center;
-	background: var(--ms-surface); border-radius: var(--ms-radius);
+	background: var(--ms-sky-wash); border-radius: var(--ms-radius);
 	padding: 1.75rem; margin: 1.5rem 0 0;
 }
 .ms-author-header__avatar { border-radius: 50%; width: 96px; height: 96px; }
@@ -421,7 +481,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 /* 12e. Block pattern helpers --------------------------------------------- */
 .ms-pattern-stats .wp-block-column { padding: 1.25rem 1.3rem; border-radius: var(--ms-radius); }
 .ms-pattern-stats h3 { color: #fff; font-size: 2rem; margin: 0 0 .2rem; }
-.ms-pattern-stats p { color: #cdd6e4; font-size: .85rem; margin: 0; }
+.ms-pattern-stats p { color: var(--ms-sky-ink); font-size: .85rem; margin: 0; }
 .ms-pattern-callout { padding: 1.5rem; border-radius: var(--ms-radius); border-left: 4px solid var(--ms-accent); }
 .ms-pattern-callout h3 { margin-top: 0; }
 .ms-pattern-contact h3 { font-size: 1.05rem; margin-bottom: .3rem; }
@@ -465,7 +525,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 
 /* 15. Custom post types -------------------------------------------------- */
 /* Events */
-.ms-event-meta { display: grid; gap: .6rem; background: var(--ms-surface); padding: 1.25rem; border-radius: var(--ms-radius); margin-bottom: 1.5rem; }
+.ms-event-meta { display: grid; gap: .6rem; background: var(--ms-sky-wash); padding: 1.25rem; border-radius: var(--ms-radius); margin-bottom: 1.5rem; }
 .ms-event-meta__row { display: flex; gap: .6rem; align-items: baseline; }
 .ms-event-meta__row strong { min-width: 90px; color: var(--ms-primary); }
 .ms-event-card__date { background: var(--ms-primary); color: #fff; border-radius: var(--ms-radius-sm); padding: .4rem .6rem; text-align: center; line-height: 1; }
@@ -487,22 +547,22 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 /* 16. Newsletter & social ------------------------------------------------ */
 .ms-newsletter { background: var(--ms-primary); color: #fff; border-radius: var(--ms-radius); padding: 2rem; }
 .ms-newsletter h2, .ms-newsletter h3 { color: #fff; }
-.ms-newsletter p { color: #d7deea; }
+.ms-newsletter p { color: var(--ms-sky-ink); }
 .ms-newsletter__form { display: flex; gap: .6rem; flex-wrap: wrap; max-width: 480px; }
 .ms-newsletter__form input[type="email"] { flex: 1; min-width: 220px; }
 .ms-social { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .ms-social a {
 	display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
-	border-radius: 50%; background: var(--ms-surface-2); color: var(--ms-primary); transition: all .15s ease;
+	border-radius: 50%; background: var(--ms-sky-soft); color: var(--ms-primary); transition: all .15s ease;
 }
 .ms-social a:hover { background: var(--ms-accent); color: #fff; }
 .ms-social svg { width: 18px; height: 18px; fill: currentColor; }
-.ms-topbar .ms-social a { background: transparent; color: #cdd6e4; width: 30px; height: 30px; }
+.ms-topbar .ms-social a { background: transparent; color: var(--ms-sky-ink); width: 30px; height: 30px; }
 .ms-topbar .ms-social a:hover { color: #fff; }
 
 /* 17. Footer ------------------------------------------------------------- */
 .ms-footer { background: var(--ms-primary-dark); color: #c2cbdb; margin-top: 3rem; }
-.ms-footer a { color: #c2cbdb; }
+.ms-footer a { color: var(--ms-sky-ink); }
 .ms-footer a:hover { color: #fff; }
 .ms-footer__widgets { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: var(--ms-gap); padding: 3rem 0; }
 .ms-footer .ms-widget-title { color: #fff; border-bottom-color: var(--ms-primary-light); }
@@ -516,7 +576,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-comments { margin: 2.5rem 0; }
 .ms-comments .comment-list { list-style: none; margin: 0; padding: 0; }
 .ms-comments .comment-list ol.children { list-style: none; margin: 0 0 0 2rem; padding: 0; }
-.ms-comments .comment-body { background: var(--ms-surface); padding: 1.1rem 1.25rem; border-radius: var(--ms-radius); margin-bottom: 1rem; }
+.ms-comments .comment-body { background: var(--ms-sky-wash); padding: 1.1rem 1.25rem; border-radius: var(--ms-radius); margin-bottom: 1rem; }
 .ms-comments .comment-author { font-weight: 700; }
 .ms-comments .comment-meta { font-size: .8rem; color: var(--ms-muted); margin-bottom: .5rem; }
 .ms-comments .avatar { border-radius: 50%; margin-right: .6rem; vertical-align: middle; }
@@ -545,7 +605,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 /* 21b. Saline County Favorites ballot ------------------------------------ */
 .ms-fav-page { max-width: 900px; margin: 0 auto; }
 .ms-fav { margin: 1.5rem 0 3rem; }
-.ms-fav__intro { background: var(--ms-surface); border-radius: var(--ms-radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+.ms-fav__intro { background: var(--ms-sky-wash); border-radius: var(--ms-radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
 .ms-fav__intro p { margin: 0 0 .5rem; }
 .ms-fav__intro p:last-child { margin-bottom: 0; }
 .ms-fav__prize { font-weight: 700; color: var(--ms-primary); }
@@ -553,7 +613,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 
 .ms-fav-notice { border-radius: var(--ms-radius); padding: 1rem 1.25rem; margin: 0 0 1.5rem; border-left: 5px solid; }
 .ms-fav-notice p { margin: 0; }
-.ms-fav-notice.is-success { background: #e8f6ee; border-color: #1a7f4b; color: #0f5231; }
+.ms-fav-notice.is-success { background: var(--ms-success-wash); border-color: var(--ms-success); color: var(--ms-success-dark); }
 .ms-fav-notice.is-warning { background: #fdf3e2; border-color: var(--ms-highlight); color: #6b4e02; }
 
 /* Sticky control bar */
@@ -565,17 +625,17 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-fav__progress-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
 .ms-fav__count { font-size: 1.05rem; color: var(--ms-primary); }
 .ms-fav__count [data-fav-voted] { font-size: 1.5rem; font-weight: 800; color: var(--ms-accent); }
-.ms-fav__qualify { font-weight: 700; color: #1a7f4b; font-size: .92rem; }
+.ms-fav__qualify { font-weight: 700; color: var(--ms-success); font-size: .92rem; }
 .ms-fav__meter { height: 10px; background: var(--ms-surface-2); border-radius: 999px; overflow: hidden; }
 .ms-fav__meter-fill { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ms-accent), var(--ms-highlight)); border-radius: 999px; transition: width .25s ease; }
-.is-qualified .ms-fav__meter-fill { background: linear-gradient(90deg, #1a7f4b, #38b06b); }
+.is-qualified .ms-fav__meter-fill { background: linear-gradient(90deg, var(--ms-success), #2ea877); }
 
 .ms-fav__sections-done { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .65rem; }
 .ms-fav__chip {
 	font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
 	padding: .22rem .55rem; border-radius: 999px; background: var(--ms-surface-2); color: var(--ms-muted);
 }
-.ms-fav__chip.is-done { background: #1a7f4b; color: #fff; }
+.ms-fav__chip.is-done { background: var(--ms-success); color: #fff; }
 .ms-fav__chip.is-done::before { content: "✓ "; }
 
 .ms-fav__tools { display: flex; gap: .75rem; align-items: center; margin-top: .9rem; flex-wrap: wrap; }
@@ -588,7 +648,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	background: var(--ms-surface); color: var(--ms-primary); border: 1px solid var(--ms-border);
 	padding: .45rem .85rem; border-radius: 999px; font-size: .88rem; font-weight: 600; cursor: pointer;
 }
-.ms-fav__tab:hover { background: var(--ms-surface-2); }
+.ms-fav__tab:hover { background: var(--ms-sky-soft); }
 .ms-fav__tab.is-active { background: var(--ms-primary); color: #fff; border-color: var(--ms-primary); }
 .ms-fav__tab-count { opacity: .65; font-size: .78rem; margin-left: .25rem; }
 
@@ -598,11 +658,11 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-fav__section-title { font-size: 1.6rem; margin: 2rem 0 1rem; padding-bottom: .4rem; border-bottom: 3px solid var(--ms-primary); }
 .ms-fav__cat {
 	border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1.1rem 1.25rem;
-	margin: 0 0 1rem; background: #fff; position: relative;
+	margin: 0 0 1rem; background: var(--ms-surface); position: relative;
 }
-.ms-fav__cat.is-done { border-color: #1a7f4b; background: #fbfefc; }
+.ms-fav__cat.is-done { border-color: var(--ms-success); background: var(--ms-success-wash); }
 .ms-fav__cat-title { font-family: var(--ms-font-head); font-weight: 700; font-size: 1.12rem; color: var(--ms-primary); padding: 0; display: flex; align-items: center; gap: .5rem; }
-.ms-fav__cat-done { color: #1a7f4b; font-weight: 800; opacity: 0; transition: opacity .15s ease; }
+.ms-fav__cat-done { color: var(--ms-success); font-weight: 800; opacity: 0; transition: opacity .15s ease; }
 .ms-fav__cat.is-done .ms-fav__cat-done { opacity: 1; }
 
 .ms-fav__options { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .4rem; margin-top: .75rem; }
@@ -611,7 +671,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	padding: .6rem .7rem; border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm);
 	background: var(--ms-surface); transition: all .12s ease; min-height: 44px;
 }
-.ms-fav__option:hover { background: var(--ms-surface-2); border-color: var(--ms-primary-light); }
+.ms-fav__option:hover { background: var(--ms-sky-wash); border-color: var(--ms-primary-light); }
 .ms-fav__option input { width: auto; margin: 0; flex-shrink: 0; }
 .ms-fav__option:has(input:checked) { background: var(--ms-primary); border-color: var(--ms-primary); color: #fff; font-weight: 600; }
 .ms-fav__option-label { flex: 1; }
@@ -621,13 +681,269 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-fav__cat:not(.is-done) .ms-fav__clear { visibility: hidden; }
 
 /* Submit */
-.ms-fav__submit { background: var(--ms-surface); border-radius: var(--ms-radius); padding: 1.5rem; margin-top: 2rem; text-align: center; }
+.ms-fav__submit { background: var(--ms-sky-wash); border-radius: var(--ms-radius); padding: 1.5rem; margin-top: 2rem; text-align: center; }
 .ms-fav__email { max-width: 460px; margin: 0 auto 1rem; text-align: left; }
 .ms-fav__email-note { display: block; font-size: .8rem; color: var(--ms-muted); margin-top: .3rem; line-height: 1.5; }
 .ms-fav__req { color: var(--ms-accent); font-weight: 700; font-size: .85rem; }
 .ms-fav__confirmed-as {
 	max-width: 460px; margin: 0 auto 1rem; padding: .75rem 1rem; border-radius: var(--ms-radius-sm);
-	background: #e8f6ee; color: #0f5231; font-size: .92rem;
+	background: var(--ms-success-wash); color: var(--ms-success-dark); font-size: .92rem;
+}
+.ms-fav__confirmed-as::before { content: "✓ "; font-weight: 800; }
+.ms-fav__submit-btn { font-size: 1.05rem; padding: .9rem 2rem; }
+.ms-fav__resubmit { font-size: .84rem; color: var(--ms-muted); margin: 1rem 0 0; }
+
+/* Results */
+.ms-fav-results__section { font-size: 1.6rem; margin: 2.5rem 0 1rem; padding-bottom: .4rem; border-bottom: 3px solid var(--ms-primary); }
+.ms-fav-result { margin-bottom: 1.5rem; }
+.ms-fav-result h3 { font-size: 1.1rem; margin-bottom: .4rem; }
+.ms-fav-result__list { margin: 0; padding-left: 1.4rem; }
+.ms-fav-result__list li { margin-bottom: .2rem; }
+.ms-fav-result__list li.is-winner { font-weight: 700; color: var(--ms-primary); }
+.ms-fav-result__list li.is-winner .ms-fav-result__name::after { content: " 🏆"; }
+
+@media (max-width: 782px) {
+	.ms-fav__bar { position: sticky; top: 0; padding: .85rem 1rem; }
+	.ms-fav__options { grid-template-columns: 1fr; }
+	.ms-fav__tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: .25rem; }
+	.ms-fav__tab { white-space: nowrap; }
+}
+
+/* 21. Responsive --------------------------------------------------------- */
+/*
+ * Most of this audience reads on a phone, so the small screen is treated as
+ * the real layout rather than the desktop one with pieces removed. Three
+ * rules drive everything below:
+ *
+ *   1. The masthead centres. On a narrow screen a left-aligned logo with a
+ *      lone button floating opposite it reads as broken alignment, so the
+ *      brand becomes a centred column and the search button sits in the
+ *      corner without pushing anything off-axis.
+ *   2. Nothing tappable is under 44px. That is the accessibility floor and
+ *      also just the difference between a site that feels finished and one
+ *      that fights back.
+ *   3. Nothing may scroll sideways. Ever.
+ */
+
+@media (max-width: 1024px) {
+	.ms-footer__widgets { grid-template-columns: 1fr 1fr; }
+	.ms-grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px) {
+	.ms-content-sidebar { grid-template-columns: minmax(0, 1fr); }
+	.ms-hero { grid-template-columns: 1fr; }
+	.ms-hero__lead { min-height: 320px; }
+	.ms-sticky { position: static; }
+}
+
+@media (max-width: 782px) {
+	body { font-size: 16px; }
+
+	/* --- Masthead: centred brand, corner-anchored search --- */
+	.ms-header__inner {
+		flex-direction: column;
+		justify-content: center;
+		gap: .5rem;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		position: relative;
+		text-align: center;
+	}
+	.ms-brand { flex-direction: column; justify-content: center; gap: .35rem; width: 100%; }
+	.ms-brand__logo img { max-height: 48px; margin: 0 auto; }
+	.ms-brand__title { font-size: 1.7rem; }
+	/* The tagline is already the meta description and the page title; on a
+	   phone it costs two lines above the fold to repeat it. */
+	.ms-brand__tagline { display: none; }
+	.ms-header__promo { padding: .25rem 0; }
+	.ms-header__promo .ms-ad { margin: .4rem auto; }
+	.ms-header__promo .ms-ad__label { font-size: .62rem; margin-bottom: .2rem; }
+	/* Taken out of the flow so it cannot shift the brand off centre. */
+	.ms-header__actions { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+	.ms-search-toggle { min-width: 44px; min-height: 44px; justify-content: center; }
+
+	/* --- Top bar: one centred row, not two ---
+	   Every row above the first headline is a row the reader has to scroll
+	   past, so the date and the social icons share a line instead of
+	   stacking. The secondary link row is already in the main menu. */
+	.ms-topbar .ms-container {
+		justify-content: center; text-align: center; gap: .75rem;
+		min-height: 0; padding-top: .15rem; padding-bottom: .15rem; flex-wrap: nowrap;
+	}
+	.ms-topbar__left, .ms-topbar__right { justify-content: center; width: auto; }
+	.ms-topbar__menu { display: none; }
+	.ms-topbar__date { font-size: .75rem; white-space: nowrap; }
+	/* The date, the phone and four icons do not fit on one 390px line. The
+	   phone is in the footer and on the contact page; the date is a trust
+	   signal a news site should not drop, so the phone gives way. */
+	.ms-topbar__text { display: none; }
+	.ms-topbar .ms-social { gap: .1rem; }
+	.ms-topbar .ms-social a { width: 30px; height: 30px; }
+	.ms-topbar .ms-social svg { width: 15px; height: 15px; }
+
+	/* --- Primary nav: a full-width control, not a button adrift --- */
+	.ms-nav .ms-container { position: relative; justify-content: stretch; padding-left: 0; padding-right: 0; }
+	.ms-nav .ms-menu-toggle {
+		display: flex; width: 100%; justify-content: center; gap: .5rem;
+		min-height: 48px; font-size: 1rem; letter-spacing: .02em;
+	}
+	.ms-menu {
+		display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--ms-primary-dark);
+		flex-direction: column; padding: .25rem 0; box-shadow: var(--ms-shadow-hover); z-index: 220;
+		max-height: calc(100vh - 120px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+	}
+	.ms-menu.is-open { display: flex; }
+	.ms-menu li { width: 100%; }
+	.ms-menu a {
+		display: flex; align-items: center; min-height: 48px; padding: .5rem 1.25rem;
+		border-bottom: 1px solid rgba(255,255,255,.08);
+	}
+	.ms-menu a:hover, .ms-menu .current-menu-item > a {
+		background: var(--ms-primary-light); border-bottom-color: rgba(255,255,255,.08);
+	}
+	.ms-menu .sub-menu {
+		position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none;
+		background: rgba(0,0,0,.22); padding-left: 0; min-width: 0;
+	}
+	.ms-menu .sub-menu a { padding-left: 2.25rem; font-weight: 500; }
+
+	/* --- Content --- */
+	.ms-grid--3, .ms-grid--2, .ms-grid--4 { grid-template-columns: 1fr; }
+	.ms-hero__side-item { grid-template-columns: 80px 1fr; }
+	.ms-section-head { flex-wrap: wrap; gap: .35rem; }
+	.ms-section-head h2 { font-size: 1.35rem; }
+	.ms-article__content { font-size: 1.05rem; }
+
+	/* Buttons and fields reach the touch floor. */
+	.ms-btn, button, input[type="submit"], .wp-block-button__link { min-height: 44px; padding: .8rem 1.4rem; }
+	input[type="text"], input[type="email"], input[type="search"], input[type="url"],
+	input[type="tel"], input[type="password"], input[type="number"], select { min-height: 44px; }
+	/* 16px is the threshold below which iOS Safari zooms the page on focus. */
+	input, select, textarea { font-size: 16px; }
+}
+
+@media (max-width: 600px) {
+	:root { --ms-container-pad: 1.1rem; }
+	.ms-footer__widgets { grid-template-columns: 1fr; text-align: center; }
+	.ms-footer .ms-social { justify-content: center; }
+	.ms-footer__bottom { justify-content: center; text-align: center; }
+	.ms-post-nav { grid-template-columns: 1fr; }
+	.ms-post-nav .ms-next { text-align: left; }
+
+	.ms-hero__lead { min-height: 260px; }
+	.ms-hero__lead-body { padding: 1.25rem; }
+	.ms-hero__side-item { grid-template-columns: 96px 1fr; }
+
+	/* Stacked, centred cards read better than a cramped two-up row. */
+	.ms-author-box, .ms-author-header { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+	.ms-author-box img, .ms-author-header__avatar { margin: 0 auto; }
+	.ms-event-meta { padding: 1rem; }
+	.ms-newsletter { padding: 1.5rem 1.25rem; text-align: center; }
+	.ms-newsletter__form { margin: 0 auto; justify-content: center; }
+	.ms-breaking__label { padding: .6rem .75rem; font-size: .72rem; }
+}
+
+@media (max-width: 400px) {
+	.ms-brand__title { font-size: 1.5rem; }
+	.ms-hero__side-item { grid-template-columns: 76px 1fr; }
+	.ms-quicklinks { gap: .6rem; }
+	.ms-quicklink { padding: 1rem .6rem; }
+	.ms-quicklink__title { font-size: .88rem; }
+}
+
+/* A single long word — a URL in a comment, an unbroken headline — must never
+   widen the page. This is the backstop for rule 3 above. */
+body { overflow-x: hidden; }
+.ms-site, .ms-container { max-width: 100%; }
+h1, h2, h3, h4, p, li, td, figcaption, .ms-card__title, .ms-brand__title { overflow-wrap: break-word; }
+
+/* 21b. Saline County Favorites ballot ------------------------------------ */
+.ms-fav-page { max-width: 900px; margin: 0 auto; }
+.ms-fav { margin: 1.5rem 0 3rem; }
+.ms-fav__intro { background: var(--ms-sky-wash); border-radius: var(--ms-radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+.ms-fav__intro p { margin: 0 0 .5rem; }
+.ms-fav__intro p:last-child { margin-bottom: 0; }
+.ms-fav__prize { font-weight: 700; color: var(--ms-primary); }
+.ms-fav__window { font-size: .9rem; color: var(--ms-muted); }
+
+.ms-fav-notice { border-radius: var(--ms-radius); padding: 1rem 1.25rem; margin: 0 0 1.5rem; border-left: 5px solid; }
+.ms-fav-notice p { margin: 0; }
+.ms-fav-notice.is-success { background: var(--ms-success-wash); border-color: var(--ms-success); color: var(--ms-success-dark); }
+.ms-fav-notice.is-warning { background: #fdf3e2; border-color: var(--ms-highlight); color: #6b4e02; }
+
+/* Sticky control bar */
+.ms-fav__bar {
+	position: sticky; top: 60px; z-index: 100;
+	background: #fff; border: 1px solid var(--ms-border); border-radius: var(--ms-radius);
+	padding: 1rem 1.15rem; margin-bottom: 1.5rem; box-shadow: var(--ms-shadow);
+}
+.ms-fav__progress-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: .5rem; }
+.ms-fav__count { font-size: 1.05rem; color: var(--ms-primary); }
+.ms-fav__count [data-fav-voted] { font-size: 1.5rem; font-weight: 800; color: var(--ms-accent); }
+.ms-fav__qualify { font-weight: 700; color: var(--ms-success); font-size: .92rem; }
+.ms-fav__meter { height: 10px; background: var(--ms-surface-2); border-radius: 999px; overflow: hidden; }
+.ms-fav__meter-fill { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ms-accent), var(--ms-highlight)); border-radius: 999px; transition: width .25s ease; }
+.is-qualified .ms-fav__meter-fill { background: linear-gradient(90deg, var(--ms-success), #2ea877); }
+
+.ms-fav__sections-done { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .65rem; }
+.ms-fav__chip {
+	font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+	padding: .22rem .55rem; border-radius: 999px; background: var(--ms-surface-2); color: var(--ms-muted);
+}
+.ms-fav__chip.is-done { background: var(--ms-success); color: #fff; }
+.ms-fav__chip.is-done::before { content: "✓ "; }
+
+.ms-fav__tools { display: flex; gap: .75rem; align-items: center; margin-top: .9rem; flex-wrap: wrap; }
+.ms-fav__search { flex: 1; min-width: 220px; }
+.ms-fav__toggle { display: flex; align-items: center; gap: .4rem; font-weight: 500; font-size: .9rem; margin: 0; white-space: nowrap; }
+.ms-fav__toggle input { width: auto; }
+
+.ms-fav__tabs { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
+.ms-fav__tab {
+	background: var(--ms-surface); color: var(--ms-primary); border: 1px solid var(--ms-border);
+	padding: .45rem .85rem; border-radius: 999px; font-size: .88rem; font-weight: 600; cursor: pointer;
+}
+.ms-fav__tab:hover { background: var(--ms-sky-soft); }
+.ms-fav__tab.is-active { background: var(--ms-primary); color: #fff; border-color: var(--ms-primary); }
+.ms-fav__tab-count { opacity: .65; font-size: .78rem; margin-left: .25rem; }
+
+.ms-fav__saved, .ms-fav__noresults { font-size: .88rem; color: var(--ms-muted); margin: 0 0 1rem; }
+
+/* Category cards */
+.ms-fav__section-title { font-size: 1.6rem; margin: 2rem 0 1rem; padding-bottom: .4rem; border-bottom: 3px solid var(--ms-primary); }
+.ms-fav__cat {
+	border: 1px solid var(--ms-border); border-radius: var(--ms-radius); padding: 1.1rem 1.25rem;
+	margin: 0 0 1rem; background: var(--ms-surface); position: relative;
+}
+.ms-fav__cat.is-done { border-color: var(--ms-success); background: var(--ms-success-wash); }
+.ms-fav__cat-title { font-family: var(--ms-font-head); font-weight: 700; font-size: 1.12rem; color: var(--ms-primary); padding: 0; display: flex; align-items: center; gap: .5rem; }
+.ms-fav__cat-done { color: var(--ms-success); font-weight: 800; opacity: 0; transition: opacity .15s ease; }
+.ms-fav__cat.is-done .ms-fav__cat-done { opacity: 1; }
+
+.ms-fav__options { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .4rem; margin-top: .75rem; }
+.ms-fav__option {
+	display: flex; align-items: center; gap: .55rem; margin: 0; font-weight: 400; cursor: pointer;
+	padding: .6rem .7rem; border: 1px solid var(--ms-border); border-radius: var(--ms-radius-sm);
+	background: var(--ms-surface); transition: all .12s ease; min-height: 44px;
+}
+.ms-fav__option:hover { background: var(--ms-sky-wash); border-color: var(--ms-primary-light); }
+.ms-fav__option input { width: auto; margin: 0; flex-shrink: 0; }
+.ms-fav__option:has(input:checked) { background: var(--ms-primary); border-color: var(--ms-primary); color: #fff; font-weight: 600; }
+.ms-fav__option-label { flex: 1; }
+.ms-fav__option-link { font-size: .85rem; opacity: .7; text-decoration: none; }
+.ms-fav__clear { background: transparent; color: var(--ms-muted); border: 0; padding: .35rem 0 0; font-size: .82rem; cursor: pointer; text-decoration: underline; }
+.ms-fav__clear:hover { background: transparent; color: var(--ms-accent); }
+.ms-fav__cat:not(.is-done) .ms-fav__clear { visibility: hidden; }
+
+/* Submit */
+.ms-fav__submit { background: var(--ms-sky-wash); border-radius: var(--ms-radius); padding: 1.5rem; margin-top: 2rem; text-align: center; }
+.ms-fav__email { max-width: 460px; margin: 0 auto 1rem; text-align: left; }
+.ms-fav__email-note { display: block; font-size: .8rem; color: var(--ms-muted); margin-top: .3rem; line-height: 1.5; }
+.ms-fav__req { color: var(--ms-accent); font-weight: 700; font-size: .85rem; }
+.ms-fav__confirmed-as {
+	max-width: 460px; margin: 0 auto 1rem; padding: .75rem 1rem; border-radius: var(--ms-radius-sm);
+	background: var(--ms-success-wash); color: var(--ms-success-dark); font-size: .92rem;
 }
 .ms-fav__confirmed-as::before { content: "✓ "; font-weight: 800; }
 .ms-fav__submit-btn { font-size: 1.05rem; padding: .9rem 2rem; }
