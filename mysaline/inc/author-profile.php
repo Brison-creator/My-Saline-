@@ -21,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 const MYSALINE_AVATAR_META = 'mysaline_profile_photo';
+const MYSALINE_TITLE_META  = 'mysaline_role_title';
 
 /**
  * Render the profile-photo field on the user profile screen.
@@ -35,8 +36,19 @@ function mysaline_avatar_field( $user ) {
 	$id  = (int) get_user_meta( $user->ID, MYSALINE_AVATAR_META, true );
 	$src = $id ? wp_get_attachment_image_url( $id, 'thumbnail' ) : '';
 	?>
-	<h2><?php esc_html_e( 'Profile photo', 'mysaline' ); ?></h2>
+	<h2><?php esc_html_e( 'MySaline profile', 'mysaline' ); ?></h2>
 	<table class="form-table" role="presentation">
+		<tr>
+			<th><label for="mysaline-role-title"><?php esc_html_e( 'Title', 'mysaline' ); ?></label></th>
+			<td>
+				<input type="text" class="regular-text" id="mysaline-role-title" name="mysaline_role_title"
+					value="<?php echo esc_attr( (string) get_user_meta( $user->ID, MYSALINE_TITLE_META, true ) ); ?>"
+					placeholder="<?php esc_attr_e( 'e.g. Publisher, Managing Editor, Sports Writer', 'mysaline' ); ?>" />
+				<p class="description">
+					<?php esc_html_e( 'Shown above the name on this writer’s page. Leave empty to fall back to the WordPress role.', 'mysaline' ); ?>
+				</p>
+			</td>
+		</tr>
 		<tr>
 			<th><label for="mysaline-profile-photo"><?php esc_html_e( 'Photo', 'mysaline' ); ?></label></th>
 			<td>
@@ -77,6 +89,15 @@ function mysaline_avatar_save( $user_id ) {
 	// the POST, so another form cannot overwrite the field.
 	if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), 'update-user_' . $user_id ) ) {
 		return;
+	}
+
+	if ( isset( $_POST['mysaline_role_title'] ) ) {
+		$title = sanitize_text_field( wp_unslash( $_POST['mysaline_role_title'] ) );
+		if ( '' !== $title ) {
+			update_user_meta( $user_id, MYSALINE_TITLE_META, $title );
+		} else {
+			delete_user_meta( $user_id, MYSALINE_TITLE_META );
+		}
 	}
 
 	if ( ! isset( $_POST['mysaline_profile_photo'] ) ) {

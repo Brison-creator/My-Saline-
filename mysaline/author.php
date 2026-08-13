@@ -32,13 +32,22 @@ $mysaline_roles = array(
 	'contributor'   => __( 'Contributor', 'mysaline' ),
 );
 $mysaline_label = __( 'Staff writer', 'mysaline' );
-if ( $mysaline_author instanceof WP_User ) {
+
+// An explicit title always wins: "Publisher" is a fact about the person, while
+// the WordPress role is only ever a guess derived from their permissions.
+$mysaline_own_title = $mysaline_id ? trim( (string) get_user_meta( $mysaline_id, 'mysaline_role_title', true ) ) : '';
+
+if ( '' === $mysaline_own_title && $mysaline_author instanceof WP_User ) {
 	foreach ( (array) $mysaline_author->roles as $mysaline_role ) {
 		if ( isset( $mysaline_roles[ $mysaline_role ] ) ) {
 			$mysaline_label = $mysaline_roles[ $mysaline_role ];
 			break;
 		}
 	}
+}
+
+if ( '' !== $mysaline_own_title ) {
+	$mysaline_label = $mysaline_own_title;
 }
 
 /**
