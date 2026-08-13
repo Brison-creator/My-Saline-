@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>Education &#8211; MySaline</title>
+	<atom:link href="https://mysaline.net/job-category/education/feed/" rel="self" type="application/rss+xml" />
+	<link>https://mysaline.net</link>
+	<description>Local News Worth Its Salt.</description>
+	<lastBuildDate>Thu, 13 Aug 2026 21:26:41 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=7.0.3</generator>
+	<item>
+		<title>School Bus Driver</title>
+		<link>https://mysaline.net/jobs/school-bus-driver/</link>
+		
+		<dc:creator><![CDATA[Dana Hollis]]></dc:creator>
+		<pubDate>Thu, 13 Aug 2026 21:22:16 +0000</pubDate>
+				<guid isPermaLink="false">https://mysaline.net/jobs/school-bus-driver/</guid>
+
+					<description><![CDATA[Bryant School District is hiring in Bryant, AR. Part time position.]]></description>
+										<content:encoded><![CDATA[<p>This is sample article copy used to populate the development site. It stands in for real reporting so the layout, typography and spacing can be reviewed with realistic text lengths.</p>
+<p>Paragraphs run at a comfortable reading measure, with headings set in the theme’s serif and body copy in a system sans. Inline links, lists and pull quotes all inherit the same treatment.</p>
+<p>Editors write stories exactly as they do now — this theme changes how content is presented, not how it is entered. Categories, tags, authors and featured images all behave the way they always have.</p>
+]]></content:encoded>
+					
+		
+		
+			</item>
+	</channel>
+</rss>
