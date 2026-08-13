@@ -37,6 +37,7 @@ Tags: news, magazine, blog, custom-logo, custom-menu, featured-images, threaded-
    14. Advertisements
    15. Custom post types (events, obituaries, businesses)
    16. Newsletter & social
+   16b. Local weather
    17. Footer
    18. Comments
    19. Pagination
@@ -60,14 +61,14 @@ Tags: news, magazine, blog, custom-logo, custom-menu, featured-images, threaded-
  * the two that a light palette usually gets wrong.
  */
 :root {
-	/* Brand blues */
-	--ms-primary: #16455f;         /* Masthead, headings — 9.5:1 on cream */
-	--ms-primary-dark: #0d2e40;
-	--ms-primary-light: #2e7396;   /* Links — 4.9:1 on cream */
-	--ms-sky: #8fcde7;             /* Baby blue: the signature */
-	--ms-sky-soft: #cbe7f5;        /* Tints for bands, chips, hovers */
-	--ms-sky-wash: #eaf5fb;
-	--ms-sky-ink: #b8dcf0;         /* Legible on the dark blue bars */
+	/* Brand blues, sampled from the logo. */
+	--ms-primary: #0f2b4e;         /* The "Saline" navy — 13.2:1 on cream */
+	--ms-primary-dark: #091c34;
+	--ms-primary-light: #0b5ce8;   /* The "My" blue — links, 5.3:1 on cream */
+	--ms-sky: #9fd3f0;             /* Salt crystal: the signature */
+	--ms-sky-soft: #cfe7f7;        /* Tints for bands, chips, hovers */
+	--ms-sky-wash: #eaf4fc;
+	--ms-sky-ink: #bbdcf5;         /* Crystal highlight — 9.8:1 on the navy bars */
 
 	/* Creams */
 	--ms-bg: #fbf7ef;              /* The page */
@@ -228,7 +229,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
    the viewport edge, so only the vertical sides are set. */
 .ms-header__inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding-top: 1.15rem; padding-bottom: 1.15rem; }
 .ms-brand { display: flex; align-items: center; gap: .85rem; min-width: 0; }
-.ms-brand__logo img { max-height: 66px; width: auto; }
+.ms-brand__logo img { max-height: 96px; width: auto; }
 .ms-brand__title { font-family: var(--ms-font-head); font-size: 1.9rem; font-weight: 800; color: var(--ms-primary); margin: 0; line-height: 1; }
 .ms-brand__title a { color: inherit; text-decoration: none; }
 .ms-brand__tagline { margin: .2rem 0 0; font-size: .8rem; color: var(--ms-muted); text-transform: uppercase; letter-spacing: .08em; }
@@ -312,7 +313,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-hero__lead img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ms-hero__lead-body {
 	position: relative; z-index: 2; padding: 2rem; color: #fff;
-	background: linear-gradient(to top, rgba(13,46,64,.94) 8%, rgba(13,46,64,.55) 52%, rgba(13,46,64,0) 100%);
+	background: linear-gradient(to top, rgba(9,28,52,.94) 8%, rgba(9,28,52,.55) 52%, rgba(9,28,52,0) 100%);
 	width: 100%;
 }
 .ms-hero__lead-body h2 { color: #fff; font-size: clamp(1.6rem, 3vw, 2.3rem); margin-bottom: .4rem; }
@@ -560,6 +561,46 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-topbar .ms-social a { background: transparent; color: var(--ms-sky-ink); width: 30px; height: 30px; }
 .ms-topbar .ms-social a:hover { color: #fff; }
 
+
+/* 16b. Local weather ----------------------------------------------------- */
+/* The chip lives on the dark top bar; the card lives in the light sidebar,
+   so each takes its colour from its own surroundings via currentColor. */
+.ms-wx-chip {
+	display: inline-flex; align-items: center; gap: .35rem;
+	color: var(--ms-sky-ink); white-space: nowrap; line-height: 1;
+}
+.ms-wx-chip .ms-wx__icon { width: 17px; height: 17px; flex: none; }
+.ms-wx-chip__temp { font-weight: 700; }
+.ms-wx-chip__place { opacity: .8; }
+
+.ms-wx { color: var(--ms-text); }
+.ms-wx__now { display: flex; align-items: center; gap: .9rem; margin-bottom: .9rem; }
+.ms-wx__now-icon { color: var(--ms-primary-light); flex: none; }
+.ms-wx__now-icon .ms-wx__icon { width: 46px; height: 46px; }
+.ms-wx__temp {
+	font-family: var(--ms-font-head); font-size: 2.1rem; font-weight: 700;
+	color: var(--ms-primary); margin: 0; line-height: 1;
+}
+.ms-wx__summary { margin: .2rem 0 0; font-size: .92rem; font-weight: 600; }
+.ms-wx__place {
+	margin: .1rem 0 0; font-size: .76rem; color: var(--ms-muted);
+	text-transform: uppercase; letter-spacing: .06em;
+}
+.ms-wx__periods { list-style: none; margin: 0; padding: 0; }
+.ms-wx__period {
+	display: grid; grid-template-columns: 1fr 20px auto; align-items: center;
+	gap: .6rem; padding: .5rem 0; border-top: 1px solid var(--ms-border);
+	font-size: .88rem;
+}
+.ms-wx__period-name { font-weight: 600; color: var(--ms-primary); }
+.ms-wx__period-icon { color: var(--ms-primary-light); display: flex; }
+.ms-wx__period-icon .ms-wx__icon { width: 20px; height: 20px; }
+/* The prose forecast is the least important part of the row, so it drops out
+   before the day name or the temperature do. */
+.ms-wx__period-short { display: none; }
+.ms-wx__period-temp { font-weight: 700; font-variant-numeric: tabular-nums; }
+.ms-wx__credit { margin: .8rem 0 0; font-size: .72rem; color: var(--ms-muted); }
+
 /* 17. Footer ------------------------------------------------------------- */
 .ms-footer { background: var(--ms-primary-dark); color: #c2cbdb; margin-top: 3rem; }
 .ms-footer a { color: var(--ms-sky-ink); }
@@ -751,7 +792,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 		text-align: center;
 	}
 	.ms-brand { flex-direction: column; justify-content: center; gap: .35rem; width: 100%; }
-	.ms-brand__logo img { max-height: 48px; margin: 0 auto; }
+	.ms-brand__logo img { max-height: 58px; margin: 0 auto; }
 	.ms-brand__title { font-size: 1.7rem; }
 	/* The tagline is already the meta description and the page title; on a
 	   phone it costs two lines above the fold to repeat it. */
@@ -778,6 +819,8 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 	   phone is in the footer and on the contact page; the date is a trust
 	   signal a news site should not drop, so the phone gives way. */
 	.ms-topbar__text { display: none; }
+	/* Three items now share the row, so the label goes and the date shortens. */
+	.ms-wx-chip__place { display: none; }
 	.ms-topbar .ms-social { gap: .1rem; }
 	.ms-topbar .ms-social a { width: 30px; height: 30px; }
 	.ms-topbar .ms-social svg { width: 15px; height: 15px; }
