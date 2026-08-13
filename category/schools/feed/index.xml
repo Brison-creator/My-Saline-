@@ -12,62 +12,12 @@
 	<atom:link href="https://mysaline.net/category/schools/feed/" rel="self" type="application/rss+xml" />
 	<link>https://mysaline.net</link>
 	<description>Local News Worth Its Salt.</description>
-	<lastBuildDate>Thu, 13 Aug 2026 21:26:40 +0000</lastBuildDate>
+	<lastBuildDate>Thu, 13 Aug 2026 22:23:55 +0000</lastBuildDate>
 	<language>en-US</language>
 	<sy:updatePeriod>
 	hourly	</sy:updatePeriod>
 	<sy:updateFrequency>
 	1	</sy:updateFrequency>
 	<generator>https://wordpress.org/?v=7.0.3</generator>
-	<item>
-		<title>Registration dates set for the coming school year</title>
-		<link>https://mysaline.net/registration-dates-set-for-the-coming-school-year/</link>
-					<comments>https://mysaline.net/registration-dates-set-for-the-coming-school-year/#respond</comments>
-		
-		<dc:creator><![CDATA[Rachel Garrett]]></dc:creator>
-		<pubDate>Thu, 06 Aug 2026 11:30:43 +0000</pubDate>
-				<category><![CDATA[Schools]]></category>
-		<category><![CDATA[local]]></category>
-		<category><![CDATA[saline county]]></category>
-		<guid isPermaLink="false">https://mysaline.net/wpsite/?p=13</guid>
-
-					<description><![CDATA[Sample excerpt used to populate the development site so card and archive layouts can be reviewed with realistic text.]]></description>
-										<content:encoded><![CDATA[<p>This is sample article copy used to populate the development site. It stands in for real reporting so the layout, typography and spacing can be reviewed with realistic text lengths.</p>
-<p>Paragraphs run at a comfortable reading measure, with headings set in the theme’s serif and body copy in a system sans. Inline links, lists and pull quotes all inherit the same treatment.</p>
-<p>Editors write stories exactly as they do now — this theme changes how content is presented, not how it is entered. Categories, tags, authors and featured images all behave the way they always have.</p>
-<p>Longer stories can carry subheads, embedded images and an in-content advertisement placed automatically a few paragraphs in, so advertising stays part of the reading experience.</p>
-<p>Below each story the theme shows tags, an author box when a bio exists, previous and next navigation, and related stories drawn from the same category.</p>
-]]></content:encoded>
-					
-					<wfw:commentRss>https://mysaline.net/registration-dates-set-for-the-coming-school-year/feed/</wfw:commentRss>
-			<slash:comments>0</slash:comments>
-		
-		
-			</item>
-		<item>
-		<title>School board reviews the transportation budget</title>
-		<link>https://mysaline.net/school-board-reviews-the-transportation-budget/</link>
-					<comments>https://mysaline.net/school-board-reviews-the-transportation-budget/#respond</comments>
-		
-		<dc:creator><![CDATA[Rachel Garrett]]></dc:creator>
-		<pubDate>Sun, 26 Jul 2026 11:30:46 +0000</pubDate>
-				<category><![CDATA[Schools]]></category>
-		<category><![CDATA[local]]></category>
-		<category><![CDATA[saline county]]></category>
-		<guid isPermaLink="false">https://mysaline.net/wpsite/?p=35</guid>
-
-					<description><![CDATA[Sample excerpt used to populate the development site so card and archive layouts can be reviewed with realistic text.]]></description>
-										<content:encoded><![CDATA[<p>This is sample article copy used to populate the development site. It stands in for real reporting so the layout, typography and spacing can be reviewed with realistic text lengths.</p>
-<p>Paragraphs run at a comfortable reading measure, with headings set in the theme’s serif and body copy in a system sans. Inline links, lists and pull quotes all inherit the same treatment.</p>
-<p>Editors write stories exactly as they do now — this theme changes how content is presented, not how it is entered. Categories, tags, authors and featured images all behave the way they always have.</p>
-<p>Longer stories can carry subheads, embedded images and an in-content advertisement placed automatically a few paragraphs in, so advertising stays part of the reading experience.</p>
-<p>Below each story the theme shows tags, an author box when a bio exists, previous and next navigation, and related stories drawn from the same category.</p>
-]]></content:encoded>
-					
-					<wfw:commentRss>https://mysaline.net/school-board-reviews-the-transportation-budget/feed/</wfw:commentRss>
-			<slash:comments>0</slash:comments>
-		
-		
-			</item>
-	</channel>
+</channel>
 </rss>
