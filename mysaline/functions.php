@@ -43,6 +43,7 @@ $mysaline_modules = array(
 	'customizer',         // Branding, colors, social, newsletter, breaking news, homepage, ads.
 	'post-types',         // Registers Obituary, Event, Business, Advertisement CPTs + taxonomies.
 	'meta-boxes',         // Featured-story flag, CPT detail fields.
+	'author-profile',     // Uploaded byline photos, since local writers rarely have a Gravatar.
 	'widgets',            // Widget areas + custom widgets (ads, newsletter, social, spotlights).
 	'ads',                // Advertisement zone helpers.
 	'breaking-news',      // Breaking-news data helpers.

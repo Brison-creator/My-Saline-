@@ -147,7 +147,7 @@ function mysaline_customize_branding( $wp_customize ) {
 	$wp_customize->add_setting(
 		'mysaline_color_primary',
 		array(
-			'default'           => '#0b2545',
+			'default'           => '#16455f',
 			'sanitize_callback' => 'sanitize_hex_color',
 			'transport'         => 'postMessage',
 		)
@@ -166,7 +166,7 @@ function mysaline_customize_branding( $wp_customize ) {
 	$wp_customize->add_setting(
 		'mysaline_color_accent',
 		array(
-			'default'           => '#c8102e',
+			'default'           => '#b2452f',
 			'sanitize_callback' => 'sanitize_hex_color',
 			'transport'         => 'postMessage',
 		)

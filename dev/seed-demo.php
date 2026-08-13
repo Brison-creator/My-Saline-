@@ -91,11 +91,11 @@ function ms_seed_image( $post_id, $seed, $w = 1200, $h = 675 ) {
 	}
 
 	$palettes = array(
-		array( array( 11, 37, 69 ), array( 200, 16, 46 ) ),
-		array( array( 22, 56, 95 ), array( 242, 183, 5 ) ),
-		array( array( 29, 74, 109 ), array( 200, 16, 46 ) ),
-		array( array( 18, 58, 82 ), array( 242, 183, 5 ) ),
-		array( array( 36, 64, 94 ), array( 120, 180, 220 ) ),
+		array( array( 22, 69, 95 ), array( 143, 205, 231 ) ),   // Harbor / baby blue.
+		array( array( 13, 46, 64 ), array( 203, 231, 245 ) ),   // Deep harbor / sky tint.
+		array( array( 46, 115, 150 ), array( 251, 247, 239 ) ), // Mid blue / cream.
+		array( array( 31, 88, 116 ), array( 227, 169, 60 ) ),   // Slate blue / honey.
+		array( array( 22, 69, 95 ), array( 178, 69, 47 ) ),     // Harbor / brick.
 	);
 	$p  = $palettes[ abs( crc32( $seed ) ) % count( $palettes ) ];
 	$im = imagecreatetruecolor( $w, $h );
@@ -153,6 +153,118 @@ function ms_seed_image( $post_id, $seed, $w = 1200, $h = 675 ) {
 	require_once ABSPATH . 'wp-admin/includes/image.php';
 	wp_update_attachment_metadata( $attach_id, wp_generate_attachment_metadata( $attach_id, $path ) );
 	set_post_thumbnail( $post_id, $attach_id );
+
+	return (int) $attach_id;
+}
+
+/**
+ * Generate a portrait-style placeholder and attach it as a writer's profile
+ * photo, exercising the theme's own author-photo field.
+ *
+ * @param int    $user_id User to attach to.
+ * @param string $initials Two letters to draw.
+ * @param string $seed     Seed for deterministic colour choice.
+ * @return int Attachment ID (0 on failure).
+ */
+function ms_seed_portrait( $user_id, $initials, $seed ) {
+	if ( ! function_exists( 'imagecreatetruecolor' ) ) {
+		return 0;
+	}
+	if ( get_user_meta( $user_id, 'mysaline_profile_photo', true ) ) {
+		return (int) get_user_meta( $user_id, 'mysaline_profile_photo', true );
+	}
+
+	$tones = array(
+		array( 22, 69, 95 ),
+		array( 46, 115, 150 ),
+		array( 31, 88, 116 ),
+		array( 13, 46, 64 ),
+	);
+	$tone = $tones[ abs( crc32( $seed ) ) % count( $tones ) ];
+
+	$size = 400;
+	$im   = imagecreatetruecolor( $size, $size );
+
+	for ( $y = 0; $y < $size; $y++ ) {
+		$t = $y / max( 1, $size - 1 );
+		$c = imagecolorallocate(
+			$im,
+			(int) ( $tone[0] + ( 143 - $tone[0] ) * $t * .55 ),
+			(int) ( $tone[1] + ( 205 - $tone[1] ) * $t * .55 ),
+			(int) ( $tone[2] + ( 231 - $tone[2] ) * $t * .55 )
+		);
+		imageline( $im, 0, $y, $size, $y, $c );
+	}
+
+	// Initials, centred, in the cream from the palette. GD's built-in bitmap
+	// fonts are 15px tall, so scaling one up to portrait size looks like a
+	// screenshot of a screenshot; a TrueType face is used when one is present.
+	$cream = imagecolorallocate( $im, 251, 247, 239 );
+	$ttf   = '';
+	foreach ( array(
+		'/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf',
+		'/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+		'/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf',
+	) as $candidate ) {
+		if ( is_readable( $candidate ) ) {
+			$ttf = $candidate;
+			break;
+		}
+	}
+
+	if ( $ttf && function_exists( 'imagettftext' ) ) {
+		$pt  = $size * 0.3;
+		$box = imagettfbbox( $pt, 0, $ttf, $initials );
+		$tw  = abs( $box[4] - $box[0] );
+		$th  = abs( $box[5] - $box[1] );
+		imagettftext(
+			$im,
+			$pt,
+			0,
+			(int) ( ( $size - $tw ) / 2 ),
+			(int) ( ( $size + $th ) / 2 ),
+			$cream,
+			$ttf,
+			$initials
+		);
+	} else {
+		$font = 5;
+		$tw   = imagefontwidth( $font ) * strlen( $initials );
+		$th   = imagefontheight( $font );
+		$tmp  = imagecreatetruecolor( $tw, $th );
+		imagesavealpha( $tmp, true );
+		imagefill( $tmp, 0, 0, imagecolorallocatealpha( $tmp, 0, 0, 0, 127 ) );
+		imagestring( $tmp, $font, 0, 0, $initials, imagecolorallocate( $tmp, 251, 247, 239 ) );
+		$scale = (int) ( $size * 0.34 );
+		imagecopyresampled(
+			$im, $tmp,
+			(int) ( ( $size - $scale * ( $tw / $th ) ) / 2 ), (int) ( ( $size - $scale ) / 2 ),
+			0, 0, (int) ( $scale * ( $tw / $th ) ), $scale, $tw, $th
+		);
+		imagedestroy( $tmp );
+	}
+
+	$upload = wp_upload_dir();
+	$name   = 'mysaline-portrait-' . substr( md5( $seed ), 0, 8 ) . '.jpg';
+	$path   = trailingslashit( $upload['path'] ) . $name;
+	imagejpeg( $im, $path, 88 );
+	imagedestroy( $im );
+
+	$attach_id = wp_insert_attachment(
+		array(
+			'post_mime_type' => 'image/jpeg',
+			'post_title'     => 'Profile photo',
+			'post_status'    => 'inherit',
+		),
+		$path
+	);
+	if ( ! $attach_id || is_wp_error( $attach_id ) ) {
+		return 0;
+	}
+
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	wp_update_attachment_metadata( $attach_id, wp_generate_attachment_metadata( $attach_id, $path ) );
+	update_user_meta( $user_id, 'mysaline_profile_photo', (int) $attach_id );
 
 	return (int) $attach_id;
 }
@@ -322,6 +434,8 @@ foreach ( $staff as $login => $person ) {
 		)
 	);
 
+	ms_seed_portrait( $user_id, strtoupper( substr( $person['first'], 0, 1 ) . substr( $person['last'], 0, 1 ) ), $login );
+
 	$staff_ids[] = $user_id;
 	foreach ( $person['beats'] as $beat ) {
 		$beat_author[ $beat ] = $user_id;
@@ -489,37 +603,59 @@ WP_CLI::log( '  · ' . count( $businesses ) . ' businesses in ' . count( $biz_ca
  *    without needing uploaded creative)
  * ---------------------------------------------------------------------- */
 
+/*
+ * Each zone gets a designed house ad rather than a dashed grey box. The demo
+ * is shown to people deciding whether the site looks finished, and a page
+ * topped by an "ad goes here" placeholder reads as unfinished no matter how
+ * good everything under it is. These are invented sponsors in the theme
+ * palette, sized to the shape of their zone.
+ */
 $zones = array(
-	'header'        => 'Header leaderboard',
-	'homepage_top'  => 'Homepage — below hero',
-	'homepage_mid'  => 'Homepage — between sections',
-	'sidebar'       => 'Sidebar',
-	'in_content'    => 'In-content',
-	'below_content' => 'Below article',
-	'in_feed'       => 'In-feed (between stories)',
-	'directory'     => 'Directory listings',
-	'newsletter'    => 'Newsletter sponsor',
-	'sticky_mobile' => 'Mobile sticky anchor',
-	'footer'        => 'Footer',
+	'header'        => array( 'Header leaderboard', 'wide',   'Saline Family Dental', 'Same-day appointments in Benton', 'Book a visit', '#16455f' ),
+	'homepage_top'  => array( 'Homepage — below hero', 'wide', 'Hurley Heat &amp; Air', 'Free system check through August', 'Schedule now', '#2e7396' ),
+	'homepage_mid'  => array( 'Homepage — between sections', 'wide', 'First Community Bank', 'Local decisions, made locally', 'Open an account', '#16455f' ),
+	'sidebar'       => array( 'Sidebar', 'box',           'Bryant Auto Care', 'Oil change &amp; tire rotation, $59', 'Get directions', '#2e7396' ),
+	'in_content'    => array( 'In-content', 'wide',       'Cornerstone Realty', 'Thinking of selling this fall?', 'Free home valuation', '#1f5874' ),
+	'below_content' => array( 'Below article', 'wide',    'Saline County Fair', 'August 22–26 · Free parking', 'See the schedule', '#b2452f' ),
+	'in_feed'       => array( 'In-feed', 'wide',          'The Sweet Spot Bakery', 'Fresh kolaches every morning', 'View the menu', '#8c3524' ),
+	'directory'     => array( 'Directory listings', 'box','Benton Lawn &amp; Landscape', 'Weekly mowing from $40', 'Request a quote', '#1c7a52' ),
+	'newsletter'    => array( 'Newsletter sponsor', 'wide','Riverside Insurance', 'Auto, home and farm coverage', 'Compare rates', '#16455f' ),
+	'sticky_mobile' => array( 'Mobile sticky anchor', 'thin', 'Casa Verde', 'Lunch specials until 3pm daily', 'Order online', '#b2452f' ),
+	'footer'        => array( 'Footer', 'wide',           'Saline Memorial Chapel', 'Serving families since 1946', 'Contact us', '#1f5874' ),
 );
 
-foreach ( $zones as $zone => $label ) {
+foreach ( $zones as $zone => $spec ) {
+	list( $label, $shape, $sponsor, $line, $cta, $color ) = $spec;
+
 	$id = ms_seed_post( 'Demo ad — ' . $label, 'ms_ad' );
 	if ( ! $id ) {
 		continue;
 	}
 	update_post_meta( $id, '_ms_ad_zone', $zone );
-	update_post_meta( $id, '_ms_ad_sponsor', 'Sample Sponsor' );
+	update_post_meta( $id, '_ms_ad_sponsor', wp_specialchars_decode( $sponsor ) );
 	update_post_meta( $id, '_ms_ad_link', 'https://example.com' );
+
+	$pad  = 'thin' === $shape ? '.6rem .9rem' : ( 'box' === $shape ? '1.5rem 1.25rem' : '1.15rem 1.35rem' );
+	$name = 'thin' === $shape ? '1rem' : ( 'box' === $shape ? '1.35rem' : '1.25rem' );
+	$dir  = 'box' === $shape ? 'column' : 'row';
+	$alig = 'box' === $shape ? 'center' : 'center';
+	$just = 'box' === $shape ? 'center' : 'space-between';
+	$txt  = 'box' === $shape ? 'center' : 'left';
+
 	update_post_meta(
 		$id,
 		'_ms_ad_code',
-		'<div style="background:repeating-linear-gradient(45deg,#eef1f6,#eef1f6 11px,#e3e8f0 11px,#e3e8f0 22px);'
-			. 'border:1px dashed #cbd4e1;border-radius:4px;padding:1.5rem;color:#5b6472;font:600 14px/1.4 system-ui,sans-serif">'
-			. esc_html( $label ) . ' ad zone &middot; managed under Advertisements</div>'
+		'<div style="background:' . esc_attr( $color ) . ';color:#fff;border-radius:10px;padding:' . $pad . ';'
+			. 'display:flex;flex-direction:' . $dir . ';align-items:' . $alig . ';justify-content:' . $just . ';'
+			. 'gap:.85rem;text-align:' . $txt . ';font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif">'
+			. '<div><div style="font:700 ' . $name . '/1.2 Georgia,serif;letter-spacing:.01em">' . $sponsor . '</div>'
+			. '<div style="font-size:.86rem;opacity:.85;margin-top:.2rem">' . $line . '</div></div>'
+			. '<span style="flex:none;background:#8fcde7;color:#0d2e40;font:700 .78rem/1 -apple-system,sans-serif;'
+			. 'padding:.6rem .9rem;border-radius:999px;white-space:nowrap">' . $cta . '</span>'
+			. '</div>'
 	);
 }
-WP_CLI::log( '  · ' . count( $zones ) . ' ads (one per zone)' );
+WP_CLI::log( '  · ' . count( $zones ) . ' house ads (one per zone)' );
 
 /* -------------------------------------------------------------------------
  * 7. Saline County Favorites ballot — via the theme's own importer
@@ -981,8 +1117,8 @@ WP_CLI::log( '  · 3 menus assigned (primary with dropdowns, top bar, footer)' )
 
 $mods = array(
 	// Identity / branding.
-	'mysaline_color_primary'        => '#0b2545',
-	'mysaline_color_accent'         => '#c8102e',
+	'mysaline_color_primary'        => '#16455f',
+	'mysaline_color_accent'         => '#b2452f',
 	'mysaline_show_tagline'         => true,
 
 	// Top bar.

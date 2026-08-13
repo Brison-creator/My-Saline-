@@ -331,7 +331,7 @@ add_filter( 'manage_post_posts_columns', 'mysaline_posts_featured_column' );
  */
 function mysaline_posts_featured_column_value( $column, $post_id ) {
 	if ( 'ms_featured' === $column && get_post_meta( $post_id, '_ms_featured', true ) ) {
-		echo '<span aria-label="' . esc_attr__( 'Featured', 'mysaline' ) . '" title="' . esc_attr__( 'Featured', 'mysaline' ) . '" class="dashicons dashicons-star-filled" style="color:#f2b705"></span>';
+		echo '<span aria-label="' . esc_attr__( 'Featured', 'mysaline' ) . '" title="' . esc_attr__( 'Featured', 'mysaline' ) . '" class="dashicons dashicons-star-filled" style="color:#e3a93c"></span>';
 	}
 }
 add_action( 'manage_post_posts_custom_column', 'mysaline_posts_featured_column_value', 10, 2 );

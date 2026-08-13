@@ -11,13 +11,17 @@
 			"defaultPalette": true,
 			"custom": true,
 			"palette": [
-				{ "slug": "primary", "color": "#0b2545", "name": "Primary" },
-				{ "slug": "primary-dark", "color": "#071a33", "name": "Primary Dark" },
-				{ "slug": "accent", "color": "#c8102e", "name": "Accent" },
-				{ "slug": "highlight", "color": "#f2b705", "name": "Highlight" },
-				{ "slug": "surface", "color": "#f4f6f9", "name": "Surface" },
-				{ "slug": "text", "color": "#1a1d23", "name": "Text" },
-				{ "slug": "muted", "color": "#5b6472", "name": "Muted" },
+				{ "slug": "primary", "color": "#16455f", "name": "Harbor Blue" },
+				{ "slug": "primary-dark", "color": "#0d2e40", "name": "Deep Harbor" },
+				{ "slug": "sky", "color": "#8fcde7", "name": "Baby Blue" },
+				{ "slug": "sky-soft", "color": "#cbe7f5", "name": "Sky Tint" },
+				{ "slug": "cream", "color": "#fbf7ef", "name": "Cream" },
+				{ "slug": "cream-deep", "color": "#f3ebdd", "name": "Deep Cream" },
+				{ "slug": "accent", "color": "#b2452f", "name": "Brick" },
+				{ "slug": "highlight", "color": "#e3a93c", "name": "Honey" },
+				{ "slug": "surface", "color": "#eaf5fb", "name": "Sky Wash" },
+				{ "slug": "text", "color": "#1e2c36", "name": "Ink" },
+				{ "slug": "muted", "color": "#5c6b77", "name": "Muted" },
 				{ "slug": "white", "color": "#ffffff", "name": "White" }
 			]
 		},
@@ -37,17 +41,17 @@
 	"styles": {
 		"color": {
 			"background": "#ffffff",
-			"text": "#1a1d23"
+			"text": "#1e2c36"
 		},
 		"typography": {
 			"fontFamily": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
 			"lineHeight": "1.65"
 		},
 		"elements": {
-			"link": { "color": { "text": "#17457f" } },
-			"h1": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#0b2545" } },
-			"h2": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#0b2545" } },
-			"h3": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#0b2545" } }
+			"link": { "color": { "text": "#2e7396" } },
+			"h1": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#16455f" } },
+			"h2": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#16455f" } },
+			"h3": { "typography": { "fontFamily": "Georgia, \"Times New Roman\", Times, serif" }, "color": { "text": "#16455f" } }
 		}
 	}
 }

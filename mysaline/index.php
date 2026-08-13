@@ -15,7 +15,7 @@ get_header();
 <?php mysaline_breadcrumbs(); ?>
 
 <?php if ( is_home() && ! is_front_page() ) : ?>
-	<header class="ms-page-header" style="margin:-2rem -1.25rem 2rem">
+	<header class="ms-page-header ms-page-header--bleed">
 		<div class="ms-container">
 			<h1><?php single_post_title(); ?></h1>
 		</div>

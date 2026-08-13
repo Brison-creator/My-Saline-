@@ -19,6 +19,35 @@ $mysaline_id     = $mysaline_author ? (int) $mysaline_author->ID : 0;
 $mysaline_bio    = $mysaline_id ? get_the_author_meta( 'description', $mysaline_id ) : '';
 $mysaline_site   = $mysaline_id ? get_the_author_meta( 'user_url', $mysaline_id ) : '';
 $mysaline_count  = $mysaline_id ? count_user_posts( $mysaline_id, 'post', true ) : 0;
+
+/*
+ * Label the writer by the role they actually hold. Calling the managing editor
+ * a "Columnist" on their own archive page is the kind of small wrongness a
+ * reader notices immediately.
+ */
+$mysaline_roles = array(
+	'administrator' => __( 'Editor', 'mysaline' ),
+	'editor'        => __( 'Editor', 'mysaline' ),
+	'author'        => __( 'Staff writer', 'mysaline' ),
+	'contributor'   => __( 'Contributor', 'mysaline' ),
+);
+$mysaline_label = __( 'Staff writer', 'mysaline' );
+if ( $mysaline_author instanceof WP_User ) {
+	foreach ( (array) $mysaline_author->roles as $mysaline_role ) {
+		if ( isset( $mysaline_roles[ $mysaline_role ] ) ) {
+			$mysaline_label = $mysaline_roles[ $mysaline_role ];
+			break;
+		}
+	}
+}
+
+/**
+ * Change the role label shown above an author's name.
+ *
+ * @param string $label   Label to display.
+ * @param int    $user_id Author being shown.
+ */
+$mysaline_label = apply_filters( 'mysaline_author_role_label', $mysaline_label, $mysaline_id );
 ?>
 
 <?php mysaline_breadcrumbs(); ?>
@@ -26,7 +55,9 @@ $mysaline_count  = $mysaline_id ? count_user_posts( $mysaline_id, 'post', true )
 <header class="ms-author-header">
 	<?php echo get_avatar( $mysaline_id, 96, '', '', array( 'class' => 'ms-author-header__avatar' ) ); ?>
 	<div class="ms-author-header__body">
-		<p class="ms-eyebrow"><?php esc_html_e( 'Columnist', 'mysaline' ); ?></p>
+		<?php if ( $mysaline_label ) : ?>
+			<p class="ms-eyebrow"><?php echo esc_html( $mysaline_label ); ?></p>
+		<?php endif; ?>
 		<h1><?php echo esc_html( get_the_author_meta( 'display_name', $mysaline_id ) ); ?></h1>
 		<?php if ( $mysaline_bio ) : ?>
 			<p class="ms-author-header__bio"><?php echo esc_html( $mysaline_bio ); ?></p>

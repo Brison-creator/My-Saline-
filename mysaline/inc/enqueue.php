@@ -44,8 +44,8 @@ add_action( 'wp_enqueue_scripts', 'mysaline_enqueue_assets' );
  * @return string CSS.
  */
 function mysaline_dynamic_css() {
-	$primary = get_theme_mod( 'mysaline_color_primary', '#0b2545' );
-	$accent  = get_theme_mod( 'mysaline_color_accent', '#c8102e' );
+	$primary = get_theme_mod( 'mysaline_color_primary', '#16455f' );
+	$accent  = get_theme_mod( 'mysaline_color_accent', '#b2452f' );
 
 	$primary_dark  = mysaline_adjust_brightness( $primary, -22 );
 	$primary_light = mysaline_adjust_brightness( $primary, 30 );
@@ -116,3 +116,50 @@ function mysaline_editor_assets() {
 	wp_enqueue_style( 'mysaline-editor', MYSALINE_URI . 'assets/css/editor.css', array(), MYSALINE_VERSION );
 }
 add_action( 'enqueue_block_editor_assets', 'mysaline_editor_assets' );
+
+/**
+ * Stop WordPress rewriting emoji as remote images.
+ *
+ * The theme invites emoji as section-hub and quick-link icons, which is the
+ * simplest icon picker an editor can be given. Core's emoji script replaces
+ * each one with an <img> served from s.w.org — so every icon becomes a
+ * third-party request that fails behind a firewall, in an offline preview or
+ * on a static export, leaving a broken-image glyph in the navigation.
+ *
+ * Every browser the site supports renders emoji natively, so the replacement
+ * buys nothing and costs a script, a stylesheet and a DNS prefetch on every
+ * page load.
+ */
+function mysaline_disable_emoji_images() {
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+	remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+	remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+}
+add_action( 'init', 'mysaline_disable_emoji_images' );
+
+/**
+ * Drop the emoji DNS prefetch left behind once the script is gone.
+ *
+ * @param array  $urls          Prefetch URLs.
+ * @param string $relation_type Link relation.
+ * @return array
+ */
+function mysaline_remove_emoji_prefetch( $urls, $relation_type ) {
+	if ( 'dns-prefetch' !== $relation_type ) {
+		return $urls;
+	}
+
+	$emoji = apply_filters( 'emoji_svg_url', 'https://s.w.org/images/core/emoji/' );
+
+	return array_filter(
+		$urls,
+		static function ( $url ) use ( $emoji ) {
+			return ! ( is_string( $url ) && false !== strpos( $url, (string) wp_parse_url( $emoji, PHP_URL_HOST ) ) );
+		}
+	);
+}
+add_filter( 'wp_resource_hints', 'mysaline_remove_emoji_prefetch', 10, 2 );

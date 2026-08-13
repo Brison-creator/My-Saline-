@@ -19,7 +19,7 @@ $mysaline_fmt  = get_option( 'date_format' );
 		if ( has_post_thumbnail() ) {
 			the_post_thumbnail( 'mysaline-square', array( 'loading' => 'lazy', 'alt' => get_the_title() ) );
 		} else {
-			echo '<img src="data:image/svg+xml;utf8,' . rawurlencode( '<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><rect width="140" height="140" fill="#eaeef4"/><text x="50%" y="52%" font-size="48" fill="#9aa6b6" text-anchor="middle" dominant-baseline="middle" font-family="Georgia">' . esc_html( mb_substr( get_the_title(), 0, 1 ) ) . '</text></svg>' ) . '" width="140" height="140" alt="" />';
+			echo '<img src="data:image/svg+xml;utf8,' . rawurlencode( '<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><rect width="140" height="140" fill="#eaf5fb"/><text x="50%" y="52%" font-size="48" fill="#7ba7c0" text-anchor="middle" dominant-baseline="middle" font-family="Georgia">' . esc_html( mb_substr( get_the_title(), 0, 1 ) ) . '</text></svg>' ) . '" width="140" height="140" alt="" />';
 		}
 		?>
 		<h3 class="ms-card__title" style="font-size:1.05rem;margin-top:.75rem"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>

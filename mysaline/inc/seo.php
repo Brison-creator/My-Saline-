@@ -564,7 +564,7 @@ add_action( 'wp_head', 'mysaline_structured_data', 6 );
 function mysaline_theme_color_meta() {
 	printf(
 		'<meta name="theme-color" content="%s">' . "\n",
-		esc_attr( get_theme_mod( 'mysaline_color_primary', '#0b2545' ) )
+		esc_attr( get_theme_mod( 'mysaline_color_primary', '#16455f' ) )
 	);
 }
 add_action( 'wp_head', 'mysaline_theme_color_meta', 4 );

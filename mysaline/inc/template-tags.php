@@ -125,7 +125,7 @@ function mysaline_thumbnail( $size = 'mysaline-card', $post = null, $link = true
  * @return string SVG markup.
  */
 function mysaline_placeholder_image() {
-	$primary = esc_attr( get_theme_mod( 'mysaline_color_primary', '#0b2545' ) );
+	$primary = esc_attr( get_theme_mod( 'mysaline_color_primary', '#16455f' ) );
 	return '<svg class="ms-placeholder" viewBox="0 0 640 360" width="640" height="360" role="img" aria-label="' . esc_attr__( 'MySaline', 'mysaline' ) . '" xmlns="http://www.w3.org/2000/svg" style="background:' . $primary . ';width:100%;height:100%">'
 		. '<rect width="640" height="360" fill="' . $primary . '"/>'
 		. '<text x="50%" y="50%" fill="rgba(255,255,255,.35)" font-family="Georgia,serif" font-size="40" font-weight="700" text-anchor="middle" dominant-baseline="middle">MySaline</text>'
