@@ -32,6 +32,8 @@ dashboard-managed package.
 │   └── assets/                    css/ js/ images/
 ├── dev/                 Local-only dev tooling (NEVER shipped in the ZIP)
 │   ├── seed-demo.php          Fills the dev site with realistic demo content
+│   ├── static-export.py       Exports the running site to deployable static files
+│   ├── snapshot-preview.py    One-page snapshot of the real theme output
 │   └── mu-plugins/            Dev mail catcher, so the ballot's email
 │                              confirmation can be tested without SMTP
 ├── docs/                Audit + installation, deployment, content, dev guides
