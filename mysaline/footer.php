@@ -46,14 +46,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<footer class="ms-footer" role="contentinfo">
 		<div class="ms-container">
-			<div class="ms-footer__widgets">
+			<div class="ms-footer__widgets<?php echo is_active_sidebar( 'footer-4' ) ? ' has-fourth' : ''; ?>">
 				<div class="ms-footer__about">
 					<?php
-					if ( has_custom_logo() ) {
-						the_custom_logo();
-					} else {
-						echo '<p class="ms-brand__title" style="color:#fff">' . esc_html( get_bloginfo( 'name' ) ) . '</p>';
-					}
+					mysaline_footer_logo();
 					$about = get_theme_mod( 'mysaline_footer_about', '' );
 					if ( $about ) {
 						echo '<p>' . wp_kses_post( $about ) . '</p>';
@@ -84,52 +80,68 @@ if ( ! defined( 'ABSPATH' ) ) {
 					?>
 				</div>
 
-				<?php for ( $i = 1; $i <= 3; $i++ ) : ?>
-					<?php if ( is_active_sidebar( 'footer-' . $i ) ) : ?>
-						<div class="ms-footer__col">
-							<?php dynamic_sidebar( 'footer-' . $i ); ?>
-						</div>
-					<?php else : ?>
-						<?php if ( 1 === $i ) : ?>
-							<div class="ms-footer__col">
-								<h2 class="ms-widget-title"><?php esc_html_e( 'Sections', 'mysaline' ); ?></h2>
-								<?php
-								if ( has_nav_menu( 'footer' ) ) {
-									wp_nav_menu(
-										array(
-											'theme_location' => 'footer',
-											'container'      => false,
-											'depth'          => 1,
-											'fallback_cb'    => false,
-										)
-									);
-								} else {
-									wp_list_categories(
-										array(
-											'title_li' => '',
-											'number'   => 8,
-											'orderby'  => 'count',
-											'order'    => 'DESC',
-										)
-									);
-								}
-								?>
-							</div>
-						<?php endif; ?>
-					<?php endif; ?>
-				<?php endfor; ?>
-
-				<div class="ms-footer__col">
-					<?php if ( is_active_sidebar( 'footer-4' ) ) : ?>
-						<?php dynamic_sidebar( 'footer-4' ); ?>
-					<?php else : ?>
-						<h2 class="ms-widget-title"><?php esc_html_e( 'Community', 'mysaline' ); ?></h2>
-						<ul>
-							<li><a href="<?php echo esc_url( get_post_type_archive_link( 'ms_event' ) ); ?>"><?php esc_html_e( 'Community Events', 'mysaline' ); ?></a></li>
-							<li><a href="<?php echo esc_url( get_post_type_archive_link( 'ms_obituary' ) ); ?>"><?php esc_html_e( 'Obituaries', 'mysaline' ); ?></a></li>
-							<li><a href="<?php echo esc_url( get_post_type_archive_link( 'ms_business' ) ); ?>"><?php esc_html_e( 'Business Directory', 'mysaline' ); ?></a></li>
-						</ul>
-					<?php endif; ?>
+				<?php
+				/*
+				 * Four widget slots, each with a fallback, so the row is never
+				 * short a column. Previously slots 2 and 3 emitted nothing at all
+				 * when empty, which left a hole in a four-column grid — the footer
+				 * read as broken rather than as sparse.
+				 */
+				for ( $ms_slot = 1; $ms_slot <= 4; $ms_slot++ ) :
+					// The fourth column has no fallback; it appears only if used.
+					if ( 4 === $ms_slot && ! is_active_sidebar( 'footer-4' ) ) {
+						continue;
+					}
+					?>
+					<div class="ms-footer__col">
+						<?php
+						if ( is_active_sidebar( 'footer-' . $ms_slot ) ) {
+							dynamic_sidebar( 'footer-' . $ms_slot );
+						} elseif ( 1 === $ms_slot ) {
+							echo '<h2 class="ms-widget-title">' . esc_html__( 'Sections', 'mysaline' ) . '</h2>';
+							if ( has_nav_menu( 'footer' ) ) {
+								wp_nav_menu(
+									array(
+										'theme_location' => 'footer',
+										'container'      => false,
+										'depth'          => 1,
+										'fallback_cb'    => false,
+									)
+								);
+							} else {
+								wp_list_categories(
+									array(
+										'title_li' => '',
+										'number'   => 8,
+										'orderby'  => 'count',
+										'order'    => 'DESC',
+									)
+								);
+							}
+						} elseif ( 2 === $ms_slot ) {
+							echo '<h2 class="ms-widget-title">' . esc_html__( 'Community', 'mysaline' ) . '</h2>';
+							?>
+							<ul>
+								<li><a href="<?php echo esc_url( get_post_type_archive_link( 'ms_event' ) ); ?>"><?php esc_html_e( 'Community Events', 'mysaline' ); ?></a></li>
+								<li><a href="<?php echo esc_url( get_post_type_archive_link( 'ms_obituary' ) ); ?>"><?php esc_html_e( 'Obituaries', 'mysaline' ); ?></a></li>
+								<li><a href="<?php echo esc_url( get_post_type_archive_link( 'ms_business' ) ); ?>"><?php esc_html_e( 'Business Directory', 'mysaline' ); ?></a></li>
+							</ul>
+							<?php
+						} elseif ( 3 === $ms_slot ) {
+							echo '<h2 class="ms-widget-title">' . esc_html__( 'More', 'mysaline' ) . '</h2>';
+							?>
+							<ul>
+								<li><a href="<?php echo esc_url( home_url( '/advertise-with-us/' ) ); ?>"><?php esc_html_e( 'Advertise With Us', 'mysaline' ); ?></a></li>
+								<li><a href="<?php echo esc_url( home_url( '/contact-us/' ) ); ?>"><?php esc_html_e( 'Contact Us', 'mysaline' ); ?></a></li>
+								<li><a href="<?php echo esc_url( home_url( '/about-mysaline/' ) ); ?>"><?php esc_html_e( 'About MySaline', 'mysaline' ); ?></a></li>
+							</ul>
+							<?php
+						}
+						?>
+					</div>
+					<?php
+				endfor;
+				?>
 				</div>
 			</div>
 

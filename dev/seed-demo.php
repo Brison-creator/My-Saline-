@@ -1489,7 +1489,9 @@ if ( function_exists( 'mysaline_weather_refresh' ) ) {
 $sidebars = get_option( 'sidebars_widgets', array() );
 $sidebars['sidebar-main'] = array( 'mysaline_weather-2', 'mysaline_ad-2', 'mysaline_recent-2', 'mysaline_events-2' );
 $sidebars['sidebar-home'] = array( 'mysaline_weather-2', 'mysaline_ad-2', 'mysaline_events-2' );
-$sidebars['footer-4']     = array( 'mysaline_social-2' );
+// Footer columns already fall back to Sections / Community / More / Follow
+// Us, so seeding a social widget here just duplicated the last one.
+unset( $sidebars['footer-4'] );
 update_option( 'sidebars_widgets', $sidebars );
 WP_CLI::log( '  · widgets placed in sidebars and footer' );
 

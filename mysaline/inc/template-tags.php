@@ -225,3 +225,52 @@ function mysaline_reading_time( $post = null ) {
 	/* translators: %d: minutes to read. */
 	return sprintf( _n( '%d min read', '%d min read', $minutes, 'mysaline' ), $minutes );
 }
+
+/**
+ * The masthead used on dark backgrounds.
+ *
+ * A colour logo on the dark footer loses whichever half of it is dark — the
+ * navy in the MySaline wordmark simply disappeared against the navy footer.
+ * So: an owner-supplied reversed logo if one is set, otherwise the reversed
+ * mark bundled with the theme, otherwise the site name in white.
+ */
+function mysaline_footer_logo() {
+	$id = (int) get_theme_mod( 'mysaline_logo_dark', 0 );
+
+	if ( $id ) {
+		$img = wp_get_attachment_image(
+			$id,
+			'full',
+			false,
+			array(
+				'class' => 'ms-footer__logo',
+				'alt'   => get_bloginfo( 'name' ),
+			)
+		);
+		if ( $img ) {
+			printf(
+				'<a href="%s" rel="home" class="ms-footer__logo-link">%s</a>',
+				esc_url( home_url( '/' ) ),
+				$img // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by core.
+			);
+			return;
+		}
+	}
+
+	$bundled = MYSALINE_DIR . 'assets/images/logo-mysaline-reverse.svg';
+	if ( file_exists( $bundled ) ) {
+		printf(
+			'<a href="%1$s" rel="home" class="ms-footer__logo-link"><img class="ms-footer__logo" src="%2$s" alt="%3$s" width="800" height="320" /></a>',
+			esc_url( home_url( '/' ) ),
+			esc_url( MYSALINE_URI . 'assets/images/logo-mysaline-reverse.svg' ),
+			esc_attr( get_bloginfo( 'name' ) )
+		);
+		return;
+	}
+
+	printf(
+		'<p class="ms-footer__wordmark"><a href="%1$s" rel="home">%2$s</a></p>',
+		esc_url( home_url( '/' ) ),
+		esc_html( get_bloginfo( 'name' ) )
+	);
+}

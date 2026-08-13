@@ -124,6 +124,7 @@ function mysaline_customize_register( $wp_customize ) {
 	mysaline_customize_sections( $wp_customize );
 	mysaline_customize_newsletter( $wp_customize );
 	mysaline_customize_social( $wp_customize );
+	mysaline_customize_dark_logo( $wp_customize );
 	mysaline_customize_weather( $wp_customize );
 	mysaline_customize_ads( $wp_customize );
 	mysaline_customize_footer( $wp_customize );
@@ -891,6 +892,33 @@ function mysaline_customize_social( $wp_customize ) {
 			)
 		);
 	}
+}
+
+/**
+ * Reversed logo for dark backgrounds.
+ *
+ * @param WP_Customize_Manager $wp_customize Manager.
+ */
+function mysaline_customize_dark_logo( $wp_customize ) {
+	$wp_customize->add_setting(
+		'mysaline_logo_dark',
+		array(
+			'default'           => 0,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Media_Control(
+			$wp_customize,
+			'mysaline_logo_dark',
+			array(
+				'label'       => __( 'Logo for dark backgrounds', 'mysaline' ),
+				'description' => __( 'A white or reversed version of your logo, used in the footer. Leave empty to use the reversed MySaline mark bundled with the theme.', 'mysaline' ),
+				'section'     => 'mysaline_branding',
+				'mime_type'   => 'image',
+			)
+		)
+	);
 }
 
 /**

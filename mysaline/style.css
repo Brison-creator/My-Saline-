@@ -656,10 +656,40 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 .ms-footer { background: var(--ms-primary-dark); color: #c2cbdb; margin-top: 3rem; }
 .ms-footer a { color: var(--ms-sky-ink); }
 .ms-footer a:hover { color: #fff; }
-.ms-footer__widgets { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: var(--ms-gap); padding: 3rem 0; }
+/* The about column carries the masthead and the address, so it gets more
+   room; the rest share what is left evenly. */
+/* The brand block is itself a grid child, so the default row is the brand
+   plus three link columns; the optional fourth widget area makes five. */
+.ms-footer__widgets { display: grid; grid-template-columns: 1.7fr 1fr 1fr 1fr; gap: var(--ms-gap); padding: 3rem 0; }
+.ms-footer__widgets.has-fourth { grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr; }
+.ms-footer__col > *:first-child { margin-top: 0; }
 .ms-footer .ms-widget-title { color: #fff; border-bottom-color: var(--ms-primary-light); }
-.ms-footer__about img { max-height: 54px; margin-bottom: 1rem; }
-.ms-footer__contact { font-style: normal; font-size: .9rem; margin: 1rem 0; line-height: 1.7; }
+/* width:auto is the whole fix here. The global reset sets height:auto on
+   images, so a max-height with no width constraint let the logo run to the
+   full column width and squash vertically — the wordmark came out stretched
+   across the footer. Constrain the width and the height follows. */
+.ms-footer__logo-link { display: inline-block; margin-bottom: 1.1rem; }
+.ms-footer__logo,
+.ms-footer__about img {
+	display: block;
+	width: auto;
+	height: auto;
+	max-width: min(100%, 260px);
+	max-height: 68px;
+	margin-bottom: 0;
+}
+.ms-footer__wordmark {
+	font-family: var(--ms-font-head); font-size: 1.7rem; font-weight: 800;
+	color: #fff; margin: 0 0 1rem; line-height: 1;
+}
+.ms-footer__wordmark a { color: #fff; text-decoration: none; }
+
+/* On the dark footer the light chips read as blank discs; a translucent well
+   with a white glyph belongs to the surface it sits on. */
+.ms-footer .ms-social a { background: rgba(255,255,255,.1); color: #fff; }
+.ms-footer .ms-social a:hover { background: var(--ms-primary-light); color: #fff; }
+.ms-footer__about > p { max-width: 42ch; font-size: .92rem; }
+.ms-footer__contact { font-style: normal; font-size: .9rem; margin: 1rem 0; line-height: 1.7; max-width: 42ch; }
 .ms-footer__bottom { border-top: 1px solid rgba(255,255,255,.12); padding: 1.25rem 0; font-size: .85rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .ms-footer ul { list-style: none; margin: 0; padding: 0; }
 .ms-footer ul li { padding: .3rem 0; }
@@ -819,6 +849,7 @@ label { font-weight: 600; display: block; margin-bottom: .35rem; }
 
 @media (max-width: 1024px) {
 	.ms-footer__widgets { grid-template-columns: 1fr 1fr; }
+	.ms-footer__about { grid-column: 1 / -1; }
 	.ms-grid--4 { grid-template-columns: repeat(2, 1fr); }
 }
 
