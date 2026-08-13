@@ -56,6 +56,20 @@ function mysaline_meta_fields() {
 			'_ms_biz_hours'   => array( 'label' => __( 'Hours', 'mysaline' ), 'type' => 'textarea', 'placeholder' => "Mon–Fri 9–5\nSat 10–2" ),
 			'_ms_biz_featured' => array( 'label' => __( 'Feature in the homepage Business Spotlight', 'mysaline' ), 'type' => 'checkbox' ),
 		),
+		'ms_job'      => array(
+			'_ms_job_employer' => array( 'label' => __( 'Employer', 'mysaline' ), 'type' => 'text' ),
+			'_ms_job_location' => array( 'label' => __( 'Location', 'mysaline' ), 'type' => 'text', 'placeholder' => 'e.g. Benton, AR' ),
+			'_ms_job_type'     => array(
+				'label'   => __( 'Employment type', 'mysaline' ),
+				'type'    => 'select',
+				'choices' => 'mysaline_job_type_choices',
+			),
+			'_ms_job_pay'      => array( 'label' => __( 'Pay', 'mysaline' ), 'type' => 'text', 'placeholder' => 'e.g. $18–$22/hr, or leave blank' ),
+			'_ms_job_apply'    => array( 'label' => __( 'How to apply (link)', 'mysaline' ), 'type' => 'url' ),
+			'_ms_job_email'    => array( 'label' => __( 'How to apply (email)', 'mysaline' ), 'type' => 'email' ),
+			'_ms_job_closes'   => array( 'label' => __( 'Closing date', 'mysaline' ), 'type' => 'date' ),
+			'_ms_job_featured' => array( 'label' => __( 'Feature this listing at the top of the jobs board', 'mysaline' ), 'type' => 'checkbox' ),
+		),
 		'ms_ad'       => array(
 			'_ms_ad_link'    => array( 'label' => __( 'Click-through URL', 'mysaline' ), 'type' => 'url' ),
 			'_ms_ad_zone'    => array(
@@ -85,6 +99,7 @@ function mysaline_add_meta_boxes() {
 	add_meta_box( 'mysaline_event', __( 'Event Details', 'mysaline' ), 'mysaline_render_cpt_box', 'ms_event', 'normal', 'high' );
 	add_meta_box( 'mysaline_obit', __( 'Obituary Details', 'mysaline' ), 'mysaline_render_cpt_box', 'ms_obituary', 'normal', 'high' );
 	add_meta_box( 'mysaline_biz', __( 'Business Details', 'mysaline' ), 'mysaline_render_cpt_box', 'ms_business', 'normal', 'high' );
+	add_meta_box( 'mysaline_job', __( 'Job Details', 'mysaline' ), 'mysaline_render_cpt_box', 'ms_job', 'normal', 'high' );
 	add_meta_box( 'mysaline_ad', __( 'Advertisement Settings', 'mysaline' ), 'mysaline_render_cpt_box', 'ms_ad', 'normal', 'high' );
 	add_meta_box( 'mysaline_ad_help', __( 'How this ad shows', 'mysaline' ), 'mysaline_render_ad_help', 'ms_ad', 'side', 'default' );
 }
@@ -335,3 +350,19 @@ function mysaline_posts_featured_column_value( $column, $post_id ) {
 	}
 }
 add_action( 'manage_post_posts_custom_column', 'mysaline_posts_featured_column_value', 10, 2 );
+
+/**
+ * Employment types offered on a job listing.
+ *
+ * @return array
+ */
+function mysaline_job_type_choices() {
+	return array(
+		'full-time'  => __( 'Full time', 'mysaline' ),
+		'part-time'  => __( 'Part time', 'mysaline' ),
+		'seasonal'   => __( 'Seasonal', 'mysaline' ),
+		'contract'   => __( 'Contract', 'mysaline' ),
+		'internship' => __( 'Internship', 'mysaline' ),
+		'volunteer'  => __( 'Volunteer', 'mysaline' ),
+	);
+}

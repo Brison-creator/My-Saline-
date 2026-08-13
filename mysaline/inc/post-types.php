@@ -64,6 +64,47 @@ function mysaline_register_post_types() {
 		)
 	);
 
+	/* ---- Photo galleries -------------------------------------------- */
+	/*
+	 * A gallery is a story told in pictures — Friday night football, the fair,
+	 * a ribbon cutting. It is its own post type rather than a category of post
+	 * because the archive wants to show covers and photo counts, not headlines
+	 * and excerpts.
+	 */
+	register_post_type(
+		'ms_gallery',
+		array(
+			'labels'        => mysaline_cpt_labels( __( 'Photo Gallery', 'mysaline' ), __( 'Photos', 'mysaline' ) ),
+			'public'        => true,
+			'has_archive'   => true,
+			'menu_icon'     => 'dashicons-format-gallery',
+			'menu_position' => 25,
+			'rewrite'       => array( 'slug' => apply_filters( 'mysaline_gallery_slug', 'photos' ), 'with_front' => false ),
+			'supports'      => array( 'title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'author' ),
+			'show_in_rest'  => true,
+		)
+	);
+
+	/* ---- Local jobs -------------------------------------------------- */
+	/*
+	 * Hiring listings expire, which is the whole reason they are a post type
+	 * with a closing date rather than posts in a category — a jobs page full of
+	 * filled positions is worse than no jobs page.
+	 */
+	register_post_type(
+		'ms_job',
+		array(
+			'labels'        => mysaline_cpt_labels( __( 'Job', 'mysaline' ), __( 'Local Jobs', 'mysaline' ) ),
+			'public'        => true,
+			'has_archive'   => true,
+			'menu_icon'     => 'dashicons-businessperson',
+			'menu_position' => 26,
+			'rewrite'       => array( 'slug' => apply_filters( 'mysaline_job_slug', 'jobs' ), 'with_front' => false ),
+			'supports'      => array( 'title', 'editor', 'thumbnail', 'excerpt', 'revisions' ),
+			'show_in_rest'  => true,
+		)
+	);
+
 	/* ---- Advertisements (not a public archive) ---------------------- */
 	register_post_type(
 		'ms_ad',
@@ -116,6 +157,25 @@ function mysaline_register_taxonomies() {
 	);
 }
 add_action( 'init', 'mysaline_register_taxonomies' );
+
+/**
+ * Job categories, so a jobs board can be filtered the way a directory is.
+ */
+function mysaline_register_job_taxonomy() {
+	register_taxonomy(
+		'ms_job_cat',
+		'ms_job',
+		array(
+			'labels'            => mysaline_tax_labels( __( 'Job Category', 'mysaline' ), __( 'Job Categories', 'mysaline' ) ),
+			'public'            => true,
+			'hierarchical'      => true,
+			'show_admin_column' => true,
+			'show_in_rest'      => true,
+			'rewrite'           => array( 'slug' => apply_filters( 'mysaline_job_cat_slug', 'job-category' ) ),
+		)
+	);
+}
+add_action( 'init', 'mysaline_register_job_taxonomy' );
 
 /**
  * Generate a full CPT labels array from singular/plural names.
@@ -196,7 +256,7 @@ function mysaline_search_include_cpts( $query ) {
 	if ( is_admin() || ! $query->is_main_query() || ! $query->is_search() ) {
 		return;
 	}
-	$query->set( 'post_type', array( 'post', 'page', 'ms_event', 'ms_business', 'ms_obituary' ) );
+	$query->set( 'post_type', array( 'post', 'page', 'ms_event', 'ms_business', 'ms_obituary', 'ms_gallery', 'ms_job' ) );
 }
 add_action( 'pre_get_posts', 'mysaline_search_include_cpts' );
 

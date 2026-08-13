@@ -434,6 +434,98 @@ class MySaline_Weather_Widget extends WP_Widget {
 	}
 }
 
+
+/**
+ * Local jobs widget.
+ */
+class MySaline_Jobs_Widget extends WP_Widget {
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		parent::__construct(
+			'mysaline_jobs',
+			__( 'MySaline: Local Jobs', 'mysaline' ),
+			array( 'description' => __( 'Open hiring listings. Closed ones drop off automatically.', 'mysaline' ) )
+		);
+	}
+
+	/**
+	 * Output.
+	 *
+	 * @param array $args     Sidebar args.
+	 * @param array $instance Settings.
+	 */
+	public function widget( $args, $instance ) {
+		$number = isset( $instance['number'] ) ? absint( $instance['number'] ) : 4;
+		$jobs   = mysaline_get_open_jobs( $number ? $number : 4 );
+
+		if ( ! $jobs ) {
+			return;
+		}
+
+		$title = isset( $instance['title'] ) ? $instance['title'] : __( 'Who’s Hiring', 'mysaline' );
+
+		echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( $title ) {
+			echo $args['before_title'] . esc_html( $title ) . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+		echo '<ul class="ms-jobs-mini">';
+		foreach ( $jobs as $job ) {
+			$employer = get_post_meta( $job->ID, '_ms_job_employer', true );
+			printf(
+				'<li><a href="%1$s">%2$s</a>%3$s</li>',
+				esc_url( get_permalink( $job ) ),
+				esc_html( get_the_title( $job ) ),
+				$employer ? '<span class="ms-jobs-mini__employer">' . esc_html( $employer ) . '</span>' : ''
+			);
+		}
+		echo '</ul>';
+		printf(
+			'<p class="ms-jobs-mini__all"><a href="%1$s">%2$s</a></p>',
+			esc_url( get_post_type_archive_link( 'ms_job' ) ),
+			esc_html__( 'See all local jobs', 'mysaline' )
+		);
+		echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/**
+	 * Form.
+	 *
+	 * @param array $instance Settings.
+	 */
+	public function form( $instance ) {
+		$title  = isset( $instance['title'] ) ? $instance['title'] : __( 'Who’s Hiring', 'mysaline' );
+		$number = isset( $instance['number'] ) ? absint( $instance['number'] ) : 4;
+		?>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'mysaline' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"
+				name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
+		</p>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'number' ) ); ?>"><?php esc_html_e( 'How many:', 'mysaline' ); ?></label>
+			<input class="tiny-text" id="<?php echo esc_attr( $this->get_field_id( 'number' ) ); ?>"
+				name="<?php echo esc_attr( $this->get_field_name( 'number' ) ); ?>" type="number" min="1" max="10" value="<?php echo esc_attr( $number ); ?>" />
+		</p>
+		<?php
+	}
+
+	/**
+	 * Save.
+	 *
+	 * @param array $new Submitted values.
+	 * @param array $old Previous values.
+	 * @return array
+	 */
+	public function update( $new, $old ) {
+		return array(
+			'title'  => sanitize_text_field( isset( $new['title'] ) ? $new['title'] : '' ),
+			'number' => min( 10, max( 1, absint( isset( $new['number'] ) ? $new['number'] : 4 ) ) ),
+		);
+	}
+}
+
 function mysaline_register_widgets() {
 	register_widget( 'MySaline_Ad_Widget' );
 	register_widget( 'MySaline_Newsletter_Widget' );
@@ -441,6 +533,7 @@ function mysaline_register_widgets() {
 	register_widget( 'MySaline_Recent_Widget' );
 	register_widget( 'MySaline_Events_Widget' );
 	register_widget( 'MySaline_Weather_Widget' );
+	register_widget( 'MySaline_Jobs_Widget' );
 }
 add_action( 'widgets_init', 'mysaline_register_widgets' );
 

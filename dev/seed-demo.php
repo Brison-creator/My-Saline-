@@ -792,6 +792,136 @@ foreach ( $businesses as $b ) {
 WP_CLI::log( '  · ' . count( $businesses ) . ' businesses in ' . count( $biz_cats ) . ' categories' );
 
 /* -------------------------------------------------------------------------
+ * 5b. Local jobs
+ * ---------------------------------------------------------------------- */
+
+$job_cats = array( 'Healthcare', 'Trades', 'Retail & Food', 'Education', 'Public Sector' );
+$job_cat_ids = array();
+foreach ( $job_cats as $jc ) {
+	$term = term_exists( $jc, 'ms_job_cat' );
+	if ( ! $term ) {
+		$term = wp_insert_term( $jc, 'ms_job_cat' );
+	}
+	if ( ! is_wp_error( $term ) ) {
+		$job_cat_ids[ $jc ] = (int) ( is_array( $term ) ? $term['term_id'] : $term );
+	}
+}
+
+$jobs = array(
+	// Title, employer, location, type, pay, category, closes (+days), featured.
+	array( 'Registered Nurse — Med/Surg', 'Saline Memorial Hospital', 'Benton, AR', 'full-time', '$32–$38/hr', 'Healthcare', 24, true ),
+	array( 'HVAC Service Technician', 'Hurley Heat & Air', 'Bryant, AR', 'full-time', '$25–$34/hr', 'Trades', 30, true ),
+	array( 'Assistant Store Manager', 'Benton Hardware Co.', 'Benton, AR', 'full-time', '$44,000–$50,000/yr', 'Retail & Food', 18, false ),
+	array( 'School Bus Driver', 'Bryant School District', 'Bryant, AR', 'part-time', '$21/hr + training paid', 'Education', 40, false ),
+	array( 'Line Cook', 'Casa Verde', 'Benton, AR', 'part-time', '$15–$18/hr', 'Retail & Food', 12, false ),
+	array( 'Equipment Operator', 'Saline County Road Department', 'Saline County, AR', 'full-time', '$23/hr', 'Public Sector', 21, false ),
+	array( 'Dental Assistant', 'Saline Family Dental', 'Benton, AR', 'full-time', '$20–$24/hr', 'Healthcare', 27, false ),
+	array( 'Seasonal Groundskeeper', 'Benton Lawn & Landscape', 'Benton, AR', 'seasonal', '$16/hr', 'Trades', 9, false ),
+	// Deliberately in the past, to prove expiry actually removes it.
+	array( 'Front Desk Associate (filled)', 'Riverside Insurance', 'Bryant, AR', 'part-time', '$16/hr', 'Retail & Food', -6, false ),
+);
+
+$made_jobs = 0;
+foreach ( $jobs as $j ) {
+	list( $title, $employer, $location, $type, $pay, $cat, $days, $featured ) = $j;
+
+	$id = ms_seed_post(
+		$title,
+		'ms_job',
+		array(
+			'post_author'  => $seed_author,
+			'post_content' => ms_seed_body( 3 ),
+			'post_excerpt' => $employer . ' is hiring in ' . $location . '. ' . ucfirst( str_replace( '-', ' ', $type ) ) . ' position.',
+		)
+	);
+	if ( ! $id ) {
+		continue;
+	}
+
+	update_post_meta( $id, '_ms_job_employer', $employer );
+	update_post_meta( $id, '_ms_job_location', $location );
+	update_post_meta( $id, '_ms_job_type', $type );
+	update_post_meta( $id, '_ms_job_pay', $pay );
+	update_post_meta( $id, '_ms_job_apply', 'https://example.com/apply' );
+	update_post_meta( $id, '_ms_job_email', 'jobs@example.com' );
+	update_post_meta( $id, '_ms_job_closes', gmdate( 'Y-m-d', strtotime( ( $days >= 0 ? '+' : '' ) . $days . ' days' ) ) );
+	if ( $featured ) {
+		update_post_meta( $id, '_ms_job_featured', '1' );
+	}
+	if ( isset( $job_cat_ids[ $cat ] ) ) {
+		wp_set_object_terms( $id, array( $job_cat_ids[ $cat ] ), 'ms_job_cat' );
+	}
+	$made_jobs++;
+}
+WP_CLI::log( '  · ' . $made_jobs . ' job listings (one already closed, to prove expiry works)' );
+
+/* -------------------------------------------------------------------------
+ * 5c. Photo galleries
+ * ---------------------------------------------------------------------- */
+
+$galleries = array(
+	array( 'Salt Bowl 2026 in pictures', 'sports', 8 ),
+	array( 'Saline County Fair: opening night', 'community', 8 ),
+	array( 'Downtown Benton ribbon cutting', 'business', 6 ),
+	array( 'First day of school across the county', 'school', 6 ),
+);
+
+$made_galleries = 0;
+foreach ( $galleries as $g ) {
+	list( $gtitle, $gscene, $gcount ) = $g;
+
+	$id = ms_seed_post(
+		$gtitle,
+		'ms_gallery',
+		array(
+			'post_author'  => $seed_author,
+			'post_content' => 'Photographs by the MySaline newsroom.',
+			'post_excerpt' => 'A gallery from ' . $gtitle . '.',
+		)
+	);
+	if ( ! $id ) {
+		continue;
+	}
+
+	// Cover.
+	ms_seed_image( $id, 'gallery-cover-' . $gtitle, 1200, 675, $gscene );
+
+	// The gallery images themselves, attached to the post the way an upload is.
+	$existing = get_posts(
+		array(
+			'post_parent'    => $id,
+			'post_type'      => 'attachment',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		)
+	);
+	if ( count( $existing ) < 2 ) {
+		for ( $i = 0; $i < $gcount; $i++ ) {
+			$tmp = wp_insert_post(
+				array(
+					'post_type'   => 'ms_gallery',
+					'post_title'  => $gtitle . ' frame ' . $i,
+					'post_status' => 'draft',
+				)
+			);
+			if ( is_wp_error( $tmp ) || ! $tmp ) {
+				continue;
+			}
+			// Generate the frame, then re-parent it onto the gallery and bin the
+			// scratch post the generator needed to hang it on.
+			$att = ms_seed_image( $tmp, 'gallery-' . $gtitle . '-' . $i, 1000, 750, $gscene );
+			if ( $att ) {
+				wp_update_post( array( 'ID' => $att, 'post_parent' => $id, 'menu_order' => $i ) );
+				update_post_meta( $att, '_wp_attachment_image_alt', $gtitle );
+			}
+			wp_delete_post( $tmp, true );
+		}
+	}
+	$made_galleries++;
+}
+WP_CLI::log( '  · ' . $made_galleries . ' photo galleries' );
+
+/* -------------------------------------------------------------------------
  * 6. Advertisements (one per zone, using the code field so they render
  *    without needing uploaded creative)
  * ---------------------------------------------------------------------- */
@@ -1133,6 +1263,12 @@ ms_seed_post(
 	array( 'post_content' => '[mysaline_favorites_results]' )
 );
 
+$postjob_id = ms_seed_post(
+	'Post a Job',
+	'page',
+	array( 'post_content' => '[mysaline_post_a_job]' )
+);
+
 update_option( 'show_on_front', 'page' );
 update_option( 'page_on_front', $home_id );
 update_option( 'page_for_posts', $news_id );
@@ -1270,10 +1406,10 @@ ms_seed_menu(
 				array( 'title' => '911 Calls', 'cat' => $cat_ids['Public Records'] ),
 				array( 'title' => 'Marriage Licenses', 'cat' => $cat_ids['Public Records'] ),
 				array( 'title' => 'Sex Offender Registry', 'cat' => $cat_ids['Public Records'] ),
-				array( 'title' => 'Jobs Listings', 'cat' => $cat_ids['Public Records'] ),
 			),
 		),
 		array( 'title' => 'Obituaries', 'url' => get_post_type_archive_link( 'ms_obituary' ) ),
+		array( 'title' => 'Photos', 'url' => get_post_type_archive_link( 'ms_gallery' ) ),
 		array(
 			'title'    => 'Things To Do',
 			'url'      => get_post_type_archive_link( 'ms_event' ),
@@ -1291,6 +1427,8 @@ ms_seed_menu(
 			'url'      => get_category_link( $cat_ids['Business News'] ),
 			'children' => array(
 				array( 'title' => 'Business News', 'cat' => $cat_ids['Business News'] ),
+				array( 'title' => 'Local Jobs', 'url' => get_post_type_archive_link( 'ms_job' ) ),
+				array( 'title' => 'Post a Job — $10', 'page' => $postjob_id ),
 				array( 'title' => 'Business Directory', 'url' => get_post_type_archive_link( 'ms_business' ) ),
 				array( 'title' => 'Advertise with us', 'page' => $page_by( 'Advertise with us' ) ),
 			),
@@ -1327,6 +1465,8 @@ ms_seed_menu(
 		array( 'title' => 'Dining', 'cat' => $cat_ids['Dining'] ),
 		array( 'title' => 'Elections', 'cat' => $cat_ids['Elections'] ),
 		array( 'title' => 'Community', 'cat' => $cat_ids['Community'] ),
+		array( 'title' => 'Photos', 'url' => get_post_type_archive_link( 'ms_gallery' ) ),
+		array( 'title' => 'Local Jobs', 'url' => get_post_type_archive_link( 'ms_job' ) ),
 	)
 );
 WP_CLI::log( '  · 3 menus assigned (primary with dropdowns, top bar, footer)' );
@@ -1337,6 +1477,9 @@ WP_CLI::log( '  · 3 menus assigned (primary with dropdowns, top bar, footer)' )
 
 $mods = array(
 	// Identity / branding.
+	'mysaline_job_price'            => '$10',
+	'mysaline_job_days'             => 30,
+	'mysaline_job_submit_enable'    => true,
 	'mysaline_color_primary'        => '#0f2b4e',
 	'mysaline_color_accent'         => '#b2452f',
 	'mysaline_show_tagline'         => true,
@@ -1469,6 +1612,13 @@ update_option(
 	)
 );
 update_option(
+	'widget_mysaline_jobs',
+	array(
+		2        => array( 'title' => 'Who’s Hiring', 'number' => 4 ),
+		'_multiwidget' => 1,
+	)
+);
+update_option(
 	'widget_mysaline_weather',
 	array(
 		2        => array( 'title' => 'Saline County Weather' ),
@@ -1487,7 +1637,7 @@ if ( function_exists( 'mysaline_weather_refresh' ) ) {
 }
 
 $sidebars = get_option( 'sidebars_widgets', array() );
-$sidebars['sidebar-main'] = array( 'mysaline_weather-2', 'mysaline_ad-2', 'mysaline_recent-2', 'mysaline_events-2' );
+$sidebars['sidebar-main'] = array( 'mysaline_weather-2', 'mysaline_ad-2', 'mysaline_jobs-2', 'mysaline_recent-2', 'mysaline_events-2' );
 $sidebars['sidebar-home'] = array( 'mysaline_weather-2', 'mysaline_ad-2', 'mysaline_events-2' );
 // Footer columns already fall back to Sections / Community / More / Follow
 // Us, so seeding a social widget here just duplicated the last one.

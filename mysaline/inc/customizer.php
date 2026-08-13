@@ -125,6 +125,7 @@ function mysaline_customize_register( $wp_customize ) {
 	mysaline_customize_newsletter( $wp_customize );
 	mysaline_customize_social( $wp_customize );
 	mysaline_customize_dark_logo( $wp_customize );
+	mysaline_customize_jobs( $wp_customize );
 	mysaline_customize_weather( $wp_customize );
 	mysaline_customize_ads( $wp_customize );
 	mysaline_customize_footer( $wp_customize );
@@ -917,6 +918,90 @@ function mysaline_customize_dark_logo( $wp_customize ) {
 				'section'     => 'mysaline_branding',
 				'mime_type'   => 'image',
 			)
+		)
+	);
+}
+
+/**
+ * Paid job submissions.
+ *
+ * @param WP_Customize_Manager $wp_customize Manager.
+ */
+function mysaline_customize_jobs( $wp_customize ) {
+	$wp_customize->add_section(
+		'mysaline_jobs',
+		array(
+			'title'       => __( 'Post a Job (paid)', 'mysaline' ),
+			'panel'       => 'mysaline_panel',
+			'description' => __( 'Sell job listings. Employers submit through the form, pay on your payment page, and the listing publishes when you approve it — no card details ever touch this site. Use a Stripe Payment Link, a PayPal button or PayPal.me: all free to create.', 'mysaline' ),
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_job_submit_enable',
+		array(
+			'default'           => true,
+			'sanitize_callback' => 'mysaline_sanitize_checkbox',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_job_submit_enable',
+		array(
+			'type'    => 'checkbox',
+			'label'   => __( 'Accept paid job listings', 'mysaline' ),
+			'section' => 'mysaline_jobs',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_job_price',
+		array(
+			'default'           => '$10',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_job_price',
+		array(
+			'type'        => 'text',
+			'label'       => __( 'Price', 'mysaline' ),
+			'description' => __( 'Shown on the button and the jobs board. Set the actual amount on your payment page too.', 'mysaline' ),
+			'section'     => 'mysaline_jobs',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_job_days',
+		array(
+			'default'           => 30,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_job_days',
+		array(
+			'type'        => 'number',
+			'label'       => __( 'Days the listing runs', 'mysaline' ),
+			'description' => __( 'The closing date is set from this, not from anything the employer types.', 'mysaline' ),
+			'section'     => 'mysaline_jobs',
+			'input_attrs' => array( 'min' => 1, 'max' => 365 ),
+		)
+	);
+
+	$wp_customize->add_setting(
+		'mysaline_job_pay_url',
+		array(
+			'default'           => '',
+			'sanitize_callback' => 'esc_url_raw',
+		)
+	);
+	$wp_customize->add_control(
+		'mysaline_job_pay_url',
+		array(
+			'type'        => 'url',
+			'label'       => __( 'Payment page URL', 'mysaline' ),
+			'description' => __( 'Where employers are sent after submitting. Leave blank and they will simply see a thank-you.', 'mysaline' ),
+			'section'     => 'mysaline_jobs',
 		)
 	);
 }

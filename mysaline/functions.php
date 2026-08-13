@@ -49,6 +49,9 @@ $mysaline_modules = array(
 	'breaking-news',      // Breaking-news data helpers.
 	'events',             // Event query/date helpers.
 	'weather',            // Local conditions from the National Weather Service.
+	'jobs',               // Local hiring board, with listings that expire on their own.
+	'job-submit',         // Paid "Post a Job" submissions, approved before they publish.
+	'galleries',          // Photo galleries drawn from the media library.
 	'homepage',           // Featured hero + configurable homepage sections.
 	'favorites',          // Saline County Favorites voting ballot.
 	'seo',                // Open Graph, Twitter cards, JSON-LD structured data.
