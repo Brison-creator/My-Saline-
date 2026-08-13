@@ -133,6 +133,7 @@ expects for **Appearance → Themes → Add New → Upload Theme**.
 - [`docs/INSTALLATION.md`](docs/INSTALLATION.md) — set up a dev site and the theme
 - [`docs/CONTENT-MANAGEMENT.md`](docs/CONTENT-MANAGEMENT.md) — manage every feature from the dashboard
 - [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — package and upload to the MySaline server safely
+- [`docs/AWS-DEPLOYMENT.md`](docs/AWS-DEPLOYMENT.md) — standing up the `mysaline.net` staging site on AWS
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — code layout, standards, how to extend
 
 ## License
